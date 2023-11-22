@@ -1,0 +1,62 @@
+<%- include("partials/header.ejs") %>
+
+    <div id="main-container">
+        <div style="float: left;">
+            <div>
+                <h3 style="text-align: center;">Texto Analizado</h1>
+            </div>
+            <div class="container text-container">
+                <p class="result-p"><%- scanText %> </p>
+            </div>
+        </div>
+        <div class="container result-container">
+            <table class="result-table">
+                <thead id="result-head">
+                    <tr>
+                        <th>Produto</th>
+                        <th style="font-weight: bold; text-align: right;">Unidade</th>
+                        <th style="text-align: right;">Valor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% for(let i=0; i <items.length; i++) {%>
+                        <% if (i==(items.length - 1)) {%>
+                            <tr class="total-row">
+                                <td class="total-name">
+                                    <%= items[i].nome %>
+                                </td>
+                                <td class="total-value">
+                                    <%= items[i].quantidade %>
+                                </td>
+                                <td class="total-value"> R$ <%= items[i].valor %>,00</td>
+                                <% } else if (items[i].valor=="Indisponível" ) {%>
+                            <tr class="table-row">
+                                <td class="resul-name">
+                                    <%= items[i].nome %>
+                                </td>
+                                <td class="resul-value">
+                                    <%= items[i].quantidade %>
+                                </td>
+                                <td class="resul-value">
+                                    <%= items[i].valor %>
+                                </td>
+                                <% } else { %>
+                            <tr class="table-row">
+                                <td class="resul-name">
+                                    <%= items[i].nome %>
+                                </td>
+                                <td class="resul-value">
+                                    <%= items[i].quantidade %>
+                                </td>
+                                <td class="resul-value">R$
+                                    <%= items[i].valor %>,00
+                                </td>
+                                <% } %>
+                            </tr>
+                            <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <%- include("partials/footer.ejs") %>

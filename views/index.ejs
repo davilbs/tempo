@@ -1,0 +1,26 @@
+<%- include("partials/header.ejs") %>
+
+    <div id="main-container" style="margin: auto;">
+        <div id="form-container" class="container upload-container">
+            <form id="file-upload-form" action="/calculate" enctype="multipart/form-data" method="POST">
+                <div>
+                    <input id='file-upload' type="file" name="prescription" style="display: none;">
+                    <label for="file-upload" class="file-upload" id="file-drag">
+                        <div id="start">
+                            <div id="file-upload-btn" class="file-button">
+                                Selecionar Arquivo<i style="margin-left: 23px;" class="fa fa-upload"></i>
+                            </div>
+                            <button type="button" id="submit-button" class="upload-button">Upload</button>
+                        </div>
+                    </div>
+                </label>
+                <div id="notimage"  class="warn-message hidden">Erro. Arquivo não suportado.</div>
+            </form>
+        </div>
+        <p class="file-types">Arquivos suportados .PDF, .JPG, .JPEG</p>
+    </div>
+
+    <script src="/scripts/script.js"></script>
+
+
+    <%- include("partials/footer.ejs") %>

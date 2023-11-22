@@ -1,0 +1,31 @@
+<%- include("partials/header.ejs") %>
+
+<div class="fade-container">
+    <h2>Tabela de Preços</h2>
+    <div class="container table-container">
+        <table>
+            <thead>
+                
+            </thead>
+            <tr>
+                <th>Produto</th>
+                <th style="font-weight: bold; text-align: right;">Unidade</th>
+                <th style="text-align: right;">Valor unitário</th>
+            </tr>
+            <% for(let i=0; i <items.length; i++) {%>
+                <tr class="table-row">
+                    <td class="med-name">
+                        <%= items[i].nome %>
+                            </td>
+                    <td class="med-value">
+                        <%= items[i].unidade %>
+                            </td>
+                    <td class="med-value">
+                        <%= items[i].preco %>,00</td>
+                </tr>
+                <% } %>
+        </table>
+    </div>
+</div>
+
+<%- include("partials/footer.ejs") %>
