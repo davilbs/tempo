@@ -45,6 +45,7 @@ function ekUpload() {
         }
         else {
             document.getElementById('notimage').classList.add("hidden");
+            document.getElementById('parseError').classList.add("hidden");
             document.getElementById('form-container').classList.add("upload-container");
             document.getElementById('form-container').classList.remove("upload-container-error");
             output(

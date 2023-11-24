@@ -17,7 +17,9 @@
                 <div id="notimage" class="warn-message hidden">Erro. Arquivo não suportado.</div>
                 <% if(parseError) {%>
                     <div id="parseError" class="warn-message">Erro ao analisar documento.</div>
-                    <%}%>
+                    <%} else { %>
+                        <div id="parseError" class="warn-message hidden">Erro ao analisar documento.</div>
+                        <% } %>
             </form>
         </div>
         <p class="file-types">Arquivos suportados .PDF, .JPG, .JPEG</p>
