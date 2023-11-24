@@ -301,10 +301,10 @@ textarea {
   cursor: pointer;
   float: left;
   color: #BBA263;
-  text-align: left;
+  text-align: center;
   font: normal normal normal 16px/24px Roboto;
   letter-spacing: 0.5px;
   min-width: 214px;
-  padding: 20px 14px 20px 16px;
+  padding: 20px 8px 20px 16px;
   font-weight: 700;
 }
