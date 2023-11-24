@@ -108,6 +108,7 @@ app.get("/results", (req, res, next) => {
                             res.render("resultado.ejs", { items: JSON.parse(output3).items, scanText: inText.toString().replace(/(?:\r\n|\r|\n)/g, '<br/>') });
                         } catch (err) {
                             console.log(err)
+                            res.render("index.ejs");
                         }
                     })
                 });
