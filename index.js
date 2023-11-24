@@ -23,7 +23,7 @@ app.use(express.urlencoded({ extended: true }))
 const spawn = require('child_process').spawn;
 
 app.get("/", (req, res) => {
-    res.render("index.ejs");
+    res.render("index.ejs", {parseError: false});
 })
 
 app.get("/table", (req, res) => {
@@ -71,6 +71,7 @@ app.get("/results", (req, res, next) => {
                 res.render("resultado.ejs", { items: JSON.parse(output4).items, scanText: inText.toString().replace(/(?:\r\n|\r|\n)/g, '<br/>') });
             } catch (err) {
                 console.log(err)
+                res.render("index.ejs", { parseError: true });
             }
         })
     } else {
@@ -108,7 +109,7 @@ app.get("/results", (req, res, next) => {
                             res.render("resultado.ejs", { items: JSON.parse(output3).items, scanText: inText.toString().replace(/(?:\r\n|\r|\n)/g, '<br/>') });
                         } catch (err) {
                             console.log(err)
-                            res.render("index.ejs");
+                            res.render("index.ejs", { parseError: true });
                         }
                     })
                 });

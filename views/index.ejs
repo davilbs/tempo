@@ -12,9 +12,12 @@
                             </div>
                             <button type="button" id="submit-button" class="upload-button">Upload</button>
                         </div>
-                    </div>
+                </div>
                 </label>
-                <div id="notimage"  class="warn-message hidden">Erro. Arquivo não suportado.</div>
+                <div id="notimage" class="warn-message hidden">Erro. Arquivo não suportado.</div>
+                <% if(parseError) {%>
+                    <div id="parseError" class="warn-message">Erro ao analisar documento.</div>
+                    <%}%>
             </form>
         </div>
         <p class="file-types">Arquivos suportados .PDF, .JPG, .JPEG</p>
