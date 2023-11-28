@@ -2,6 +2,7 @@ const express = require("express")
 const fs = require("fs");
 const multer = require("multer")
 const path = require("path")
+const https = require('https')
 
 var app = express();
 const port = 3000;
@@ -16,7 +17,7 @@ const storage = multer.diskStorage({
 })
 const upload = multer({ storage: storage })
 
-app.use(express.static("public"));
+app.use(express.static("public", {dotfiles: 'allow'}));
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
@@ -120,4 +121,15 @@ app.get("/results", (req, res, next) => {
 
 app.listen(port, () => {
     console.log(`Server started on port ${port}`);
+})
+
+https.createServer(
+    {
+        key: fs.readFileSync('/etc/letsencrypt/live/quoter-mvp.anaai.com.br/privkey.pem'),
+        cert: fs.readFileSync('/etc/letsencrypt/live/quoter-mvp.anaai.com.br/cert.pem'),
+        ca: fs.readFileSync('/etc/letsencrypt/live/quoter-mvp.anaai.com.br/chain.pem'),
+    },
+    app
+).listen(443, () => {
+    console.log("Server running also on 443")
 })
