@@ -4,14 +4,22 @@ import json
 import sys
 import re
 
+# UFC   -> Unidades Formadoras de Colonia
+# UI    -> Unidades Internacionais
+# conversao de UI para gramas e arbitrario, cada medicamento tem sua conversao
+# VO    -> Via Oral
+# CP    -> Capsula
+
 def lookup(cur, medicamento, response_json, total_cost, total_qtd):
     nome = medicamento["nome"].upper()
     cur.execute("SELECT dosage, value FROM medicines WHERE name=?", (nome,))
     rows = cur.fetchall()
-    quantidade = int(medicamento["posologia"])* int(medicamento["duracao"])
+    posology = re.search(r'\d+', str(medicamento["posologia"]))[0]
+    duration = re.search(r'\d+', str(medicamento["duracao"]))[0]
+    quantidade = int(posology) * int(duration)
     if len(rows) > 0:
         row = rows[0]
-        quantidade_real = float(re.split(r'\D+', medicamento["dosagem"])[0]) / float(row[0].split(' ')[0])
+        # quantidade_real = float(re.split(r'\D+', medicamento["dosagem"])[0]) / float(row[0].split(' ')[0])
         total_cost += (row[1] * quantidade)
         total_qtd += quantidade
         valor = row[1] * quantidade
@@ -36,7 +44,10 @@ def main():
         for medicamento in parsed_answer["medicamentos"]:
             if ("ingredientes" in medicamento.keys()) and (len(medicamento["ingredientes"]) > 1):
                 for ingrediente in medicamento["ingredientes"]:
-                    ingrediente["posologia"] = ingrediente["quantidade"]
+                    if len(ingrediente["quantidade"]) >= 1:
+                        ingrediente["posologia"] = ingrediente["quantidade"]
+                    else:
+                        ingrediente["posologia"] = medicamento["posologia"]
                     ingrediente["duracao"] = medicamento["duracao"]
                     ingrediente["dosagem"] = medicamento["dosagem"]
                     total_cost, total_qtd = lookup(cur, ingrediente, response_json, total_cost, total_qtd)

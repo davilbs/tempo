@@ -1,5 +1,4 @@
 <%- include("partials/header.ejs") %>
-
     <div id="main-container" style="margin: auto;">
         <div id="form-container" class="container upload-container">
             <form id="file-upload-form" action="/calculate" enctype="multipart/form-data" method="POST">
@@ -14,6 +13,7 @@
                         </div>
                 </div>
                 </label>
+                <div id="updatable-content" class="loading-message"></div>
                 <div id="notimage" class="warn-message hidden">Erro. Arquivo não suportado.</div>
                 <% if(parseError) {%>
                     <div id="parseError" class="warn-message">Erro ao analisar documento.</div>

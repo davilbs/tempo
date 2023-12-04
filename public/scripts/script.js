@@ -12,6 +12,15 @@ function ekUpload() {
         submitButton.addEventListener('click', uploadFile, false)
     }
 
+    function AddLoading(filename) {
+        var source = new EventSource("/events?filename=" + filename);
+        source.addEventListener('message', (message) => {
+            console.log("received message", message);
+
+            document.querySelector('#updatable-content').innerHTML = event.data
+        });
+    }
+
     function fileSelectHandler(e) {
         // Fetch FileList object
         var files = e.target.files || e.dataTransfer.files;
@@ -58,8 +67,9 @@ function ekUpload() {
         e.preventDefault()
         const file = document.getElementById("file-upload")
         console.log(file.files)
-        if(file.files.length > 0){
+        if (file.files.length > 0) {
             document.getElementById("file-upload-form").submit()
+            AddLoading(file.files[0].name)
         }
     }
 

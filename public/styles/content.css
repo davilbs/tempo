@@ -294,6 +294,10 @@ textarea {
   color: red;
 }
 
+.loading-message {
+  text-align: center;
+}
+
 .file-button {
   background: #FFFFFF;
   border-radius: 50px;
