@@ -1,6 +1,7 @@
 # https://tesseract-ocr.github.io/
 import os
 import sys
+from PIL import Image
 from tika import parser
 
 
@@ -21,6 +22,10 @@ def main():
     if exten == "pdf":
         raw = parser.from_file(document)
     else:
+        im = Image.open(document)
+        w, h = im.size
+        im_resized = im.resize((w, h), resample=Image.HAMMING)
+        im_resized.save(document)
         raw = parser.from_file(document, headers=headers)
 
     if raw["content"] == None:
