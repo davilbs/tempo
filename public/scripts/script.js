@@ -47,6 +47,7 @@ function ekUpload() {
             document.getElementById('notimage').classList.remove("hidden");
             document.getElementById('form-container').classList.remove("upload-container");
             document.getElementById('form-container').classList.add("upload-container-error");
+            document.getElementById("loading-bar").classList.add("hidden");
             output(
                 'Selecionar Arquivo<i style="margin-left: 23px;" class="fa fa-upload"></i>'
             );
@@ -57,6 +58,7 @@ function ekUpload() {
             document.getElementById('parseError').classList.add("hidden");
             document.getElementById('form-container').classList.add("upload-container");
             document.getElementById('form-container').classList.remove("upload-container-error");
+            document.getElementById("loading-bar").classList.remove("hidden");
             output(
                 encodeURI(file.name) + '<i style="margin-left: 23px;" class="fa fa-upload"></i>'
             );
@@ -79,3 +81,24 @@ function ekUpload() {
     }
 }
 ekUpload();
+// regras de associacao
+// predict potential top cluster prescriptors
+// semaforo de atendimento
+function updateBar(target) {
+    var i = 0;
+    if (i == 0) {
+      i = 1;
+      var elem = document.getElementById("progress-bar");
+      var width = 1;
+      var id = setInterval(frame, 100, {target});
+      function frame(target) {
+        if (width >= target) {
+          clearInterval(id);
+          i = 0;
+        } else {
+          width++;
+          elem.style.width = width + "%";
+        }
+      }
+    }
+  }

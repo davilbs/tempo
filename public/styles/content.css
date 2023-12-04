@@ -298,6 +298,19 @@ textarea {
   text-align: center;
 }
 
+#loading-bar{
+  width: 100%;
+  background-color: grey;
+  border-radius: 50px;
+}
+
+#progress-bar{
+  width: 0%;
+  height: 30px;
+  background-color: #BBA263;
+  border-radius: 50px;
+}
+
 .file-button {
   background: #FFFFFF;
   border-radius: 50px;
