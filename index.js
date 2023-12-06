@@ -6,7 +6,7 @@ const https = require('https');
 const md5 = require("md5");
 
 var app = express();
-const port = 80;
+const port = 3000;
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -23,7 +23,6 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
 const spawn = require('child_process').spawn;
-var loading_status = "Fazendo upload do arquivo... (1/3)";
 
 app.get("/", (req, res) => {
     res.render("index.ejs", { parseError: false });
@@ -52,6 +51,9 @@ app.post("/calculate", upload.single("prescription"), (req, res, next) => {
 });
 
 app.get('/events', async function (req, res) {
+    var loading_status = "Fazendo upload do arquivo... (1/3)";
+    var loading_code = 0;
+
     console.log("Current status", loading_status);
     console.log('Got /events with argument ' + req.query.filename);
     let filename = md5(req.query.filename).split('.')[0];
@@ -88,16 +90,19 @@ app.get('/events', async function (req, res) {
                 curr_ext = ".json";
                 directory = __dirname + "/processed/";
                 loading_status = "Identificando medicamentos... (3/3)";
+                loading_code = 2;
             }
             else if (curr_ext == ".json") {
                 loading_status = "Processo finalizado!";
+                loading_code = 3;
             } else {
                 curr_ext = ".txt";
                 directory = __dirname + "/scans/";
                 loading_status = "Analisando texto... (2/3)";
+                loading_code = 1;
             }
         }
-        res.write(`data: ${loading_status}\n\n`);
+        res.write(`data: {"status_text": "${loading_status}", "status_code": ${loading_code}}\n\n`);
     }
 })
 
@@ -199,13 +204,13 @@ app.listen(port, () => {
     console.log(`Server started on port ${port}`);
 })
 
-https.createServer(
-    {
-        key: fs.readFileSync('/etc/letsencrypt/live/quoter-mvp.anaai.com.br/privkey.pem'),
-        cert: fs.readFileSync('/etc/letsencrypt/live/quoter-mvp.anaai.com.br/cert.pem'),
-        ca: fs.readFileSync('/etc/letsencrypt/live/quoter-mvp.anaai.com.br/chain.pem'),
-    },
-    app
-).listen(443, () => {
-    console.log("Server running also on 443")
-})
+// https.createServer(
+//     {
+//         key: fs.readFileSync('/etc/letsencrypt/live/quoter-mvp.anaai.com.br/privkey.pem'),
+//         cert: fs.readFileSync('/etc/letsencrypt/live/quoter-mvp.anaai.com.br/cert.pem'),
+//         ca: fs.readFileSync('/etc/letsencrypt/live/quoter-mvp.anaai.com.br/chain.pem'),
+//     },
+//     app
+// ).listen(443, () => {
+//     console.log("Server running also on 443")
+// })

@@ -14,8 +14,15 @@
                 </div>
                 </label>
                 <div id="updatable-content" class="loading-message"></div>
-                <div id="loading-bar" class="hidden">
-                    <div id="progress-bar"></div>
+                <div id="loading-container" class="hidden">
+                    <div class="lds-facebook">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                    <div id="loading-bar">
+                        <div id="progress-bar"></div>
+                    </div>
                 </div>
                 <div id="notimage" class="warn-message hidden">Erro. Arquivo não suportado.</div>
                 <% if(parseError) {%>

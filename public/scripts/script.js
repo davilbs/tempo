@@ -12,12 +12,39 @@ function ekUpload() {
         submitButton.addEventListener('click', uploadFile, false)
     }
 
+    var i = 0;
+    var curr_width = 0;
+    function updateBar(target) {
+        i = 1;
+        var elem = document.getElementById("progress-bar");
+        console.log("Atualizando barra ", curr_width, target);
+        var id = setInterval(frame, 100, target);
+        function frame(target) {
+            console.log(curr_width, target)
+            if (curr_width >= target) {
+                console.log("Clearing interval for ", target)
+                if (curr_width < 95) {
+                    i = 0;
+                }
+                clearInterval(id);
+            } else {
+                curr_width++;
+                elem.style.width = curr_width + "%";
+            }
+        }
+    }
+
     function AddLoading(filename) {
         var source = new EventSource("/events?filename=" + filename);
         source.addEventListener('message', (message) => {
             console.log("received message", message);
-
-            document.querySelector('#updatable-content').innerHTML = event.data
+            var data_json = JSON.parse(message.data)
+            console.log(i)
+            if (i == 0) {
+                console.log(data_json)
+                updateBar(data_json.status_code * 33);
+            }
+            document.querySelector('#updatable-content').innerHTML = data_json.status_text
         });
     }
 
@@ -47,18 +74,17 @@ function ekUpload() {
             document.getElementById('notimage').classList.remove("hidden");
             document.getElementById('form-container').classList.remove("upload-container");
             document.getElementById('form-container').classList.add("upload-container-error");
-            document.getElementById("loading-bar").classList.add("hidden");
             output(
                 'Selecionar Arquivo<i style="margin-left: 23px;" class="fa fa-upload"></i>'
             );
             document.getElementById("file-upload-form").reset();
+            document.getElementById("loading-container").classList.add("hidden");
         }
         else {
             document.getElementById('notimage').classList.add("hidden");
             document.getElementById('parseError').classList.add("hidden");
             document.getElementById('form-container').classList.add("upload-container");
             document.getElementById('form-container').classList.remove("upload-container-error");
-            document.getElementById("loading-bar").classList.remove("hidden");
             output(
                 encodeURI(file.name) + '<i style="margin-left: 23px;" class="fa fa-upload"></i>'
             );
@@ -71,6 +97,7 @@ function ekUpload() {
         console.log(file.files)
         if (file.files.length > 0) {
             document.getElementById("file-upload-form").submit()
+            document.getElementById("loading-container").classList.remove("hidden");
             AddLoading(file.files[0].name)
         }
     }
@@ -84,21 +111,3 @@ ekUpload();
 // regras de associacao
 // predict potential top cluster prescriptors
 // semaforo de atendimento
-function updateBar(target) {
-    var i = 0;
-    if (i == 0) {
-      i = 1;
-      var elem = document.getElementById("progress-bar");
-      var width = 1;
-      var id = setInterval(frame, 100, {target});
-      function frame(target) {
-        if (width >= target) {
-          clearInterval(id);
-          i = 0;
-        } else {
-          width++;
-          elem.style.width = width + "%";
-        }
-      }
-    }
-  }
