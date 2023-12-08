@@ -14,11 +14,11 @@ function ekUpload() {
 
     var i = 0;
     var curr_width = 0;
-    function updateBar(target) {
+    function updateBar(target, delay) {
         i = 1;
         var elem = document.getElementById("progress-bar");
         console.log("Atualizando barra ", curr_width, target);
-        var id = setInterval(frame, 100, target);
+        var id = setInterval(frame, delay, target);
         function frame(target) {
             console.log(curr_width, target)
             if (curr_width >= target) {
@@ -40,9 +40,15 @@ function ekUpload() {
             console.log("received message", message);
             var data_json = JSON.parse(message.data)
             console.log(i)
+            var delay = 100;
+            var delta = (data_json.status_code + 1) * 33;
             if (i == 0) {
                 console.log(data_json)
-                updateBar(data_json.status_code * 33);
+                if (data_json.status_code == 2){
+                    delta -= 5;
+                    delay = 1500;
+                }
+                updateBar(delta, delay);
             }
             document.querySelector('#updatable-content').innerHTML = data_json.status_text
         });
