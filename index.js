@@ -4,6 +4,7 @@ const multer = require("multer");
 const path = require("path");
 const https = require('https');
 const md5 = require("md5");
+const session = require('express-session');
 
 var app = express();
 const port = 3000;
@@ -13,7 +14,8 @@ const storage = multer.diskStorage({
         cb(null, 'uploads/')
     },
     filename: function (req, file, cb) {
-        cb(null, md5(file.originalname) + path.extname(file.originalname))
+        console.log("Got filename salt", req.session.salt)
+        cb(null, md5(file.originalname + req.session.salt) + path.extname(file.originalname))
     }
 })
 const upload = multer({ storage: storage })
@@ -21,10 +23,18 @@ const upload = multer({ storage: storage })
 app.use(express.static("public", { dotfiles: 'allow' }));
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+app.use(session({ secret: 'keyboard cat', resave: false, saveUninitialized: true, cookie: { maxAge: 60000 } }));
 
 const spawn = require('child_process').spawn;
 
 app.get("/", (req, res) => {
+    if(req.session.salt)
+    {
+        console.log("Salt already setup");
+    }else{
+        req.session.salt = md5(Date.now())
+        console.log("Setup salt to", req.session.salt)
+    }
     res.render("index.ejs", { parseError: false });
 })
 
@@ -56,7 +66,7 @@ app.get('/events', async function (req, res) {
 
     console.log("Current status", loading_status);
     console.log('Got /events with argument ' + req.query.filename);
-    let filename = md5(req.query.filename).split('.')[0];
+    let filename = md5(req.query.filename + req.session.salt);
     let curr_ext = path.extname(req.query.filename);
     let directory = __dirname + "/uploads/";
     console.log("Filename: " + filename)
