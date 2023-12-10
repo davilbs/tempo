@@ -43,7 +43,7 @@ function build_table(json) {
         table_content += '</td> <td class="med-value">';
         table_content += item.unidade;
         table_content += '</td> <td class="med-value"> BRK$ ';
-        table_content += item.preco.toLocaleString(undefined);
+        table_content += item.preco.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
         table_content += '</td> </tr>';
     }
     table_content += '</tbody>'

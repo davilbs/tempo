@@ -28,7 +28,7 @@
                                 <td class="total-value">
                                     <%= items[i].quantidade %>
                                 </td>
-                                <td class="total-value"> BRK$ <%= items[i].valor.toLocaleString(undefined) %></td>
+                                <td class="total-value"> BRK$ <%= items[i].valor.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) %></td>
                                 <% } else if (items[i].valor=="Indisponível" ) {%>
                             <tr class="table-row">
                                 <td class="resul-name">
@@ -49,7 +49,7 @@
                                     <%= items[i].quantidade %>
                                 </td>
                                 <td class="resul-value">BRK$
-                                    <%= items[i].valor.toLocaleString(undefined) %>
+                                    <%= items[i].valor.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) %>
                                 </td>
                                 <% } %>
                             </tr>
