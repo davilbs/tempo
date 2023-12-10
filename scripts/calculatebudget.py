@@ -23,11 +23,13 @@ def lookup(cur, medicamento, response_json, total_cost, total_qtd):
     if len(rows) > 0:
         row = rows[0]
         # quantidade_real = float(re.split(r'\D+', medicamento["dosagem"])[0]) / float(row[0].split(' ')[0])
-        valor = round(float(row[1] * quantidade), 2)
+        valor = round(float((row[1] / row[0]) * quantidade), 2)
     else:
-        valor = round(uniform(1, 2), 2)
-        print(f"INSERT INTO medicines VALUES ('{nome}', '{randint(1, 3)}', {valor});")
-        cur.execute(f"INSERT INTO medicines VALUES ('{nome}', '{randint(1, 3)}', {valor});")
+        price = round(uniform(1, 2), 2)
+        amount = randint(1, 5)
+        valor = round((price/amount) * quantidade, 2)
+        print(f"INSERT INTO medicines VALUES ('{nome}', '{amount}', {valor});")
+        cur.execute(f"INSERT INTO medicines VALUES ('{nome}', '{amount}', {valor});")
         cur.execute('COMMIT')
     total_cost += valor
     response_json["items"].append({"nome": nome, "quantidade": quantidade, "valor": valor})
