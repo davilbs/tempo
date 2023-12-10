@@ -9,8 +9,8 @@ with open("Ativos.csv", "r") as sourc:
     for line in sourc.readlines():
         line = line.split(";")
         value = round(uniform(1, 3), 2)
-        print(f"INSERT INTO medicines VALUES ('{unidecode(line[0].upper())}', '{line[1].lstrip().rstrip()}', {value});")
-        cur.execute(f"INSERT INTO medicines VALUES ('{line[0].upper()}', '{line[1].lstrip().rstrip()}', {value});")
+        print(f"INSERT INTO medicines VALUES ('{unidecode(line[0].upper())}', {float(line[1].lstrip().rstrip())}, {value});")
+        cur.execute(f"INSERT INTO medicines VALUES ('{unidecode(line[0].upper())}', {float(line[1].lstrip().rstrip())}, {value});")
         cur.execute('COMMIT')
 
 cur.execute("SELECT * FROM medicines")
