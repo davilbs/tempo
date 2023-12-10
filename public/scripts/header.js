@@ -10,7 +10,11 @@ function new_budget(e) {
 function show_table(e) {
     // check if table size is greater than 0
     console.log(window.location);
-    var endpoint = "http://" + window.location.host + "/table"
+    if (window.location.includes("https://")){
+        var endpoint = "https://" + window.location.host + "/table"
+    }else {
+        var endpoint = "http://" + window.location.host + "/table"
+    }
     console.log(endpoint)
     document.getElementById("overlay").classList.remove("hidden");
     var resultHeader = document.getElementById("result-head");
