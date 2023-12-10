@@ -3,6 +3,8 @@ import os
 import json
 import sys
 import re
+from random import uniform, randint
+from unidecode import unidecode
 
 # UFC   -> Unidades Formadoras de Colonia
 # UI    -> Unidades Internacionais
@@ -11,21 +13,23 @@ import re
 # CP    -> Capsula
 
 def lookup(cur, medicamento, response_json, total_cost, total_qtd):
-    nome = medicamento["nome"].upper()
+    nome = unidecode(medicamento["nome"].upper())
     cur.execute("SELECT dosage, value FROM medicines WHERE name=?", (nome,))
     rows = cur.fetchall()
     posology = re.search(r'\d+', str(medicamento["posologia"]))[0]
     duration = re.search(r'\d+', str(medicamento["duracao"]))[0]
     quantidade = int(posology) * int(duration)
+    total_qtd += quantidade
     if len(rows) > 0:
         row = rows[0]
         # quantidade_real = float(re.split(r'\D+', medicamento["dosagem"])[0]) / float(row[0].split(' ')[0])
-        total_cost += (row[1] * quantidade)
-        total_qtd += quantidade
-        valor = row[1] * quantidade
+        valor = round(float(row[1] * quantidade), 2)
     else:
-        valor = "Indisponível"
-        quantidade = "-"
+        valor = round(uniform(1, 2), 2)
+        print(f"INSERT INTO medicines VALUES ('{nome}', '{randint(1, 3)}', {valor});")
+        cur.execute(f"INSERT INTO medicines VALUES ('{nome}', '{randint(1, 3)}', {valor});")
+        cur.execute('COMMIT')
+    total_cost += valor
     response_json["items"].append({"nome": nome, "quantidade": quantidade, "valor": valor})
     return total_cost, total_qtd
 
@@ -44,16 +48,15 @@ def main():
         for medicamento in parsed_answer["medicamentos"]:
             if ("ingredientes" in medicamento.keys()) and (len(medicamento["ingredientes"]) > 1):
                 for ingrediente in medicamento["ingredientes"]:
-                    if len(ingrediente["quantidade"]) >= 1:
-                        ingrediente["posologia"] = ingrediente["quantidade"]
+                    if len(ingrediente["dosagem"]) >= 1:
+                        ingrediente["posologia"] = ingrediente["dosagem"]
                     else:
                         ingrediente["posologia"] = medicamento["posologia"]
                     ingrediente["duracao"] = medicamento["duracao"]
-                    ingrediente["dosagem"] = medicamento["dosagem"]
                     total_cost, total_qtd = lookup(cur, ingrediente, response_json, total_cost, total_qtd)
             else:
                 total_cost, total_qtd = lookup(cur, medicamento, response_json, total_cost, total_qtd)
-        response_json["items"].append({"nome": "TOTAL", "quantidade": total_qtd, "valor": total_cost})
+        response_json["items"].append({"nome": "TOTAL", "quantidade": total_qtd, "valor": round(total_cost, 2)})
         answer.close()
     return response_json
 

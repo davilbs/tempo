@@ -42,9 +42,9 @@ function build_table(json) {
         table_content += item.nome;
         table_content += '</td> <td class="med-value">';
         table_content += item.unidade;
-        table_content += '</td> <td class="med-value"> R$ ';
-        table_content += item.preco;
-        table_content += ',00</td> </tr>';
+        table_content += '</td> <td class="med-value"> BRK$ ';
+        table_content += item.preco.toLocaleString(undefined);
+        table_content += '</td> </tr>';
     }
     table_content += '</tbody>'
     var m = document.getElementById('product-table');
