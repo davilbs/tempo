@@ -27,8 +27,8 @@ def lookup(cur, medicamento, response_json, total_cost, total_qtd):
     else:
         price = round(uniform(1, 2), 2)
         amount = randint(1, 5)
-        print(f"INSERT INTO medicines VALUES ('{nome}', '{amount}', {price});")
-        cur.execute(f"INSERT INTO medicines VALUES ('{nome}', '{amount}', {price});")
+        print(f"INSERT INTO medicines VALUES ('{nome}', {amount}, {price});")
+        cur.execute(f"INSERT INTO medicines VALUES ('{nome}', {amount}, {price});")
         cur.execute('COMMIT')
         valor = round((price/amount) * quantidade, 2)
     total_cost += valor
