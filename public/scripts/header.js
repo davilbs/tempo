@@ -10,7 +10,7 @@ function new_budget(e) {
 function show_table(e) {
     // check if table size is greater than 0
     console.log(window.location);
-    if (window.location.includes("https://")){
+    if (window.location.href.includes("https://")){
         var endpoint = "https://" + window.location.host + "/table"
     }else {
         var endpoint = "http://" + window.location.host + "/table"
