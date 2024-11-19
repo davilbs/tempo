@@ -1,0 +1,45 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+.table-container {
+    width: 80%;
+    margin: 20px auto;
+    border-collapse: collapse;
+}
+
+table {
+    width: 100%;
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+}
+
+th,
+td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    background-color: #f2f2f2;
+    text-align: left;
+}
+
+.header-row {
+    background-color: #f9f9f9;
+}
+
+.total-row {
+    font-weight: bold;
+    background-color: #f1f1f1;
+    text-align: left;
+}
+
+.price-column {
+    text-align: right;
+}
+
+.text-center {
+    text-align: center;
+}
