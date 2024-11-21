@@ -48,6 +48,11 @@ class orcamentoClass:
         self.choose_embalagem()
         self.print_orcamento()
 
+    # TODO: implement this method to update the price without
+    # choose anything, only using what it receives
+    def getPrice(self, orcamento_values):
+        return
+
     def do_descr_match(self, target, df):
         if df['DESCR'].str.contains(target, case=False, na=False).any():
             return df[df['DESCR'].str.contains(target, case=False, na=False)]
