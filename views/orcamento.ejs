@@ -14,31 +14,19 @@
         <!-- Header Information -->
         <table>
             <tr>
-                <td>Nome Cliente: <input type="text" /></td>
-                <td>Nome Médico: <input type="text" /></td>
+                <td>Nome Cliente: <%= nomeCliente %>
+                </td>
+                <td>Nome Médico: <%= nomeMedico %>
+                </td>
             </tr>
         </table>
         <table>
             <tr>
                 <td>Quantidade: <%= quantidade %>
                 </td>
-                <td>Forma Farmacêutica:
-                    <select id="forma-farmaceutica" name="forma-farmaceutica" onchange="updateSubgrupoDropdown()">
-                        <% formaFarmaceutica.forEach(function(forma, index) { %>
-                        <option value="<%= forma %>" <%= index === 0 ? 'selected' : '' %>>
-                            <%= forma %>
-                        </option>
-                        <% }) %>
-                    </select>
+                <td>Forma Farmacêutica: <%= formaFarmaceutica %>
                 </td>
-                <td>Forma Farmacêutica (Subgrupo):
-                    <select id="forma-farmaceutica-subgrupo" name="forma-farmaceutica-subgrupo">
-                        <% formaFarmaceuticaSubgrupo[formaFarmaceutica[0]].forEach(function(subgrupo, index) { %>
-                        <option value="<%= subgrupo %>" <%= index === 0 ? 'selected' : '' %>>
-                            <%= subgrupo %>
-                        </option>
-                        <% }) %>
-                    </select>
+                <td>Forma Farmacêutica (Subgrupo): <%= formaFarmaceuticaSubgrupo %>
                 </td>
             </tr>
         </table>
@@ -55,29 +43,30 @@
             </thead>
             <tbody>
                 <% ativos.forEach(function(ativo, rowIndex) { %>
-                <tr>
-                    <td>
-                        <!-- Dropdown for Ativo Puro -->
-                        <select name="ativoPuro" id="ativoPuro-<%= rowIndex %>" onchange="handleAtivoChange(<%= rowIndex %>)">
-                            <% ativo.opcoes.forEach(function(opcao) { %>
-                            <option value="<%= opcao.nome %>" data-preco="<%= opcao.preco %>">
-                                <%= opcao.nome || "Selecione" %>
-                            </option>
-                            <% }) %>
-                        </select>
-                    </td>
-                    <td id="quantidade-<%= rowIndex %>">
-                        <%= ativo.quantidade %>
-                    <td id="unidade-<%= rowIndex %>">
-                        <%= ativo.unidade %>
-                    </td>
-                    </td>
-                    <td id="preco-<%= rowIndex %>" class="price-column">
-                        <%= ativo.opcoes[0].preco !=='-' ? `R$${parseFloat(ativo.opcoes[0].preco).toFixed(2)}` :
+                    <tr>
+                        <td>
+                            <!-- Dropdown for Ativo Puro -->
+                            <select name="ativoPuro" id="ativoPuro-<%= rowIndex %>"
+                                onchange='handleAtivoChange("<%= rowIndex %>")'>
+                                <% ativo.opcoes.forEach(function(opcao) { %>
+                                    <option value="<%= opcao.nome %>" data-preco="<%= opcao.preco %>">
+                                        <%= opcao.nome || "Selecione" %>
+                                    </option>
+                                    <% }) %>
+                            </select>
+                        </td>
+                        <td id="quantidade-<%= rowIndex %>">
+                            <%= ativo.quantidade %>
+                        <td id="unidade-<%= rowIndex %>">
+                            <%= ativo.unidade %>
+                        </td>
+                        </td>
+                        <td id="preco-<%= rowIndex %>" class="price-column">
+                            <%= ativo.opcoes[0].preco !=='-' ? `R$${parseFloat(ativo.opcoes[0].preco).toFixed(2)}` :
                                 ativo.opcoes[0].preco %>
-                    </td>
-                </tr>
-                <% }) %>
+                        </td>
+                    </tr>
+                    <% }) %>
             </tbody>
         </table>
 
@@ -102,7 +91,7 @@
                     <td>
                         <%= embalagem.quantidade %>
                     </td>
-                    <td class="price-column">R$<%= embalagem.preco.toFixed(2) %>
+                    <td id="preco-embalagem" class="price-column">R$<%= embalagem.preco.toFixed(2) %>
                     </td>
                 </tr>
             </tbody>
@@ -121,7 +110,7 @@
             <tbody>
                 <tr>
                     <td>
-                        <%= excipiente.tipo %>
+                        <%= excipiente.nome %>
                     </td>
                     <td>
                         <%= excipiente.unidade %>
@@ -129,7 +118,7 @@
                     <td>
                         <%= excipiente.quantidade %>
                     </td>
-                    <td class="price-column">R$<%= excipiente.preco.toFixed(2) %>
+                    <td id="preco-excipiente" class="price-column">R$<%= excipiente.preco.toFixed(2) %>
                     </td>
                 </tr>
             </tbody>
@@ -149,34 +138,23 @@
             </thead>
             <tbody>
                 <tr>
-                    <td>
-                        <select id="capsula-tipo" name="capsula-tipo" onchange="updateCapsulaDropdown()">
-                            <% capsulas.opcoes.forEach(function(capsula, index) { %>
-                            <option value="<%= capsula.tipo %>" <%= index === 0 ? 'selected' : '' %>>
-                                <%= capsula.tipo %>
-                            </option>
-                            <% }) %>
-                        </select>
+                    <td id="capsula-tipo" name="capsula-tipo">
+                        <%= capsula.tipo %>
                     </td>
-                    <td>
-                        <select id="capsula-nome" name="capsula-nome" onchange="updateCapsulaContem()">
-                            <% capsulas.opcoes[0].tipo_opcoes.forEach(function(capsula, index) { %>
-                            <option value="<%= capsula.nome %>" <%= index === 0 ? 'selected' : '' %>>
-                                <%= capsula.nome %>
-                            </option>
-                            <% }) %>
-                        </select>
+                    <td id="capsula-nome" name="capsula-nome">
+                        <%= capsula.nome %>
                     </td>
-                    <td>
-                        <%= capsulas.unidade %>
+                    <td id="capsula-quantidade" name="capsula-quantidade">
+                        <%= capsula.quantidade %>
                     </td>
-                    <td>
-                        <%= capsulas.quantidade %>
+                    <td id="capsula-unidade" name="capsula-unidade">
+                        <%= capsula.unidade %>
                     </td>
                     <td id="capsula-contem" name="capsula-contem">
-                        <%= capsulas.opcoes[0].tipo_opcoes[0].contem %>
+                        <%= capsula.contem %>
                     </td>
-                    <td id="capsula-preco" class="capsula-price">R$<%= capsulas.opcoes[0].tipo_opcoes[0].preco.toFixed(2) %></td>
+                    <td id="preco-capsula" class="price-column">R$<%= capsula.preco.toFixed(2) %>
+                    </td>
                 </tr>
             </tbody>
         </table>
@@ -185,24 +163,19 @@
         <table>
             <tr class="total-row">
                 <td colspan="3">Custo Fixo</td>
-                <td class="price-column">R$<%= custoFixo.toFixed(2) %>
+                <td id="preco-custo-fixo" class="price-column">R$<%= custoFixo.toFixed(2) %>
                 </td>
             </tr>
             <tr class="total-row">
                 <td colspan="3">Total</td>
-                <td id="total" class="price-column">R$0.00</td>
+                <td id="total-preco" class="price-column">R$0.00</td>
             </tr>
         </table>
+        <a href="/orcamento/edit">
+            <button type="button" id="edit-button" class="upload-button">Editar</button>
+        </a>
     </div>
 
-    <script>
-        // Embed the formaFarmaceuticaSubgrupo object in a global variable
-        const formaFarmaceuticaSubgrupo = <%- JSON.stringify(formaFarmaceuticaSubgrupo) %>;
-    </script>
-    <script>
-        // Embed the capsulas object in a global variable
-        const capsulas = <%- JSON.stringify(capsulas) %>;
-    </script>
     <script src="/scripts/orcamento.js"></script>
 </body>
 
