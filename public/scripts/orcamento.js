@@ -1,4 +1,4 @@
-window.onload = (event) => {
+window.onload = () => {
     updateTotal();
 };
 
@@ -63,6 +63,9 @@ function updateSubgrupoDropdown() {
 function updateCapsulaDropdown() {
     const capsulaTipo = document.getElementById('capsula-tipo').value;
     const capsulaNome = document.getElementById('capsula-nome');
+    if (capsulaNome.innerText == '-') {
+        return;
+    }
     capsulaNome.innerHTML = '';
 
     var subgrupoOptionsCapsule = ['-'];
@@ -130,4 +133,115 @@ function updateCapsulaPrice() {
     }
 
     document.getElementById('capsula-preco').innerText = `R$${capsulaPrice.toFixed(2)}`;
+}
+
+function parse_orcamento_editted() {
+    var ativos = [];
+    var embalagem = {};
+    var excipiente = {};
+    var capsula = {}
+    const rows = document.querySelectorAll("table tbody tr");
+    rows.forEach((tr) => {
+        var ativo = {};
+        var tds = tr.querySelectorAll('td');
+        if (tr.id == 'ativo') {
+            tds.forEach((td) => {
+                var id;
+                if (td.querySelector('select')) {
+                    id = td.querySelector('select').id;
+                } else {
+                    id = td.id;
+                }
+                if (id.includes('ativoPuro') && td.value != 'Selecione') {
+                    ativo['nome'] = td.value;
+                }
+                else if (id.includes('ativo-unidade')) {
+                    ativo['unidade'] = td.value;
+                }
+                else if (id.includes('ativo-quantidade')) {
+                    ativo['quantidade'] = td.value;
+                }
+            });
+        }
+        else if (tr.id == 'embalagem') {
+            tds.forEach((td) => {
+                var id;
+                if (td.querySelector('select')) {
+                    id = td.querySelector('select').id;
+                } else {
+                    id = td.id;
+                }
+                if (id.includes('embalagem-nome') && td.value != '') {
+                    embalagem['nome'] = td.value;
+                }
+                else if (id.includes('embalagem-unidade')) {
+                    embalagem['unidade'] = td.value;
+                }
+                else if (id.includes('embalagem-quantidade')) {
+                    embalagem['quantidade'] = td.value;
+                }
+            });
+        }
+        else if (tr.id == 'excipiente') {
+            tds.forEach((td) => {
+                var id;
+                if (td.querySelector('select')) {
+                    id = td.querySelector('select').id;
+                } else {
+                    id = td.id;
+                }
+                if (id.includes('excipiente-nome') && td.value != '') {
+                    excipiente['nome'] = td.value;
+                }
+                else if (id.includes('excipiente-unidade')) {
+                    excipiente['unidade'] = td.value;
+                }
+                else if (id.includes('excipiente-quantidade')) {
+                    excipiente['quantidade'] = td.value;
+                }
+            });
+        }
+        else if (tr.id == 'capsula') {
+            tds.forEach((td) => {
+                var id;
+                if (td.querySelector('select')) {
+                    id = td.querySelector('select').id;
+                } else {
+                    id = td.id;
+                }
+                if (id.includes('capsula-nome')) {
+                    capsula['nome'] = td.value;
+                }
+                else if (id.includes('capsula-unidade')) {
+                    capsula['unidade'] = td.value;
+                }
+                else if (id.includes('capsula-quantidade')) {
+                    capsula['quantidade'] = td.value;
+                }
+            });
+        }
+        ativos.concat(ativo);
+    });
+    return {
+        "quantity": document.getElementById('quantidade-orcamento').value,
+        "formaFarmaceutica": document.getElementById('forma-farmaceutica').value,
+        "formaFarmaceuticaSubgrupo": document.getElementById('forma-farmaceutica-subgrupo').value,
+        "ativos": ativos,
+        "embalagem": embalagem,
+        "excipiente": excipiente,
+        "capsula": capsula,
+    };
+}
+
+function submit_orcamento() {
+    orcamento = parse_orcamento_editted();
+    console.log(orcamento);
+    // fetch("http://127.0.0.1:5000/update_orcamento", {
+    //     method: "POST",
+    //     "body": JSON.stringify({
+    //         orcamento
+    //     }),
+    // })
+    //     .then((response) => response.json())
+    //     .then((json) => console.log(json));
 }
