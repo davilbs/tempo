@@ -39,7 +39,7 @@ class orcamentoClass:
             print(capsule)
         print(self.excipiente)
         print(self.embalagem)
-        
+
     def create_orcamento(self):
         self.calc_price_ativos()
         self.calc_price_range()
