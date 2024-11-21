@@ -1,3 +1,7 @@
+window.onload = (event) => {
+    updateTotal();
+};
+
 function handleAtivoChange(rowIndex) {
     // Get the dropdown for the current row
     const selectElement = document.getElementById(`ativoPuro-${rowIndex}`);
@@ -19,19 +23,10 @@ function updateTotal() {
     // Loop through all rows to calculate the sum of selected prices
     const rows = document.querySelectorAll("table tbody tr");
     rows.forEach((row, index) => {
-        if (document.getElementById(`preco-${index}`)) {
-            const precoCell = document.getElementById(`preco-${index}`);
-            const precoText = precoCell.innerText;
+        var tds = row.querySelectorAll('td');
 
-            if (precoText && precoText.startsWith("R$")) {
-                const preco = parseFloat(precoText.replace("R$", "").replace(",", "."));
-                if (!isNaN(preco)) {
-                    total += preco;
-                }
-            }
-        } else if (document.getElementById(`preco-${index}`)) {
-            const precoCell = document.getElementById(`preco-${index}`);
-            const precoText = precoCell.innerText;
+        if (tds[tds.length - 1].id.includes('preco-')) {
+            const precoText = tds[tds.length - 1].innerText;
 
             if (precoText && precoText.startsWith("R$")) {
                 const preco = parseFloat(precoText.replace("R$", "").replace(",", "."));
@@ -43,16 +38,17 @@ function updateTotal() {
     });
 
     // Update the Total cell
-    const totalCell = document.getElementById("total");
+    const totalCell = document.getElementById("total-preco");
     totalCell.innerText = `R$${total.toFixed(2)}`;
 }
 
 function updateSubgrupoDropdown() {
     const formaFarmaceutica = document.getElementById('forma-farmaceutica').value;
     const subgrupoDropdown = document.getElementById('forma-farmaceutica-subgrupo');
+
     subgrupoDropdown.innerHTML = '';
 
-    const subgrupoOptions = formaFarmaceuticaSubgrupo[formaFarmaceutica];
+    const subgrupoOptions = formaFarmaceuticaSubgrupoAll[formaFarmaceutica];
     subgrupoOptions.forEach((subgrupo, index) => {
         const option = document.createElement('option');
         option.value = subgrupo;
@@ -116,7 +112,7 @@ function updateCapsulaContem() {
 function updateCapsulaPrice() {
     const capsulaTipo = document.getElementById('capsula-tipo').value;
     const capsulaNome = document.getElementById('capsula-nome').value;
-    
+
     var subgrupoOptionsCapsule = ['-'];
     var capsulaPrice = '-';
 
@@ -132,6 +128,6 @@ function updateCapsulaPrice() {
             break;
         }
     }
-    
+
     document.getElementById('capsula-preco').innerText = `R$${capsulaPrice.toFixed(2)}`;
 }
