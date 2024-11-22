@@ -78,7 +78,7 @@
                             </select>
                         </td>
                         <td id="ativo-quantidade-<%= rowIndex %>">
-                            <input type="text" value="<%= ativo.quantidade %>" />
+                            <input id="ativo-quantidade" type="text" value="<%= ativo.quantidade %>" />
                         </td>
                         <td id="ativo-preco-<%= rowIndex %>" class="price-column">
                             <%= ativo.opcoes[0].preco !=='-' ? `R$${parseFloat(ativo.opcoes[0].preco).toFixed(2)}` :
@@ -102,14 +102,14 @@
             <tbody>
                 <tr id="embalagem">
                     <td>
-                        <datalist name="embalagens" id="embalagem-nome">
+                        <datalist name="embalagens" id="embalagens">
                             <% embalagens.forEach(function(embalagem) { %>
                                 <option value="<%= embalagem %>">
                                     <%= embalagem %>
                                 </option>
                                 <% }) %>
                         </datalist>
-                        <input autoComplete="on" list="embalagem-nome" value="<%= embalagem.nome %>" />
+                        <input id="embalagem-nome" autoComplete="on" list="embalagens" value="<%= embalagem.nome %>" />
                     </td>
                     <td>
                         <select id="embalagem-unidade" name="embalagem-unidade">
@@ -142,14 +142,14 @@
             <tbody>
                 <tr id="excipiente">
                     <td>
-                        <datalist name="excipientes" id="excipiente-nome">
+                        <datalist name="excipientes" id="excipientes">
                             <% excipientes.forEach(function(excipiente) { %>
                                 <option value="<%= excipiente %>">
                                     <%= excipiente %>
                                 </option>
                                 <% }) %>
                         </datalist>
-                        <input autoComplete="on" list="excipiente-nome" value="<%= excipiente.nome %>" />
+                        <input id="excipiente-nome" autoComplete="on" list="excipientes" value="<%= excipiente.nome %>" />
                     </td>
                     <td>
                         <select id="excipiente-unidade" name="excipiente-unidade">
@@ -201,9 +201,9 @@
                                 </option>
                                 <% }) %>
                         </select>
-                    </td>
                     <td>
                         <input id="capsula-quantidade" type="text" value="<%= capsula.quantidade %>" />
+                    </td>
                     </td>
                     <td id="capsula-contem" name="capsula-contem"><%= capsula.contem %>
                     </td>
