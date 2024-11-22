@@ -1,67 +1,66 @@
 import sys
 import os
-import json
+import json 
+from pydantic import BaseModel, Field
+from typing import Optional
+from langchain_openai import ChatOpenAI
+from langchain_core.messages import SystemMessage, HumanMessage
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from openai import OpenAI
-from dotenv import load_dotenv
+from pdfminer.high_level import extract_text
+
+import dotenv
+dotenv.load_dotenv()
 
 
-def main():
-    load_dotenv()
+class Ingredient(BaseModel):
+    nome: str = Field(...,description="Nome do ingrediente")
+    dosagem: str = Field(...,description="Quantidade do ingrediente. Se for QSP escreva QSP.")
+    unidade: str = Field(...,description="Unidade de medida do ingrediente")
+
+class Product(BaseModel):
+    nome: str = Field(...,description="Nome do medicamento, suplemento ou fórmula")
+    quantidade: str = Field(...,description="Quantidade do medicamento/fórmula. Doses")
+    excipiente: Optional[str] = Field(...,description="Excipiente do medicamento")
+    posologia: int = Field(...,description="Quantidade a ser utilizada por dia")
+    ingredientes: Optional[list[Ingredient]] = Field(...,description="Lista de ingredientes do medicamento com seus respectivos nomes, quantidades e unidade de medida.")
+
+class productList(BaseModel):
+    medicamentos: list[Product] = Field(...,description="Lista de medicamentos ou suplementos")
+
+class PrescriptionInfo(BaseModel):
+    medico: Optional[str] = Field(...,description="Nome do médico que prescreveu a fórmula")
+    paciente: Optional[str] = Field(...,description="Nome do paciente que irá utilizar a fórmula")
+    data: Optional[str] = Field(...,description="Data da prescrição")
+    medicamentos: productList = Field(...,description="Lista de medicamentos ou suplementos prescritos")
+
+def extract_prescription(input_file):
+    llm_structured = ChatOpenAI(model="gpt-4o-mini", temperature=0).with_structured_output(PrescriptionInfo)
     rootpath = os.path.dirname(os.getcwd())
-    document = rootpath + "/backend/scans/" + sys.argv[1]
+    document = rootpath + input_file
 
-    input_text = ""
-    with open(document, "r") as prescript:
-        input_text = prescript.read()
+    system_prompt = """
+    Você é um atendente de farmácia com habilidades para extrair informações de receitas médicas e convertê-las em um formato JSON específico.
+    Analise o texto abaixo da receita e extraia as fórmulas descritas. Caso encontre medicamentos sem ingredientes não preencha o campo de ingredientes.
+    Não invente informações, caso não haja informações suficientes retorne uma resposta vazia.\n\n
+    """
+    prompt = ChatPromptTemplate([
+        ("system", system_prompt),
+        ("human", "{input}")
+    ])
 
-    client = OpenAI(
-        api_key=os.getenv("OPENAI_KEY"))
-    completion = client.chat.completions.create(
-        model="gpt-3.5-turbo",
-        messages=[{"role": "system", "content":'''Você é um atendente de farmácia com habilidades para extrair informações de receitas médicas e convertê-las em um formato JSON específico. O formato do JSON é o seguinte: 
+    chain = prompt | llm_structured
 
-{
-  "medicamentos": [
-    {
-      "nome": "",
-      "quantidade": "",
-      "posologia": 0,
-      "duracao": 0,
-      "ingredientes": [
-        {
-          "nome": "",
-          "dosagem": ""
-        }
-      ]
-    }
-  ]
-}
-
-Regras para preenchimento do JSON:
-- Campo "nome": Deve conter o nome do medicamento ou suplemento, não incluindo nomes dos ingredientes.
-- Campo "quantidade": Deve incluir a quantidade do medicamento com a unidade de medida escrita em letras minúsculas (ex: mg, ml, cápsulas, comprimidos, etc.), sem incluir nomes de ingredientes, calculados com base na posologia e duração caso hajam ingredientes.
-- Campo "posologia": Deve conter a quantidade a ser utilizada por dia, sendo necessário calcular a quantidade diária em casos de expressões como "1x/12h" (que corresponde a 2 vezes por dia) ou "a cada 6 horas" (que corresponde a 4 vezes por dia).
-- Campo "duração": Deve conter a duração em dias do tratamento ou ser preenchido com o numeral 1 se não for possível calcular.
-- Campo "dosagem": Deve incluir a dosagem e a unidade de medida (ex: mg, mL, cápsulas, comprimidos, etc.).
-- Campo "ingredientes": Deve listar os ingredientes do medicamento com seus respectivos nomes e quantidades. Você deve verificar se o nome do ingrediente faz sentido, descartando possíveis textos espúrios resultantes de erros do OCR. Contraia "Vitamina" para "Vit", "Cápsulas" para "Cap".
-
-Observações:
-- 'qsp' significa 'quantidade suficiente para'.
-- "manipular X" indica a quantidade a ser fabricada do medicamento/suplemento.
-'''},
-                  {"role": "user", "content": f"{input_text}"}],
-        temperature=0.1
-    )
-
-    filename = sys.argv[1].split(".")[0]
-    with open(rootpath + f"/backend/processed/{filename}.json", "w+") as jdump:
-        cont_json = json.loads(completion.choices[0].message.content)
-        json.dump(cont_json, jdump)
-        jdump.close()
-    return filename
+    text = extract_text(document)
+    response = chain.invoke({"input": text})
+    filename = document.split("/")[-1].split(".")[0]
+    with open(f"{filename}.json", "w") as f:
+        json.dump(response.dict(), f, indent=4)
+    
+    print(text)
+    print(response)
+    return response.dict()
 
 
 if __name__ == "__main__":
-    filename = main()
-    print(f"{filename}.json", end='')
-    sys.stdout.flush()
+    filename = extract_prescription("receitas/1.pdf")
