@@ -210,8 +210,8 @@ function parse_orcamento_editted() {
                 else if (td.querySelector('input')) {
                     td = td.querySelector('input');
                 }
-                if (td.id.includes('capsula-nome')) {
-                    capsula['nome'] = td.value;
+                if (td.id.includes('capsula-tipo')) {
+                    capsula['tipo'] = td.value;
                 }
                 else if (td.id.includes('capsula-unidade')) {
                     capsula['unidade'] = td.value;
