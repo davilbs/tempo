@@ -269,7 +269,7 @@ app.get("/orcamento", async function (req, res, next) {
             }
         ],
         embalagem: {
-            'tipo': 'POTE CAPS 310ML',
+            'nome': 'POTE CAPS 310ML',
             'unidade': 'MG',
             'quantidade': 1,
             'preco': 21.88,
