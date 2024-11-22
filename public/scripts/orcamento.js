@@ -146,81 +146,81 @@ function parse_orcamento_editted() {
         var tds = tr.querySelectorAll('td');
         if (tr.id == 'ativo') {
             tds.forEach((td) => {
-                var id;
                 if (td.querySelector('select')) {
-                    id = td.querySelector('select').id;
-                } else {
-                    id = td.id;
+                    td = td.querySelector('select');
                 }
-                if (id.includes('ativoPuro') && td.value != 'Selecione') {
+                else if (td.querySelector('input')) {
+                    td = td.querySelector('input');
+                }
+                if (td.id.includes('ativoPuro') && td.value != 'Selecione') {
                     ativo['nome'] = td.value;
                 }
-                else if (id.includes('ativo-unidade')) {
+                else if (td.id.includes('ativo-unidade')) {
                     ativo['unidade'] = td.value;
                 }
-                else if (id.includes('ativo-quantidade')) {
+                else if (td.id.includes('ativo-quantidade')) {
                     ativo['quantidade'] = td.value;
                 }
             });
+            ativos = ativos.concat(ativo);
         }
         else if (tr.id == 'embalagem') {
             tds.forEach((td) => {
-                var id;
                 if (td.querySelector('select')) {
-                    id = td.querySelector('select').id;
-                } else {
-                    id = td.id;
+                    td = td.querySelector('select');
                 }
-                if (id.includes('embalagem-nome') && td.value != '') {
+                else if (td.querySelector('input')) {
+                    td = td.querySelector('input');
+                }
+                if (td.id.includes('embalagem-nome') && td.value != '') {
                     embalagem['nome'] = td.value;
                 }
-                else if (id.includes('embalagem-unidade')) {
+                else if (td.id.includes('embalagem-unidade')) {
                     embalagem['unidade'] = td.value;
                 }
-                else if (id.includes('embalagem-quantidade')) {
+                else if (td.id.includes('embalagem-quantidade')) {
                     embalagem['quantidade'] = td.value;
                 }
             });
         }
         else if (tr.id == 'excipiente') {
             tds.forEach((td) => {
-                var id;
                 if (td.querySelector('select')) {
-                    id = td.querySelector('select').id;
-                } else {
-                    id = td.id;
+                    td = td.querySelector('select');
                 }
-                if (id.includes('excipiente-nome') && td.value != '') {
+                else if (td.querySelector('input')) {
+                    td = td.querySelector('input');
+                }
+                if (td.id.includes('excipiente-nome') && td.value != '') {
                     excipiente['nome'] = td.value;
                 }
-                else if (id.includes('excipiente-unidade')) {
+                else if (td.id.includes('excipiente-unidade')) {
                     excipiente['unidade'] = td.value;
                 }
-                else if (id.includes('excipiente-quantidade')) {
+                else if (td.id.includes('excipiente-quantidade')) {
                     excipiente['quantidade'] = td.value;
                 }
             });
         }
         else if (tr.id == 'capsula') {
             tds.forEach((td) => {
-                var id;
                 if (td.querySelector('select')) {
-                    id = td.querySelector('select').id;
-                } else {
-                    id = td.id;
+                    td = td.querySelector('select');
                 }
-                if (id.includes('capsula-nome')) {
+                else if (td.querySelector('input')) {
+                    td = td.querySelector('input');
+                }
+                if (td.id.includes('capsula-nome')) {
                     capsula['nome'] = td.value;
                 }
-                else if (id.includes('capsula-unidade')) {
+                else if (td.id.includes('capsula-unidade')) {
                     capsula['unidade'] = td.value;
                 }
-                else if (id.includes('capsula-quantidade')) {
+                else if (td.id.includes('capsula-quantidade')) {
                     capsula['quantidade'] = td.value;
                 }
             });
         }
-        ativos.concat(ativo);
     });
     return {
         "quantity": document.getElementById('quantidade-orcamento').value,
@@ -235,13 +235,12 @@ function parse_orcamento_editted() {
 
 function submit_orcamento() {
     orcamento = parse_orcamento_editted();
-    console.log(orcamento);
-    // fetch("http://127.0.0.1:5000/update_orcamento", {
-    //     method: "POST",
-    //     "body": JSON.stringify({
-    //         orcamento
-    //     }),
-    // })
-    //     .then((response) => response.json())
-    //     .then((json) => console.log(json));
+    fetch("http://127.0.0.1:5000/update_orcamento", {
+        method: "POST",
+        "body": JSON.stringify({
+            orcamento
+        }),
+    })
+        .then((response) => response.json())
+        .then((json) => console.log(json));
 }
