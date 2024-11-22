@@ -55,11 +55,11 @@
                                     <% }) %>
                             </select>
                         </td>
-                        <td id="quantidade-<%= rowIndex %>">
-                            <%= ativo.quantidade %>
                         <td id="unidade-<%= rowIndex %>">
                             <%= ativo.unidade %>
                         </td>
+                        <td id="quantidade-<%= rowIndex %>">
+                            <%= ativo.quantidade %>
                         </td>
                         <td id="preco-<%= rowIndex %>" class="price-column">
                             <%= ativo.opcoes[0].preco !=='-' ? `R$${parseFloat(ativo.opcoes[0].preco).toFixed(2)}` :
@@ -144,11 +144,11 @@
                     <td id="capsula-nome" name="capsula-nome">
                         <%= capsula.nome %>
                     </td>
-                    <td id="capsula-quantidade" name="capsula-quantidade">
-                        <%= capsula.quantidade %>
-                    </td>
                     <td id="capsula-unidade" name="capsula-unidade">
                         <%= capsula.unidade %>
+                    </td>
+                    <td id="capsula-quantidade" name="capsula-quantidade">
+                        <%= capsula.quantidade %>
                     </td>
                     <td id="capsula-contem" name="capsula-contem">
                         <%= capsula.contem %>
