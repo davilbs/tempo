@@ -11,7 +11,7 @@ function handleAtivoChange(rowIndex) {
     const preco = selectedOption.getAttribute('data-preco');
 
     // Update the corresponding Preço cell
-    document.getElementById(`preco-${rowIndex}`).innerText =
+    document.getElementById(`preco-ativo-${rowIndex}`).innerText =
         preco !== '-' ? `R$${parseFloat(preco).toFixed(2)}` : preco;
 
     updateTotal();
@@ -135,12 +135,13 @@ function updateCapsulaPrice() {
     document.getElementById('capsula-preco').innerText = `R$${capsulaPrice.toFixed(2)}`;
 }
 
-function parse_orcamento_editted() {
+function parse_orcamento() {
     var ativos = [];
     var embalagem = {};
     var excipiente = {};
     var capsula = {}
     const rows = document.querySelectorAll("table tbody tr");
+    var ativoCounter = 0;
     rows.forEach((tr) => {
         var ativo = {};
         var tds = tr.querySelectorAll('td');
@@ -148,21 +149,28 @@ function parse_orcamento_editted() {
             tds.forEach((td) => {
                 if (td.querySelector('select')) {
                     td = td.querySelector('select');
-                }
-                else if (td.querySelector('input')) {
-                    td = td.querySelector('input');
-                }
-                if (td.id.includes('ativoPuro') && td.value != 'Selecione') {
-                    ativo['nome'] = td.value;
+                    const values = Array.from(td.options).map(option => option.value);
+                    ativo['opcoes'] = [];
+                    for (let i = 0; i < values.length; i++) {
+                        var element = values[i];
+                        var price = ativosAll[ativoCounter].opcoes[i]['preco'];
+                        ativo['opcoes'].push(
+                            {
+                                'nome': element,
+                                'preco': price
+                            }
+                        );
+                    }
                 }
                 else if (td.id.includes('ativo-unidade')) {
-                    ativo['unidade'] = td.value;
+                    ativo['unidade'] = td.innerText;
                 }
                 else if (td.id.includes('ativo-quantidade')) {
-                    ativo['quantidade'] = td.value;
+                    ativo['quantidade'] = parseInt(td.innerText);
                 }
             });
             ativos = ativos.concat(ativo);
+            ativoCounter += 1;
         }
         else if (tr.id == 'embalagem') {
             tds.forEach((td) => {
@@ -172,14 +180,17 @@ function parse_orcamento_editted() {
                 else if (td.querySelector('input')) {
                     td = td.querySelector('input');
                 }
-                if (td.id.includes('embalagem-nome') && td.value != '') {
-                    embalagem['nome'] = td.value;
+                if (td.id.includes('embalagem-nome')) {
+                    embalagem['nome'] = td.innerText;
                 }
                 else if (td.id.includes('embalagem-unidade')) {
-                    embalagem['unidade'] = td.value;
+                    embalagem['unidade'] = td.innerText;
                 }
                 else if (td.id.includes('embalagem-quantidade')) {
-                    embalagem['quantidade'] = td.value;
+                    embalagem['quantidade'] = parseInt(td.innerText);
+                }
+                else if (td.id.includes('preco-embalagem')) {
+                    embalagem['preco'] = parseFloat(td.innerText.replace("R$", ""));
                 }
             });
         }
@@ -191,14 +202,17 @@ function parse_orcamento_editted() {
                 else if (td.querySelector('input')) {
                     td = td.querySelector('input');
                 }
-                if (td.id.includes('excipiente-nome') && td.value != '') {
-                    excipiente['nome'] = td.value;
+                if (td.id.includes('excipiente-nome')) {
+                    excipiente['nome'] = td.innerText;
                 }
                 else if (td.id.includes('excipiente-unidade')) {
-                    excipiente['unidade'] = td.value;
+                    excipiente['unidade'] = td.innerText;
                 }
                 else if (td.id.includes('excipiente-quantidade')) {
-                    excipiente['quantidade'] = td.value;
+                    excipiente['quantidade'] = parseInt(td.innerText);
+                }
+                else if (td.id.includes('preco-excipiente')) {
+                    excipiente['preco'] = parseFloat(td.innerText.replace("R$", ""));
                 }
             });
         }
@@ -211,21 +225,32 @@ function parse_orcamento_editted() {
                     td = td.querySelector('input');
                 }
                 if (td.id.includes('capsula-tipo')) {
-                    capsula['tipo'] = td.value;
+                    capsula['tipo'] = td.innerText;
+                }
+                else if (td.id.includes('capsula-nome')) {
+                    capsula['nome'] = td.innerText;
+                }
+                else if (td.id.includes('capsula-contem')) {
+                    capsula['contem'] = td.innerText;
                 }
                 else if (td.id.includes('capsula-unidade')) {
-                    capsula['unidade'] = td.value;
+                    capsula['unidade'] = td.innerText;
                 }
                 else if (td.id.includes('capsula-quantidade')) {
-                    capsula['quantidade'] = td.value;
+                    capsula['quantidade'] = parseInt(td.innerText);
+                }
+                else if (td.id.includes('preco-capsula')) {
+                    capsula['preco'] = parseFloat(td.innerText.replace("R$", ""));
                 }
             });
         }
     });
     return {
-        "quantity": document.getElementById('quantidade-orcamento').value,
-        "formaFarmaceutica": document.getElementById('forma-farmaceutica').value,
-        "formaFarmaceuticaSubgrupo": document.getElementById('forma-farmaceutica-subgrupo').value,
+        "nomeCliente": document.getElementById('nome-cliente').innerText,
+        "nomeMedico": document.getElementById('nome-medico').innerText,
+        "custoFixo": parseInt(document.getElementById('quantidade-orcamento').innerText),
+        "formaFarmaceutica": document.getElementById('forma-farmaceutica').innerText,
+        "formaFarmaceuticaSubgrupo": document.getElementById('forma-farmaceutica-subgrupo').innerText,
         "ativos": ativos,
         "embalagem": embalagem,
         "excipiente": excipiente,
@@ -233,14 +258,18 @@ function parse_orcamento_editted() {
     };
 }
 
-function submit_orcamento() {
-    orcamento = parse_orcamento_editted();
-    fetch("http://127.0.0.1:5000/update_orcamento", {
-        method: "POST",
-        "body": JSON.stringify({
-            orcamento
-        }),
-    })
-        .then((response) => response.json())
-        .then((json) => console.log(json));
-}
+document.getElementById('edit_orcamento').addEventListener('click', async () => {
+    const orcamento = JSON.stringify(parse_orcamento());
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/orcamento/edit';
+
+    const orcamentoInput = document.createElement('input');
+    orcamentoInput.type = 'hidden';
+    orcamentoInput.name = 'orcamento';
+    orcamentoInput.value = orcamento;
+    form.appendChild(orcamentoInput);
+
+    document.body.appendChild(form);
+    form.submit();
+});
