@@ -1,5 +1,5 @@
 # index.py
-import utils
+import utils, json
 
 from orcamento import orcamentoClass
 from flask import Flask, request
@@ -29,8 +29,13 @@ def calculate_orcamento():
 
 @app.route('/update_orcamento', methods=['POST'])
 def update_orcamento():
-    body = request.form.to_dict()
-    result = orcamentoClass().getPrice({body})
+    body = json.loads(request.data.decode('utf-8'))['orcamento']
+    result = orcamentoClass(
+        body['ativos'],
+        body['quantity'],
+        body['formaFarmaceutica'],
+        body['formaFarmaceuticaSubgrupo'],
+    ).getPrice(body)
     value_return = utils.make_lambda_response(utils.HTTP_STATUS_OK, {'result': result})
     return value_return
 
