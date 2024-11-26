@@ -56,3 +56,18 @@ def make_lambda_response(status_code, body=None, headers={}, multi_value_headers
     if body is not None:
         response['body'] = json.dumps(body)
     return response
+
+def unityCalcConversion(unity: str):
+    unity = unity.upper()
+    if unity == '%':
+        return 0.01
+    elif unity == 'MG':
+        return 0.001
+    elif unity == 'MCG':
+        return 0.000001
+    elif unity == 'KG':
+        return 1000
+    elif unity == 'L':
+        return 1000
+    else:
+        return 1
