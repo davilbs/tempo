@@ -280,21 +280,23 @@ app.get("/orcamento", async function (req, res, next) {
             'quantidade': 173.79,
             'preco': 2.60,
         },
-        capsula: {
-            'quantidade': 60,
-            'unidade': 'UN',
-            'tipo': 'INCOLOR',
-            'nome': 'CAP INCOLOR 0',
-            'contem': 3,
-            'preco': 30.15
-        },
+        capsulas: [
+            {
+                'quantidade': 60,
+                'unidade': 'UN',
+                'tipo': 'INCOLOR',
+                'nome': 'CAP INCOLOR 0',
+                'contem': 3,
+                'preco': 30.15
+            },
+        ],
         custoFixo: 7.80,
         total: 494.10,
         parseError: false,
     });
 })
 
-app.get("/orcamento/edit", (req, res) => {
+app.post("/orcamento/edit", (req, res) => {
     const {
         formaFarmaceuticaAll,
         formaFarmaceuticaSubgrupoAll,
@@ -303,82 +305,15 @@ app.get("/orcamento/edit", (req, res) => {
         excipientes,
         unidades,
     } = require('./constants');
+    const orcamento = JSON.parse(req.body['orcamento']);
     const formaFarmaceutica = '1 - Cápsula';
     const formaFarmaceuticaSubgrupo = 'Slow Release';
     const embalagemNome = 'POTE CAPS 310ML';
     const excipienteNome = 'EXCIPIENTE PADRÃO CÁPSULAS';
-    const ativos = [
-        {
-            'unidade': 'MG',
-            'quantidade': 200,
-            'opcoes': [
-                {
-                    'nome': '',
-                    'preco': '-'
-                },
-                {
-                    'nome': 'FENUGREEK (50% FENUSIDEOS)',
-                    'preco': 47.85
-                }
-            ]
-        },
-        {
-            'unidade': 'MG',
-            'quantidade': 500,
-            'opcoes': [
-                {
-                    'nome': '',
-                    'preco': '-'
-                },
-                {
-                    'nome': 'MACA',
-                    'preco': 36.88
-                },
-                {
-                    'nome': 'VINAGRE MACA',
-                    'preco': 36.84
-                }
-            ]
-        },
-        {
-            'unidade': 'MG',
-            'quantidade': 100,
-            'opcoes': [
-                {
-                    'nome': '',
-                    'preco': '-'
-                },
-                {
-                    'nome': 'GINKGO BILOBA EXTRACT 2:1',
-                    'preco': 7.55
-                },
-                {
-                    'nome': 'EXT GLICOL GINKGO BILOBA',
-                    'preco': 2.66
-                }
-            ]
-        }
-    ];
-    const embalagem= {
-        'nome': 'POTE CAPS 310ML',
-        'unidade': 'MG',
-        'quantidade': 1,
-        'preco': 21.88,
-    };
-    const excipiente = {
-        'nome': 'EXCIPIENTE PADRÃO CÁPSULAS',
-        'unidade': 'MG',
-        'quantidade': 173.79,
-        'preco': 2.60,
-    };
-    const capsula = {
-        'quantidade': 60,
-        'unidade': 'UN',
-        'tipo': 'INCOLOR',
-        'nome': 'CAP INCOLOR 0',
-        'contem': 3,
-        'preco': 30.15
-    };
+    const ativos = orcamento['ativos'];
+    const embalagem = orcamento['embalagem'];
+    const excipiente = orcamento['excipiente'];
+    const capsula = orcamento['capsula'];
 
     var formaFarmaceuticaAllEdited = [formaFarmaceutica].concat(formaFarmaceuticaAll);
     for (let i = 1; i < formaFarmaceuticaAllEdited.length; i++) {
@@ -417,17 +352,16 @@ app.get("/orcamento/edit", (req, res) => {
     for (let i = 0; i < ativos.length; i++) {
         unidadesEdited['ativos'] = unidadesEdited['ativos'].concat([[... new Set([ativos[i].unidade].concat(unidades))]]);
     }
-    
-    res.render("orcamento_edit.ejs", {
+    const orcamento_edit = {
+        nomeCliente: 'Maria',
+        nomeMedico: 'João',
+        quantidade: 60,
         formaFarmaceuticaAll: formaFarmaceuticaAllEdited,
         formaFarmaceuticaSubgrupoAll: formaFarmaceuticaSubgrupoAllEdited,
         tipoCapsulas: tipoCapsulas,
         embalagens: embalagensEdited,
         excipientes: excipientesEdited,
         unidades: unidadesEdited,
-        nomeCliente: 'Maria',
-        quantidade: 60,
-        nomeMedico: 'João',
         formaFarmaceutica: formaFarmaceutica,
         formaFarmaceuticaSubgrupo: formaFarmaceuticaSubgrupo,
         ativos: ativos,
@@ -437,8 +371,15 @@ app.get("/orcamento/edit", (req, res) => {
         custoFixo: 7.80,
         total: 494.10,
         parseError: false,
-    });
+    };
+    res.render("orcamento_edit.ejs", orcamento_edit);
 })
+
+app.post('/orcamento/result', (req, res) => {
+    const editted_orcamento = JSON.parse(req.body['submited_orcamento']);
+    
+    res.render("orcamento.ejs", editted_orcamento);
+});
 
 app.listen(port, () => {
     console.log(`Server started on port ${port}`);
