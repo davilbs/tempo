@@ -14,21 +14,21 @@ class excipientRules:
 
     def check_sub_forma_farmaceutica(self, ativos):
         if self.sub_forma_farmaceutica in [
-            "1 - Slow Release",
-            "1 - Hipoalergênica",
-            "1 - Sublingual",
+            "Slow Release",
+            "Hipoalergênica",
+            "Sublingual",
         ]:
-            if self.sub_forma_farmaceutica == '1 - Slow Release':
+            if self.sub_forma_farmaceutica == 'Slow Release':
                 return 'EXCIPIENTE SLOW RELEASE II'
-            elif self.sub_forma_farmaceutica == '1 - Hipoalergênica':
+            elif self.sub_forma_farmaceutica == 'Hipoalergênica':
                 return 'EXCIP HIPOALERGENICO CAPS-VEG'
-            elif self.sub_forma_farmaceutica == '1 - Sublingual':
+            elif self.sub_forma_farmaceutica == 'Sublingual':
                 return 'EXCIPIENTE CAPSULA SUBLINGUAL'
             elif (
-                self.sub_forma_farmaceutica == '1 - Iodo Metalóide + Iodeto de Potássio'
+                self.sub_forma_farmaceutica == 'Iodo Metalóide + Iodeto de Potássio'
             ):
                 return self.iodo(ativos)
-            elif self.sub_forma_farmaceutica == "1 - Lipofílica / Oleosa":
+            elif self.sub_forma_farmaceutica == "Lipofílica / Oleosa":
                 return self.lipofilico_oleosa(ativos)
 
     def lipofilico_oleosa(self, ativos: list[ativoClass]):
