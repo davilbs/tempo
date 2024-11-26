@@ -19,7 +19,7 @@ if __name__ == '__main__':
     #     ativos,
     #     60,
     #     forma_farmaceutica='1 - Cápsulas',
-    #     sub_forma_farmaceutica='1 - Slow Release',
+    #     sub_forma_farmaceutica='Slow Release',
     # )
     # orcamento.create_orcamento()
     orcamento_body = {
