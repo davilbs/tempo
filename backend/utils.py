@@ -1,4 +1,4 @@
-import simplejson as json
+import simplejson as json, re
 
 DEFAULT_CONTENT_TYPE = 'application/json'
 
@@ -71,3 +71,35 @@ def unityCalcConversion(unity: str):
         return 1000
     else:
         return 1
+    
+def do_descr_match( target, df):
+        if df['DESCR'].str.contains(target, case=False, na=False).any():
+            return df[df['DESCR'].str.contains(target, case=False, na=False)]
+        return []
+
+def find_closest_match_contains(df, target, exact = False):
+    # Exact match
+    if exact:
+        return df[df['DESCR'] == target]
+
+    # Step 1: Full match
+    matchs = do_descr_match(target, df)
+    if len(matchs) > 0:
+        return matchs
+
+    # Step 2: Remove words progressively
+    words = target.split()
+    for i in range(len(words) - 1, 0, -1):
+        shortened_name = re.escape(" ".join(words[:i]))
+        matchs = do_descr_match(shortened_name, df)
+        if len(matchs) > 0:
+            return matchs
+
+    # Step 3: Remove letters progressively
+    for i in range(len(target) - 1, 0, -1):
+        shortened_name = re.escape(target[:i])
+        matchs = do_descr_match(shortened_name, df)
+        if len(matchs) > 0:
+            return matchs
+
+    return None  # No match found
