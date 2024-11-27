@@ -33,7 +33,6 @@ class PrescriptionInfo(BaseModel):
 def extract_prescription(input_file):
     llm_structured = ChatOpenAI(model="gpt-4o-mini", temperature=0).with_structured_output(PrescriptionInfo)
     rootpath = os.path.dirname(os.getcwd())
-    document = rootpath + "/backend/" + input_file
 
     system_prompt = """
     Você é um atendente de farmácia com habilidades para extrair informações de receitas médicas e convertê-las em um formato JSON específico.
@@ -46,14 +45,15 @@ def extract_prescription(input_file):
 
     chain = prompt | llm_structured
 
-    text = extract_text(document)
+    text = extract_text(input_file)
     print(text)
     if len(text) == 0:
         return None
     response = chain.invoke({"input": text})
     print(response)
-    filename = document.split("/")[-1].split(".")[0]
-    with open(f"{filename}.json", "w") as f:
+    filename = input_file.split("/")[-1].split(".")[0]
+    rootpath = "/".join(input_file.split("/")[:-2])
+    with open(f"{rootpath}/processed/{filename}.json", "w") as f:
         json.dump(response.dict(), f, indent=4)
     
     return response.dict()

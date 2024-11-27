@@ -2,12 +2,13 @@ const express = require("express");
 const fs = require("fs");
 const multer = require("multer");
 const path = require("path");
+const http = require('http');
 const https = require('https');
 const md5 = require("md5");
 const session = require('express-session');
 
 var app = express();
-const port = 80;
+const port = 8080;
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -56,7 +57,7 @@ app.post("/calculate", upload.single("prescription"), (req, res, next) => {
         error.httpStatusCode = 400
         return next(error)
     }
-    res.redirect("/results?filename=" + req.file.filename);
+    res.redirect("/orcamento?filename=" + req.file.filename);
 });
 
 app.get('/events', async function (req, res) {
@@ -113,103 +114,57 @@ app.get('/events', async function (req, res) {
         }
         res.write(`data: {"status_text": "${loading_status}", "status_code": ${loading_code}}\n\n`);
     }
+
 })
 
-app.get("/results", async function (req, res, next) {
-    var resultPath = path.join(__dirname + "/processed/", req.query.filename.split('.')[0] + ".json");
-    console.log("check existing json " + resultPath);
-    if (fs.existsSync(resultPath)) {
-        console.log("Caminho encontrado");
-        let json_name = req.query.filename.split('.')[0] + ".json";
-        let txt_name = req.query.filename.split('.')[0] + ".txt";
-        console.log(json_name)
-        const calculatebudget = spawn('python', [__dirname + '/scripts/calculatebudget.py', json_name]);
-
-        let budget_output = "";
-        calculatebudget.stdout.on("data", (data) => {
-            budget_output += data.toString();
-
+app.get("/orcamento", function (req, res, next) {
+    var pdf_path = path.join(__dirname + "/uploads/", req.query.filename);
+    console.log("check existing file " + pdf_path);
+    do {
+        console.log("waiting for file " + pdf_path);
+    } while (!fs.existsSync(pdf_path))
+    // Make request to local api to convert pdf to text and extract content
+    var content = JSON.stringify({ "filename": pdf_path });
+    var options = {
+        hostname: 'localhost',
+        port: 8000,
+        path: "/extract_prescription",
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': Buffer.byteLength(content)
+        }
+    };
+    var r = http.request(options, (res) => {
+        console.log(`statusCode: ${res.statusCode}`);
+        res.setEncoding('utf8');
+        res.on('data', (d) => {
+            console.log(d);
         });
-        calculatebudget.on("error", (err) => {
-            console.log(err);
-            res.render("index.ejs", { parseError: true });
-        })
-        calculatebudget.on("close", () => {
-            console.log(budget_output)
-            try {
-                let document = __dirname + "/scans/" + txt_name
-                console.log(document)
-                let inText = fs.readFileSync(document)
-                res.render("resultado.ejs", { items: JSON.parse(budget_output).items, scanText: inText.toString().replace(/(?:\r\n|\r|\n)/g, '<br/>') });
-            } catch (err) {
-                console.log(err)
-                res.render("index.ejs", { parseError: true });
-            }
-        })
+    });
 
-    } else {
-        const tikaocr = spawn('python', [__dirname + '/scripts/tikaocr.py', req.query.filename]);
+    r.on('error', (error) => {
+        console.error(error);
+    });
 
-        let ocr_output = "";
-        tikaocr.stdout.on("data", (data) => {
-            ocr_output += data.toString();
-        });
+    r.write(content);
 
-        tikaocr.on("error", (err) => {
-            console.log(err);
-            res.render("index.ejs", { parseError: true });
-        })
-
-        tikaocr.on("close", () => {
-            console.log(ocr_output);
-            if (ocr_output != "fail.txt") {
-                const llmanalyze = spawn('python', [__dirname + '/scripts/analyze.py', ocr_output]);
-                let llm_output = "";
-                llmanalyze.stdout.on("data", (data) => {
-                    llm_output += data.toString();
-
-                });
-
-                llmanalyze.on("error", () => {
-                    console.log(err);
-                    res.render("index.ejs", { parseError: true });
-                })
-
-                llmanalyze.on("close", () => {
-                    console.log(llm_output)
-                    const calculatebudget = spawn('python', [__dirname + '/scripts/calculatebudget.py', llm_output]);
-
-                    let budget_output = "";
-                    calculatebudget.stdout.on("data", (data) => {
-                        budget_output += data.toString();
-
-                    });
-
-                    calculatebudget.on("error", (err) => {
-                        console.log(err);
-                        res.render("index.ejs", { parseError: true });
-                    })
-
-                    calculatebudget.on("close", () => {
-                        console.log(budget_output)
-                        try {
-                            let document = __dirname + "/scans/" + ocr_output
-                            console.log(document)
-                            let inText = fs.readFileSync(document)
-                            res.render("resultado.ejs", { items: JSON.parse(budget_output).items, scanText: inText.toString().replace(/(?:\r\n|\r|\n)/g, '<br/>') });
-                        } catch (err) {
-                            console.log(err)
-                            res.render("index.ejs", { parseError: true });
-                        }
-                    })
-                });
-            }
-        });
-
-    }
+    r.end();
+    var json_path = path.join(__dirname + "/processed/", req.query.filename.split('.')[0] + ".json");
+    console.log("check existing file " + json_path);
+    do {
+    } while (!fs.existsSync(json_path))
+    res.render("orcamento.ejs", {})
 })
 
 app.get("/orcamento", async function (req, res, next) {
+    var json_path = path.join(__dirname + "/processed/", req.query.filename.split('.')[0] + ".json");
+    console.log("check existing file " + json_path);
+    do {
+    } while (!fs.existsSync(json_path))
+    var content = fs.readFileSync(json_path);
+    var data = JSON.parse(content);
+    console.log(data);
     res.render("orcamento.ejs", {
         nomeCliente: 'Maria',
         quantidade: 60,
@@ -359,7 +314,7 @@ app.get("/orcamento/edit", (req, res) => {
             ]
         }
     ];
-    const embalagem= {
+    const embalagem = {
         'nome': 'POTE CAPS 310ML',
         'unidade': 'MG',
         'quantidade': 1,
@@ -417,7 +372,7 @@ app.get("/orcamento/edit", (req, res) => {
     for (let i = 0; i < ativos.length; i++) {
         unidadesEdited['ativos'] = unidadesEdited['ativos'].concat([[... new Set([ativos[i].unidade].concat(unidades))]]);
     }
-    
+
     res.render("orcamento_edit.ejs", {
         formaFarmaceuticaAll: formaFarmaceuticaAllEdited,
         formaFarmaceuticaSubgrupoAll: formaFarmaceuticaSubgrupoAllEdited,
