@@ -1,23 +1,23 @@
 import pandas as pd
 
-from ativo.main import ativoClass, ativoOrcamentoClass
+from ativo.main import ativoClass
 
 
-class embalagemClass:
-    ativo: ativoClass = None
-
-    def set_embalagem_values(self, volume, name = None):
+class embalagemClass(ativoClass):
+    def __init__(self, volume, name=None):
         if name == None:
             name = self.embalagemVolume(volume)
+        super().__init__(name)
+
+    def set_values(self):
         df_embalagens = pd.read_csv(
             './orcamento_tables/smart/embalagens_FCerta_SMART_2024.csv'
         )
-        embalagem = df_embalagens[df_embalagens['DESCR'] == name]
-        self.ativo = ativoClass(name, None)
-        self.ativo.density = embalagem['DENSIDADE'].iloc[0]
-        self.ativo.dilution = embalagem['DILUICAO'].iloc[0]
-        self.ativo.equivalency = embalagem['EQUIV'].iloc[0]
-        self.ativo.price = embalagem['PRVEN'].iloc[0]
+        embalagem = df_embalagens[df_embalagens['DESCR'] == self.name]
+        self.density = embalagem['DENSIDADE'].iloc[0]
+        self.dilution = embalagem['DILUICAO'].iloc[0]
+        self.equivalency = embalagem['EQUIV'].iloc[0]
+        self.price = embalagem['PRVEN'].iloc[0]
 
     def embalagemVolume(self, volume):
         df_volume = pd.read_csv('./orcamento_tables/smart/volume_embalagens.csv')
@@ -27,14 +27,7 @@ class embalagemClass:
             .iloc[0]
         )
 
-    def calc_price(self, quantity):
-        self.ativo.orcamento = ativoOrcamentoClass(quantity, 'UN')
-        self.ativo.orcamento.price = (
-            self.ativo.price
-            * self.ativo.dilution
-            * self.ativo.equivalency
-            * quantity
+    def calc_price(self):
+        self.orcamento.price = (
+            self.price * self.dilution * self.equivalency * self.orcamento.quantity
         )
-
-    def __str__(self):
-        return f"name: {self.ativo.name}, price: {self.ativo.price}"
