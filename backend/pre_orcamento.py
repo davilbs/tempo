@@ -52,7 +52,7 @@ class preOrcamentoClass:
         possible_ativo.set_orcamento_values(
             ativo.orcamento.quantity, ativo.orcamento.unity
         )
-        return ativo
+        return possible_ativo
 
     def find_ativos(self):
         df_ativos = pd.read_csv(
