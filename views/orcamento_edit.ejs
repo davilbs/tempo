@@ -80,7 +80,7 @@
                         <td id="ativo-quantidade-<%= rowIndex %>">
                             <input id="ativo-quantidade" type="text" value="<%= ativo.quantidade %>" />
                         </td>
-                        <td id="ativo-preco-<%= rowIndex %>" class="price-column">
+                        <td id="preco-ativo-<%= rowIndex %>" class="price-column">
                             <%= ativo.opcoes[0].preco !=='-' ? `R$${parseFloat(ativo.opcoes[0].preco).toFixed(2)}` :
                                 ativo.opcoes[0].preco %>
                         </td>
@@ -94,8 +94,7 @@
             <thead>
                 <tr class="header-row">
                     <th>Embalagem</th>
-                    <th>Unidade</th>
-                    <th>Nº Potes</th>
+                    <th>Nº Embalagens</th>
                     <th>Preço</th>
                 </tr>
             </thead>
@@ -112,18 +111,9 @@
                         <input id="embalagem-nome" autoComplete="on" list="embalagens" value="<%= embalagem.nome %>" />
                     </td>
                     <td>
-                        <select id="embalagem-unidade" name="embalagem-unidade">
-                            <% unidades.embalagem.forEach(function(unidade) { %>
-                                <option value="<%= unidade %>">
-                                    <%= unidade %>
-                                </option>
-                                <% }) %>
-                        </select>
-                    </td>
-                    <td>
                         <input id="embalagem-quantidade" type="text" value="<%= embalagem.quantidade %>" />
                     </td>
-                    <td id="embalagem-preco" class="price-column">R$<%= embalagem.preco.toFixed(2) %>
+                    <td id="preco-embalagem" class="price-column">R$<%= embalagem.preco.toFixed(2) %>
                     </td>
                 </tr>
             </tbody>
@@ -163,7 +153,7 @@
                     <td>
                         <input id="excipiente-quantidade" type="text" value="<%= excipiente.quantidade %>" />
                     </td>
-                    <td id="excipiente-preco" class="price-column">R$<%= excipiente.preco.toFixed(2) %>
+                    <td id="preco-excipiente" class="price-column">R$<%= excipiente.preco.toFixed(2) %>
                     </td>
                 </tr>
             </tbody>
@@ -207,7 +197,7 @@
                     </td>
                     <td id="capsula-contem" name="capsula-contem"><%= capsula.contem %>
                     </td>
-                    <td id="capsula-preco" class="capsula-price">R$<%= capsula.preco.toFixed(2) %>
+                    <td id="preco-capsula" class="price-column">R$<%= capsula.preco.toFixed(2) %>
                     </td>
                 </tr>
             </tbody>
@@ -226,15 +216,13 @@
             </tr>
         </table>
 
-        <!-- <a href="/orcamento"> -->
-            <button type="button" id="save-button" class="upload-button" onclick="submit_orcamento()">Salvar</button>
-        <!-- </a> -->
+        <button type="button" id="submit_orcamento" class="upload-button" >Salvar</button>
 
     </div>
     <script>
         const formaFarmaceuticaSubgrupoAll = <%- JSON.stringify(formaFarmaceuticaSubgrupoAll) %>;
     </script>
-    <script src="/scripts/orcamento.js"></script>
+    <script src="/scripts/orcamento_edited.js"></script>
 </body>
 
 </html>

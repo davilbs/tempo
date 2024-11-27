@@ -1,13 +1,14 @@
 import pandas as pd
 
-from ativo.main import ativoClass
+from ativo.main import ativoClass, ativoOrcamentoClass
 
 
 class embalagemClass:
     ativo: ativoClass = None
 
-    def getEmbalagem(self, volume):
-        name = self.embalagemVolume(volume)
+    def set_embalagem_values(self, volume, name = None):
+        if name == None:
+            name = self.embalagemVolume(volume)
         df_embalagens = pd.read_csv(
             './orcamento_tables/smart/embalagens_FCerta_SMART_2024.csv'
         )
@@ -24,6 +25,15 @@ class embalagemClass:
             df_volume[df_volume['volume_interno'] >= volume]
             .sort_values('volume_interno')['embalagem']
             .iloc[0]
+        )
+
+    def calc_price(self, quantity):
+        self.ativo.orcamento = ativoOrcamentoClass(quantity, 'UN')
+        self.ativo.orcamento.price = (
+            self.ativo.price
+            * self.ativo.dilution
+            * self.ativo.equivalency
+            * quantity
         )
 
     def __str__(self):

@@ -132,7 +132,105 @@ function updateCapsulaPrice() {
         }
     }
 
-    document.getElementById('capsula-preco').innerText = `R$${capsulaPrice.toFixed(2)}`;
+    document.getElementById('preco-capsula').innerText = `R$${capsulaPrice.toFixed(2)}`;
+}
+
+function parse_orcamento_editted() {
+    var ativos = [];
+    var embalagem = {};
+    var excipiente = {};
+    var capsula = {}
+    const rows = document.querySelectorAll("table tbody tr");
+    rows.forEach((tr) => {
+        var ativo = {};
+        var tds = tr.querySelectorAll('td');
+        if (tr.id == 'ativo') {
+            tds.forEach((td) => {
+                if (td.querySelector('select')) {
+                    td = td.querySelector('select');
+                }
+                else if (td.querySelector('input')) {
+                    td = td.querySelector('input');
+                }
+                if (td.id.includes('ativoPuro') && td.value != 'Selecione') {
+                    ativo['nome'] = td.value;
+                }
+                else if (td.id.includes('ativo-unidade')) {
+                    ativo['unidade'] = td.value;
+                }
+                else if (td.id.includes('ativo-quantidade')) {
+                    ativo['quantidade'] = parseInt(td.value);
+                }
+            });
+            ativos = ativos.concat(ativo);
+        }
+        else if (tr.id == 'embalagem') {
+            tds.forEach((td) => {
+                if (td.querySelector('select')) {
+                    td = td.querySelector('select');
+                }
+                else if (td.querySelector('input')) {
+                    td = td.querySelector('input');
+                }
+                if (td.id.includes('embalagem-nome') && td.value != '') {
+                    embalagem['nome'] = td.value;
+                }
+                else if (td.id.includes('embalagem-unidade')) {
+                    embalagem['unidade'] = td.value;
+                }
+                else if (td.id.includes('embalagem-quantidade')) {
+                    embalagem['quantidade'] = parseInt(td.value);
+                }
+            });
+        }
+        else if (tr.id == 'excipiente') {
+            tds.forEach((td) => {
+                if (td.querySelector('select')) {
+                    td = td.querySelector('select');
+                }
+                else if (td.querySelector('input')) {
+                    td = td.querySelector('input');
+                }
+                if (td.id.includes('excipiente-nome') && td.value != '') {
+                    excipiente['nome'] = td.value;
+                }
+                else if (td.id.includes('excipiente-unidade')) {
+                    excipiente['unidade'] = td.value;
+                }
+                else if (td.id.includes('excipiente-quantidade')) {
+                    excipiente['quantidade'] = parseInt(td.value);
+                }
+            });
+        }
+        else if (tr.id == 'capsula') {
+            tds.forEach((td) => {
+                if (td.querySelector('select')) {
+                    td = td.querySelector('select');
+                }
+                else if (td.querySelector('input')) {
+                    td = td.querySelector('input');
+                }
+                if (td.id.includes('capsula-tipo')) {
+                    capsula['tipo'] = td.value;
+                }
+                else if (td.id.includes('capsula-unidade')) {
+                    capsula['unidade'] = td.value;
+                }
+                else if (td.id.includes('capsula-quantidade')) {
+                    capsula['quantidade'] = parseInt(td.value);
+                }
+            });
+        }
+    });
+    return {
+        "quantity": parseInt(document.getElementById('quantidade-orcamento').value),
+        "formaFarmaceutica": document.getElementById('forma-farmaceutica').value,
+        "formaFarmaceuticaSubgrupo": document.getElementById('forma-farmaceutica-subgrupo').value,
+        "ativos": ativos,
+        "embalagem": embalagem,
+        "excipiente": excipiente,
+        "capsula": capsula,
+    };
 }
 
 function parse_orcamento() {
@@ -141,7 +239,6 @@ function parse_orcamento() {
     var excipiente = {};
     var capsula = {}
     const rows = document.querySelectorAll("table tbody tr");
-    var ativoCounter = 0;
     rows.forEach((tr) => {
         var ativo = {};
         var tds = tr.querySelectorAll('td');
@@ -149,18 +246,12 @@ function parse_orcamento() {
             tds.forEach((td) => {
                 if (td.querySelector('select')) {
                     td = td.querySelector('select');
-                    const values = Array.from(td.options).map(option => option.value);
-                    ativo['opcoes'] = [];
-                    for (let i = 0; i < values.length; i++) {
-                        var element = values[i];
-                        var price = ativosAll[ativoCounter].opcoes[i]['preco'];
-                        ativo['opcoes'].push(
-                            {
-                                'nome': element,
-                                'preco': price
-                            }
-                        );
-                    }
+                }
+                else if (td.querySelector('input')) {
+                    td = td.querySelector('input');
+                }
+                if (td.id.includes('ativoPuro')) {
+                    ativo['nome'] = td.value;
                 }
                 else if (td.id.includes('ativo-unidade')) {
                     ativo['unidade'] = td.innerText;
@@ -170,7 +261,6 @@ function parse_orcamento() {
                 }
             });
             ativos = ativos.concat(ativo);
-            ativoCounter += 1;
         }
         else if (tr.id == 'embalagem') {
             tds.forEach((td) => {
@@ -188,9 +278,6 @@ function parse_orcamento() {
                 }
                 else if (td.id.includes('embalagem-quantidade')) {
                     embalagem['quantidade'] = parseInt(td.innerText);
-                }
-                else if (td.id.includes('preco-embalagem')) {
-                    embalagem['preco'] = parseFloat(td.innerText.replace("R$", ""));
                 }
             });
         }
@@ -211,9 +298,6 @@ function parse_orcamento() {
                 else if (td.id.includes('excipiente-quantidade')) {
                     excipiente['quantidade'] = parseInt(td.innerText);
                 }
-                else if (td.id.includes('preco-excipiente')) {
-                    excipiente['preco'] = parseFloat(td.innerText.replace("R$", ""));
-                }
             });
         }
         else if (tr.id == 'capsula') {
@@ -227,20 +311,11 @@ function parse_orcamento() {
                 if (td.id.includes('capsula-tipo')) {
                     capsula['tipo'] = td.innerText;
                 }
-                else if (td.id.includes('capsula-nome')) {
-                    capsula['nome'] = td.innerText;
-                }
-                else if (td.id.includes('capsula-contem')) {
-                    capsula['contem'] = td.innerText;
-                }
                 else if (td.id.includes('capsula-unidade')) {
                     capsula['unidade'] = td.innerText;
                 }
                 else if (td.id.includes('capsula-quantidade')) {
                     capsula['quantidade'] = parseInt(td.innerText);
-                }
-                else if (td.id.includes('preco-capsula')) {
-                    capsula['preco'] = parseFloat(td.innerText.replace("R$", ""));
                 }
             });
         }
@@ -258,18 +333,38 @@ function parse_orcamento() {
     };
 }
 
-document.getElementById('edit_orcamento').addEventListener('click', async () => {
-    const orcamento = JSON.stringify(parse_orcamento());
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = '/orcamento/edit';
+document.getElementById('submit_orcamento').addEventListener('click', async () => {
+    orcamento = parse_orcamento_editted();
 
-    const orcamentoInput = document.createElement('input');
-    orcamentoInput.type = 'hidden';
-    orcamentoInput.name = 'orcamento';
-    orcamentoInput.value = orcamento;
-    form.appendChild(orcamentoInput);
+    const response = await fetch("http://127.0.0.1:5000/update_orcamento", {
+        method: "POST",
+        "body": JSON.stringify({
+            orcamento
+        }),
+    });
+    if (response.ok) {
+        const result = JSON.parse((await response.json())['body'])['result'];
+        
+        // Create a form for POST redirection
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/orcamento/result';
 
-    document.body.appendChild(form);
-    form.submit();
+        // Add the processed data as a hidden input
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'submited_orcamento';
+        input.value = JSON.stringify(result);
+        form.appendChild(input);
+
+        // Append the form to the body and submit it
+        document.body.appendChild(form);
+        form.submit();
+    } else {
+        alert('Failed to process data. Try again.');
+    }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const orcamento = JSON.parse(sessionStorage.getItem('orcamento'));
 });
