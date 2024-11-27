@@ -19,6 +19,8 @@ class preOrcamentoClass:
         dosagem,
         forma_farmaceutica='',
         sub_forma_farmaceutica='',
+        nome_cliente='',
+        nome_medico='',
     ) -> None:
         self.ativos = []
         for ativoRaw in ativos:
@@ -30,6 +32,8 @@ class preOrcamentoClass:
         self.dosagem = int(dosagem)
         self.forma_farmaceutica = forma_farmaceutica
         self.sub_forma_farmaceutica = sub_forma_farmaceutica
+        self.nome_cliente = nome_cliente
+        self.nome_medico = nome_medico
 
     def print_orcamento(self):
         for ativo_name in self.possible_ativos.keys():
@@ -63,8 +67,7 @@ class preOrcamentoClass:
                 self.possible_ativos[ativo.name].append(possible_ativo)
 
     def choose_excipiente(self):
-        self.excipiente = excipientClass()
-        self.excipiente.set_excipiente_name(self.sub_forma_farmaceutica, self.ativos)
+        self.excipiente = excipientClass(self.sub_forma_farmaceutica, self.ativos)
 
     def get_custo_fixo(self):
         df_custos = pd.read_csv(
@@ -127,7 +130,7 @@ class preOrcamentoClass:
                 'preco': '-',
             },
             'excipiente': {
-                'nome': 'EXCIPIENTE PADRÃO CÁPSULAS',
+                'nome': self.excipiente.name,
                 'unidade': 'MG',
                 'quantidade': '-',
                 'preco': '-',
