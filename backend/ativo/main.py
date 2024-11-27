@@ -1,3 +1,5 @@
+import pandas as pd
+
 class ativoOrcamentoClass:
     quantity: int = 0
     unity: str = ''
@@ -28,6 +30,19 @@ class ativoClass:
     ) -> None:
         self.name = name
 
+    def set_values(self):
+        df_ativos = pd.read_csv(
+            './orcamento_tables/smart/ativos_joined_FCerta_SMART_2024.csv'
+        )
+        row = df_ativos[df_ativos['DESCR'] == self.name]
+        self.price = row['PRVEN']
+        self.equivalency = row['EQUIV']
+        self.dilution = row['DILUICAO']
+        self.density = row['DENSIDADE']
+        if isinstance(row['ARGUMENTO'], str):
+            self.unity_conversion = row['ARGUMENTO']
+            self.unity_value_conversion = float(row['PARAMETRO'])
+    
     def set_orcamento_values(
         self,
         quantity,

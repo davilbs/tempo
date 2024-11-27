@@ -42,18 +42,12 @@ class preOrcamentoClass:
         orcamento = self.parse_to_web()
         print(orcamento)
 
-    def parse_ativo_fields(self, row, ativoReceita: ativoClass):
-        ativo = ativoClass(
-            row['DESCR'],
+    def parse_ativo_fields(self, row, ativo: ativoClass):
+        possible_ativo = ativoClass(row['DESCR'])
+        possible_ativo.set_values()
+        possible_ativo.set_orcamento_values(
+            ativo.orcamento.quantity, ativo.orcamento.unity
         )
-        ativo.price = row['PRVEN']
-        ativo.equivalency = row['EQUIV']
-        ativo.dilution = row['DILUICAO']
-        ativo.density = row['DENSIDADE']
-        if isinstance(row['ARGUMENTO'], str):
-            ativo.unity_conversion = row['ARGUMENTO']
-            ativo.unity_value_conversion = float(row['PARAMETRO'])
-        ativo.set_orcamento_values(ativoReceita.orcamento.quantity, ativoReceita.orcamento.unity)
         return ativo
 
     def find_ativos(self):
@@ -77,7 +71,11 @@ class preOrcamentoClass:
             './orcamento_tables/smart/custo_fixo_FCerta_SMART_2024.csv'
         )
         forma_farmaceutica_id = re.split(r'(\d+)', self.forma_farmaceutica)[1]
-        return float(df_custos[df_custos['forma_farmaceutica'] == forma_farmaceutica_id]['custo_fixo'].iloc[0])
+        return float(
+            df_custos[df_custos['forma_farmaceutica'] == forma_farmaceutica_id][
+                'custo_fixo'
+            ].iloc[0]
+        )
 
     def calc_price(self, ativo: ativoClass):
         ativo.orcamento.price = (

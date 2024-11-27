@@ -9,12 +9,11 @@ class excipientClass(ativoClass):
         self.ativo = ativoClass(rule.get_excipiente(ativos))
         self.set_values(self.ativo.name)
 
-    def set_values(self, name):
+    def set_values(self):
         df_excipientes = pd.read_csv(
             './orcamento_tables/smart/excipientes_FCerta_SMART_2024.csv'
         )
-        embalagem = df_excipientes[df_excipientes['DESCR'] == name]
-        self.ativo = ativoClass(name)
+        embalagem = df_excipientes[df_excipientes['DESCR'] == self.ativo.name]
         self.ativo.density = embalagem['DENSIDADE'].iloc[0]
         self.ativo.dilution = embalagem['DILUICAO'].iloc[0]
         self.ativo.equivalency = embalagem['EQUIV'].iloc[0]
