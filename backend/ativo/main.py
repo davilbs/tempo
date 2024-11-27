@@ -29,6 +29,7 @@ class ativoClass:
         name,
     ) -> None:
         self.name = name
+        self.set_values()
 
     def set_values(self):
         df_ativos = pd.read_csv(
