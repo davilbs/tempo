@@ -25,10 +25,21 @@ class ativoClass:
     def __init__(
         self,
         name,
-        orcamento: ativoOrcamentoClass,
     ) -> None:
         self.name = name
-        self.orcamento = orcamento
+
+    def set_orcamento_values(
+        self,
+        quantity,
+        unity,
+    ):
+        self.orcamento = ativoOrcamentoClass(
+            quantity,
+            unity,
+        )
 
     def __str__(self):
-        return f"name: {self.name}, unity: {self.orcamento.unity}, quantity: {self.orcamento.quantity}, price: {self.orcamento.price}"
+        if self.orcamento != None:
+            return f"name: {self.name}, unity: {self.orcamento.unity}, quantity: {self.orcamento.quantity}, price: {self.orcamento.price}"
+        else:
+            return f"name: {self.name}"
