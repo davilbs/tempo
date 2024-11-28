@@ -160,7 +160,7 @@ class orcamentoClass:
 
     def choose_excipiente(self, orcamento_values):
         self.excipiente = excipientClass(
-            orcamento_values['forma_farmaceutica'],
+            orcamento_values['sub_forma_farmaceutica'],
             self.ativos,
             orcamento_values['excipiente']['nome'],
         )
