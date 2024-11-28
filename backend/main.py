@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from analyze import extract_prescription
-from orcamento import orcamentoClass, ativoClass, ativoOrcamentoClass
+from pre_orcamento import preOrcamentoClass
 
 app = FastAPI()
 
@@ -24,19 +24,25 @@ def extract_prescription_route(file: File):
             forma_farmaceutica = medicamento['excipiente']
             qtd = medicamento['quantidade']
             for ingrediente in medicamento['ingredientes']:
-                ativo = ativoClass(ingrediente['nome'], ativoOrcamentoClass(int(ingrediente['dosagem']), ingrediente['unidade']))
+                ativo = {
+                    'nome': ingrediente['nome'],
+                    'unidade': ingrediente['unidade'],
+                    'quantidade': int(ingrediente['dosagem']),
+                }
                 ativos.append(ativo)
-            
-            orcamento = orcamentoClass(
+
+            orcamento = preOrcamentoClass(
                 ativos,
                 qtd,
                 forma_farmaceutica=forma_farmaceutica,
                 sub_forma_farmaceutica='',
+                nome_medico='João',
+                nome_cliente='Maria',
             )
-            # orcamento.create_orcamento()
+            orcamento_result = orcamento.create_pre_orcamento()
             break
 
-        print(orcamento)
+        print(orcamento_result)
         # Enviar orçamento para o front-end
-        return {"status": "success", "result": result}
+        return {"status": "success", "result": orcamento_result}
     return {"status": "error", "result": "No prescription found"}
