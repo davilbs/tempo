@@ -45,7 +45,7 @@ class preOrcamentoClass:
         self.find_ativos()
         self.choose_excipiente()
         orcamento = self.parse_to_web()
-        print(orcamento)
+        return orcamento
 
     def parse_ativo_fields(self, row, ativo):
         possible_ativo = ativoClass(row['DESCR'])
@@ -123,7 +123,7 @@ class preOrcamentoClass:
                 'quantidade': '-',
                 'preco': '-',
             },
-            'capsulas': {
+            'capsula': {
                 'quantidade': self.dosagem,
                 'unidade': 'UN',
                 'tipo': 'INCOLOR',
