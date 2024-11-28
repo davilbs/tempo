@@ -152,8 +152,8 @@ function parse_orcamento_editted() {
                 else if (td.querySelector('input')) {
                     td = td.querySelector('input');
                 }
-                if (td.id.includes('ativoPuro') && td.value != 'Selecione') {
-                    ativo['nome'] = td.value;
+                if (td.id.includes('ativoPuro')) {
+                    ativo['nome'] = td.value == 'Selecione' ? '' : td.value;
                 }
                 else if (td.id.includes('ativo-unidade')) {
                     ativo['unidade'] = td.value;
@@ -172,7 +172,7 @@ function parse_orcamento_editted() {
                 else if (td.querySelector('input')) {
                     td = td.querySelector('input');
                 }
-                if (td.id.includes('embalagem-nome') && td.value != '') {
+                if (td.id.includes('embalagem-nome')) {
                     embalagem['nome'] = td.value;
                 }
                 else if (td.id.includes('embalagem-unidade')) {
@@ -191,7 +191,7 @@ function parse_orcamento_editted() {
                 else if (td.querySelector('input')) {
                     td = td.querySelector('input');
                 }
-                if (td.id.includes('excipiente-nome') && td.value != '') {
+                if (td.id.includes('excipiente-nome')) {
                     excipiente['nome'] = td.value;
                 }
                 else if (td.id.includes('excipiente-unidade')) {
@@ -223,109 +223,12 @@ function parse_orcamento_editted() {
         }
     });
     return {
-        "quantity": parseInt(document.getElementById('quantidade-orcamento').value),
-        "formaFarmaceutica": document.getElementById('forma-farmaceutica').value,
-        "formaFarmaceuticaSubgrupo": document.getElementById('forma-farmaceutica-subgrupo').value,
-        "ativos": ativos,
-        "embalagem": embalagem,
-        "excipiente": excipiente,
-        "capsula": capsula,
-    };
-}
-
-function parse_orcamento() {
-    var ativos = [];
-    var embalagem = {};
-    var excipiente = {};
-    var capsula = {}
-    const rows = document.querySelectorAll("table tbody tr");
-    rows.forEach((tr) => {
-        var ativo = {};
-        var tds = tr.querySelectorAll('td');
-        if (tr.id == 'ativo') {
-            tds.forEach((td) => {
-                if (td.querySelector('select')) {
-                    td = td.querySelector('select');
-                }
-                else if (td.querySelector('input')) {
-                    td = td.querySelector('input');
-                }
-                if (td.id.includes('ativoPuro')) {
-                    ativo['nome'] = td.value;
-                }
-                else if (td.id.includes('ativo-unidade')) {
-                    ativo['unidade'] = td.innerText;
-                }
-                else if (td.id.includes('ativo-quantidade')) {
-                    ativo['quantidade'] = parseInt(td.innerText);
-                }
-            });
-            ativos = ativos.concat(ativo);
-        }
-        else if (tr.id == 'embalagem') {
-            tds.forEach((td) => {
-                if (td.querySelector('select')) {
-                    td = td.querySelector('select');
-                }
-                else if (td.querySelector('input')) {
-                    td = td.querySelector('input');
-                }
-                if (td.id.includes('embalagem-nome')) {
-                    embalagem['nome'] = td.innerText;
-                }
-                else if (td.id.includes('embalagem-unidade')) {
-                    embalagem['unidade'] = td.innerText;
-                }
-                else if (td.id.includes('embalagem-quantidade')) {
-                    embalagem['quantidade'] = parseInt(td.innerText);
-                }
-            });
-        }
-        else if (tr.id == 'excipiente') {
-            tds.forEach((td) => {
-                if (td.querySelector('select')) {
-                    td = td.querySelector('select');
-                }
-                else if (td.querySelector('input')) {
-                    td = td.querySelector('input');
-                }
-                if (td.id.includes('excipiente-nome')) {
-                    excipiente['nome'] = td.innerText;
-                }
-                else if (td.id.includes('excipiente-unidade')) {
-                    excipiente['unidade'] = td.innerText;
-                }
-                else if (td.id.includes('excipiente-quantidade')) {
-                    excipiente['quantidade'] = parseInt(td.innerText);
-                }
-            });
-        }
-        else if (tr.id == 'capsula') {
-            tds.forEach((td) => {
-                if (td.querySelector('select')) {
-                    td = td.querySelector('select');
-                }
-                else if (td.querySelector('input')) {
-                    td = td.querySelector('input');
-                }
-                if (td.id.includes('capsula-tipo')) {
-                    capsula['tipo'] = td.innerText;
-                }
-                else if (td.id.includes('capsula-unidade')) {
-                    capsula['unidade'] = td.innerText;
-                }
-                else if (td.id.includes('capsula-quantidade')) {
-                    capsula['quantidade'] = parseInt(td.innerText);
-                }
-            });
-        }
-    });
-    return {
-        "nomeCliente": document.getElementById('nome-cliente').innerText,
-        "nomeMedico": document.getElementById('nome-medico').innerText,
-        "custoFixo": parseInt(document.getElementById('quantidade-orcamento').innerText),
-        "formaFarmaceutica": document.getElementById('forma-farmaceutica').innerText,
-        "formaFarmaceuticaSubgrupo": document.getElementById('forma-farmaceutica-subgrupo').innerText,
+        "nome_cliente": document.getElementById('quantidade-orcamento').value,
+        "nome_medico": document.getElementById('quantidade-orcamento').value,
+        "dosagem": parseInt(document.getElementById('quantidade-orcamento').value),
+        "dosagem": parseInt(document.getElementById('quantidade-orcamento').value),
+        "forma_farmaceutica": document.getElementById('forma-farmaceutica').value,
+        "sub_forma_farmaceutica": document.getElementById('forma-farmaceutica-subgrupo').value,
         "ativos": ativos,
         "embalagem": embalagem,
         "excipiente": excipiente,
