@@ -4,10 +4,13 @@ from excipients.rules import excipientRules
 from ativo.main import ativoClass
 
 class excipientClass(ativoClass):
+
     def __init__(self, sub_forma_farmaceutica, ativos, name = '') -> None:
         if name == '':
-            rule = excipientRules(sub_forma_farmaceutica)
-            name = rule.get_excipiente(ativos)
+            name = "EXCIPIENTE CAPSULA SUBLINGUAL"
+            # rule = excipientRules(sub_forma_farmaceutica)
+            # name = rule.get_excipiente(ativos)
+        print(name)
         super().__init__(name)
 
     def set_values(self):

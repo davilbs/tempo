@@ -1,5 +1,7 @@
 import pandas as pd, re
 import utils
+from pydantic import BaseModel
+from typing import Sequence
 
 from ativo.main import ativoClass, ativoOrcamentoClass
 from excipients.main import excipientClass
@@ -7,20 +9,21 @@ from capsules.main import capsuleClass
 from embalagens.main import embalagemClass
 
 
-class orcamentoClass:
+class orcamentoClass(BaseModel):
     compression_factor: float = 0.8
-    ativos: list[ativoClass] = []
+    ativos: Sequence[ativoClass] = []
     dosagem: int = 0
     number_of_capsule: int = 1
     nome_cliente: str = ''
     nome_medico: str = ''
     forma_farmaceutica: str = ''
     sub_forma_farmaceutica: str = ''
-    capsulas: list[capsuleClass] = []
+    capsulas: Sequence[capsuleClass] = []
     excipiente: excipientClass = None
     embalagem: embalagemClass = None
 
     def __init__(self, orcamento_values) -> None:
+        super().__init__()
         self.ativos = []
         for ativoRaw in orcamento_values['ativos']:
             ativo = ativoClass(

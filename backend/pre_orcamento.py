@@ -1,18 +1,22 @@
 import pandas as pd, utils, re
+from pydantic import BaseModel
+from typing import List, Dict
+from typing_extensions import TypedDict
 
 from ativo.main import ativoClass
 from excipients.main import excipientClass
 
 
-class preOrcamentoClass:
-    ativos: list[dict] = []
-    possible_ativos: dict[str : list[ativoClass]] = {}
-    nome_cliente = ''
-    nome_medico = ''
-    forma_farmaceutica = ''
-    sub_forma_farmaceutica = ''
-    dosagem = 0
-
+class preOrcamentoClass(BaseModel):
+    ativos: List[Dict] = []
+    possible_ativos: Dict[str, List[ativoClass]] = {}
+    nome_cliente: str = ''
+    nome_medico: str = ''
+    forma_farmaceutica: str = ''
+    sub_forma_farmaceutica: str = ''
+    dosagem: int = 0
+    excipiente: str = ''
+    
     def __init__(
         self,
         ativos,
@@ -22,6 +26,7 @@ class preOrcamentoClass:
         nome_cliente='',
         nome_medico='',
     ) -> None:
+        super().__init__()
         self.ativos = []
         for ativoRaw in ativos:
             ativo = {

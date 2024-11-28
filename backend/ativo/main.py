@@ -1,6 +1,7 @@
 import pandas as pd
+from pydantic import BaseModel
 
-class ativoOrcamentoClass:
+class ativoOrcamentoClass(BaseModel):
     quantity: int = 0
     unity: str = ''
     price: float = 0
@@ -10,24 +11,26 @@ class ativoOrcamentoClass:
         quantity,
         unity,
     ) -> None:
+        super().__init__()
         self.quantity = quantity
         self.unity = unity
 
 
-class ativoClass:
+class ativoClass(BaseModel):
     name: str = ''
-    price = 0
-    equivalency = 1
-    dilution = 1
-    density = 1
-    unity_conversion = ''
-    unity_value_conversion = 1
+    price: float = 0
+    equivalency: int = 1
+    dilution: int = 1
+    density: int = 1
+    unity_conversion: str = ''
+    unity_value_conversion: int = 1
     orcamento: ativoOrcamentoClass = None
 
     def __init__(
         self,
         name,
     ) -> None:
+        super().__init__()
         self.name = name
         self.set_values()
 

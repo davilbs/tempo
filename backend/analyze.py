@@ -2,7 +2,7 @@ import sys
 import os
 import json 
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, Literal
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import SystemMessage, HumanMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
@@ -20,7 +20,8 @@ class Ingredient(BaseModel):
 class Product(BaseModel):
     nome: str = Field(...,description="Nome do medicamento, suplemento ou fórmula")
     quantidade: Optional[int] = Field(...,description="Quantidade do medicamento/fórmula. Doses")
-    excipiente: Optional[str] = Field(...,description="Excipiente do medicamento. Descreva o excipiente se houver (capsula, etc).")
+    excipiente: Optional[Literal['1 - Cápsula',    '2 - Cremes',    '3 - Loções',    '4 - Shampoo',    '5 - Outros',    '6 - Envase / Produtos Heel / Fisioquantic / Oli Vera Cha Verde / Repelente / Teloactive / Comprimido']] = Field(...,description="Excipiente do medicamento.")
+    sub_excipiente: Optional[Literal['Slow Release', 'Sublingual', 'Combo', 'Lipofílica/Oleosa', 'Complexo B','Envase', 'Produtos Heel', 'Fisioquantic', 'Repelente']] = Field(...,description="Subespecificação do excipiente do medicamento, se houver.")
     posologia: Optional[int] = Field(...,description="Quantidade a ser utilizada por dia")
     ingredientes: Optional[list[Ingredient]] = Field(...,description="Lista de ingredientes do medicamento com seus respectivos nomes, quantidades e unidade de medida.")
 

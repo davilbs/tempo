@@ -75,9 +75,9 @@ def unityCalcConversion(unity: str):
     else:
         return 1
     
-def do_descr_match( target, df):
-        if df['DESCR'].str.contains(target, case=False, na=False).any():
-            return df[df['DESCR'].str.contains(target, case=False, na=False)]
+def do_descr_match(target, df):
+        if df['DESCR'].str.contains(target, regex=False, case=False, na=False).any():
+            return df[df['DESCR'].str.contains(target, regex=False, case=False, na=False)]
         return []
 
 def find_closest_match_contains(df, target, exact = False):
