@@ -43,3 +43,11 @@ th {
 .text-center {
     text-align: center;
 }
+
+.required::after {
+    content: "    *";
+    color: red;
+    font-size: 24px; /* Make the asterisk larger */
+    vertical-align: middle; /* Align it neatly */
+    line-height: 1; /* Ensure it doesn't add extra spacing */
+}
