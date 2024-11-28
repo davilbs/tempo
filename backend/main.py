@@ -15,8 +15,10 @@ def root():
 @app.post("/extract_prescription")
 def extract_prescription_route(file: File):
     print("Extracting prescription from ", file.filename)
+    # Extrair o JSON da receita
     result = extract_prescription(file.filename)
     if result:
+        # Formatar orçamento para o front-end
         for medicamento in result['medicamentos']:
             ativos = []
             forma_farmaceutica = medicamento['excipiente']
@@ -35,5 +37,6 @@ def extract_prescription_route(file: File):
             break
 
         print(orcamento)
+        # Enviar orçamento para o front-end
         return {"status": "success", "result": result}
     return {"status": "error", "result": "No prescription found"}

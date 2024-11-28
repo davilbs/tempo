@@ -150,21 +150,18 @@ app.get("/orcamento", function (req, res, next) {
     r.write(content);
 
     r.end();
+
+    // Wait for the file to be processed
     var json_path = path.join(__dirname + "/processed/", req.query.filename.split('.')[0] + ".json");
     console.log("check existing file " + json_path);
     do {
     } while (!fs.existsSync(json_path))
     res.render("orcamento.ejs", {})
-})
-
-app.get("/orcamento", async function (req, res, next) {
-    var json_path = path.join(__dirname + "/processed/", req.query.filename.split('.')[0] + ".json");
-    console.log("check existing file " + json_path);
-    do {
-    } while (!fs.existsSync(json_path))
     var content = fs.readFileSync(json_path);
     var data = JSON.parse(content);
     console.log(data);
+    
+    // Render the page with the data 
     res.render("orcamento.ejs", {
         nomeCliente: 'Maria',
         quantidade: 60,
