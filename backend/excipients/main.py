@@ -4,11 +4,11 @@ from excipients.rules import excipientRules
 from ativo.main import ativoClass
 
 class excipientClass(ativoClass):
-    def __init__(self, sub_forma_farmaceutica, ativos) -> None:
-        rule = excipientRules(sub_forma_farmaceutica)
-        name = rule.get_excipiente(ativos)
+    def __init__(self, sub_forma_farmaceutica, ativos, name = '') -> None:
+        if name == '':
+            rule = excipientRules(sub_forma_farmaceutica)
+            name = rule.get_excipiente(ativos)
         super().__init__(name)
-        self.set_values()
 
     def set_values(self):
         df_excipientes = pd.read_csv(

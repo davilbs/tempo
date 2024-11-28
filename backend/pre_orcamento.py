@@ -5,7 +5,7 @@ from excipients.main import excipientClass
 
 
 class preOrcamentoClass:
-    ativos: list[ativoClass] = []
+    ativos: list[dict] = []
     possible_ativos: dict[str : list[ativoClass]] = {}
     nome_cliente = ''
     nome_medico = ''
@@ -24,10 +24,11 @@ class preOrcamentoClass:
     ) -> None:
         self.ativos = []
         for ativoRaw in ativos:
-            ativo = ativoClass(
-                ativoRaw['nome'],
-            )
-            ativo.set_orcamento_values(ativoRaw['quantidade'], ativoRaw['unidade'])
+            ativo = {
+                'nome': ativoRaw['nome'],
+                'quantidade': ativoRaw['quantidade'],
+                'unidade': ativoRaw['unidade'],
+            }
             self.ativos.append(ativo)
         self.dosagem = int(dosagem)
         self.forma_farmaceutica = forma_farmaceutica
@@ -44,27 +45,27 @@ class preOrcamentoClass:
         self.find_ativos()
         self.choose_excipiente()
         orcamento = self.parse_to_web()
-        print(orcamento)
+        return orcamento
 
-    def parse_ativo_fields(self, row, ativo: ativoClass):
+    def parse_ativo_fields(self, row, ativo):
         possible_ativo = ativoClass(row['DESCR'])
         possible_ativo.set_values()
         possible_ativo.set_orcamento_values(
-            ativo.orcamento.quantity, ativo.orcamento.unity
+            ativo['quantidade'], ativo['unidade']
         )
-        return ativo
+        return possible_ativo
 
     def find_ativos(self):
         df_ativos = pd.read_csv(
             './orcamento_tables/smart/ativos_joined_FCerta_SMART_2024.csv'
         )
         for ativo in self.ativos:
-            df_match = utils.find_closest_match_contains(df_ativos, ativo.name)
-            self.possible_ativos[ativo.name] = []
+            df_match = utils.find_closest_match_contains(df_ativos, ativo['nome'])
+            self.possible_ativos[ativo['nome']] = []
             for row in df_match.iterrows():
                 row = row[1].to_dict()
                 possible_ativo = self.parse_ativo_fields(row, ativo)
-                self.possible_ativos[ativo.name].append(possible_ativo)
+                self.possible_ativos[ativo['nome']].append(possible_ativo)
 
     def choose_excipiente(self):
         self.excipiente = excipientClass(self.sub_forma_farmaceutica, self.ativos)
@@ -79,19 +80,6 @@ class preOrcamentoClass:
                 'custo_fixo'
             ].iloc[0]
         )
-
-    def calc_price(self, ativo: ativoClass):
-        ativo.orcamento.price = (
-            ativo.price
-            * ativo.dilution
-            * ativo.equivalency
-            * ativo.orcamento.quantity
-            * utils.unityCalcConversion(ativo.orcamento.unity)
-            / ativo.unity_value_conversion
-        )
-        if self.forma_farmaceutica not in ['']:
-            ativo.orcamento.price *= self.dosagem
-        ativo.orcamento.price = round(ativo.orcamento.price, 2)
 
     def parse_to_web(self):
         ativos = []
@@ -109,7 +97,7 @@ class preOrcamentoClass:
                 }
             )
             for ativo in ativosAll:
-                self.calc_price(ativo)
+                utils.calc_price(ativo, self.forma_farmaceutica, self.dosagem)
                 ativos[-1]['opcoes'].append(
                     {
                         'nome': ativo.name,
@@ -135,7 +123,7 @@ class preOrcamentoClass:
                 'quantidade': '-',
                 'preco': '-',
             },
-            'capsulas': {
+            'capsula': {
                 'quantidade': self.dosagem,
                 'unidade': 'UN',
                 'tipo': 'INCOLOR',

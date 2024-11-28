@@ -2,6 +2,7 @@
 import utils, json
 
 from orcamento import orcamentoClass
+from pre_orcamento import preOrcamentoClass
 from flask import Flask, request
 from flask_cors import CORS
 
@@ -11,18 +12,16 @@ CORS(app)
 
 @app.route('/calculate_orcamento', methods=['POST'])
 def calculate_orcamento():
-    body = request.form.to_dict()
-    # Need to initialize this ocamentoClass as the file "calc_orcamento.py"
-    # This body fields are only alias to the what the class expect
-    # We can ignore getting the correct forma farmaceutica and sub_forma_farmaceutica
-    # Pass as it is in the "calc_orcamento.py" file
-    orcamento = orcamentoClass(
+    body = json.loads(request.data.decode('utf-8'))['pre_orcamento']
+    orcamento = preOrcamentoClass(
         body['ativos'],
-        body['quantity'],
+        body['dosagem'],
         body['forma_farmaceutica'],
         body['sub_forma_farmaceutica'],
+        body['nome_medico'],
+        body['nome_cliente'],
     )
-    result = orcamento.create_orcamento()
+    result = orcamento.create_pre_orcamento()
     value_return = utils.make_lambda_response(utils.HTTP_STATUS_OK, {'result': result})
     return value_return
 
@@ -30,12 +29,7 @@ def calculate_orcamento():
 @app.route('/update_orcamento', methods=['POST'])
 def update_orcamento():
     body = json.loads(request.data.decode('utf-8'))['orcamento']
-    result = orcamentoClass(
-        body['ativos'],
-        body['quantity'],
-        body['formaFarmaceutica'],
-        body['formaFarmaceuticaSubgrupo'],
-    ).getPrice(body)
+    result = orcamentoClass(body).create_orcamento()
     value_return = utils.make_lambda_response(utils.HTTP_STATUS_OK, {'result': result})
     return value_return
 

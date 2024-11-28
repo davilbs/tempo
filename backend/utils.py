@@ -1,5 +1,8 @@
 import simplejson as json, re
 
+from ativo.main import ativoClass
+
+
 DEFAULT_CONTENT_TYPE = 'application/json'
 
 HTTP_STATUS_OK = 200
@@ -103,3 +106,16 @@ def find_closest_match_contains(df, target, exact = False):
             return matchs
 
     return None  # No match found
+
+def calc_price(ativo: ativoClass, forma_farmaceutica: str, dosagem: int):
+    ativo.orcamento.price = (
+        ativo.price
+        * ativo.dilution
+        * ativo.equivalency
+        * ativo.orcamento.quantity
+        * unityCalcConversion(ativo.orcamento.unity)
+        / ativo.unity_value_conversion
+    )
+    if forma_farmaceutica not in ['']:
+        ativo.orcamento.price *= dosagem
+    ativo.orcamento.price = round(ativo.orcamento.price, 2)

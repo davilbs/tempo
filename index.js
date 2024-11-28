@@ -164,7 +164,7 @@ app.get("/orcamento", function (req, res, next) {
     // Render the page with the data 
     res.render("orcamento.ejs", {
         nomeCliente: 'Maria',
-        quantidade: 60,
+        dosagem: 60,
         nomeMedico: 'João',
         formaFarmaceutica: '1 - Cápsula',
         formaFarmaceuticaSubgrupo: 'Slow Release',
@@ -248,7 +248,54 @@ app.get("/orcamento", function (req, res, next) {
     });
 })
 
-app.post("/orcamento/edit", (req, res) => {
+// This route exists only for demonstration while the integration
+// with the recipe extraction doesn't work
+app.get("/pre_orcamento", async function (req, res, next) {
+    const pre_orcamento = {
+        dosagem: 60,
+        nome_cliente: 'Maria',
+        nome_medico: 'João',
+        forma_farmaceutica: '1 - Cápsula',
+        sub_forma_farmaceutica: 'Slow Release',
+        ativos: [
+            {
+                'unidade': 'MG',
+                'quantidade': 200,
+                'nome': 'FENUGREEK (50% FENUSIDEOS)',
+
+            },
+            {
+                'unidade': 'MG',
+                'quantidade': 500,
+                'nome': 'MACA',
+            },
+            {
+                'unidade': 'MG',
+                'quantidade': 100,
+                'nome': 'GINKGO',
+
+            }
+        ],
+    };
+    var response = await fetch("http://127.0.0.1:5000/calculate_orcamento", {
+        method: "POST",
+        "body": JSON.stringify({
+            pre_orcamento
+        }),
+    });
+    if (response.ok) {
+        const result = JSON.parse((await response.json())['body'])['result'];
+        response = process_orcamento(result);
+    } else {
+        console.log('Failed to process data. Try again.');
+    }
+    console.log(response);
+    res.render("orcamento_edit.ejs", response);
+})
+
+// This function exists only for demonstration while the integration
+// with the recipe extraction doesn't work
+function process_orcamento(orcamento) {
     const {
         formaFarmaceuticaAll,
         formaFarmaceuticaSubgrupoAll,
@@ -257,11 +304,10 @@ app.post("/orcamento/edit", (req, res) => {
         excipientes,
         unidades,
     } = require('./constants');
-    const orcamento = JSON.parse(req.body['orcamento']);
-    const formaFarmaceutica = '1 - Cápsula';
-    const formaFarmaceuticaSubgrupo = 'Slow Release';
-    const embalagemNome = 'POTE CAPS 310ML';
-    const excipienteNome = 'EXCIPIENTE PADRÃO CÁPSULAS';
+    const formaFarmaceutica = orcamento['formaFarmaceutica'];
+    const formaFarmaceuticaSubgrupo = orcamento['formaFarmaceuticaSubgrupo'];
+    const embalagemNome = orcamento['embalagem']['nome'];
+    const excipienteNome = orcamento['excipiente']['nome'];
     const ativos = orcamento['ativos'];
     const embalagem = orcamento['embalagem'];
     const excipiente = orcamento['excipiente'];
@@ -305,9 +351,9 @@ app.post("/orcamento/edit", (req, res) => {
         unidadesEdited['ativos'] = unidadesEdited['ativos'].concat([[... new Set([ativos[i].unidade].concat(unidades))]]);
     }
     const orcamento_edit = {
-        nomeCliente: 'Maria',
-        nomeMedico: 'João',
-        quantidade: 60,
+        nomeCliente: orcamento['nomeCliente'],
+        nomeMedico: orcamento['nomeMedico'],
+        dosagem: orcamento['dosagem'],
         formaFarmaceuticaAll: formaFarmaceuticaAllEdited,
         formaFarmaceuticaSubgrupoAll: formaFarmaceuticaSubgrupoAllEdited,
         tipoCapsulas: tipoCapsulas,
@@ -320,16 +366,91 @@ app.post("/orcamento/edit", (req, res) => {
         embalagem: embalagem,
         excipiente: excipiente,
         capsula: capsula,
-        custoFixo: 7.80,
-        total: 494.10,
-        parseError: false,
+        custoFixo: orcamento['custoFixo'],
+    };
+    return orcamento_edit;
+}
+
+app.post("/orcamento/edit", (req, res) => {
+    const {
+        formaFarmaceuticaAll,
+        formaFarmaceuticaSubgrupoAll,
+        tipoCapsulas,
+        embalagens,
+        excipientes,
+        unidades,
+    } = require('./constants');
+    const orcamento = req.body;
+    const formaFarmaceutica = orcamento['formaFarmaceutica'];
+    const formaFarmaceuticaSubgrupo = orcamento['formaFarmaceuticaSubgrupo'];
+    const embalagemNome = orcamento['embalagem']['nome'];
+    const excipienteNome = orcamento['excipiente']['nome'];
+    const ativos = orcamento['ativos'];
+    const embalagem = orcamento['embalagem'];
+    const excipiente = orcamento['excipiente'];
+    const capsula = orcamento['capsula'];
+
+    var formaFarmaceuticaAllEdited = [formaFarmaceutica].concat(formaFarmaceuticaAll);
+    for (let i = 1; i < formaFarmaceuticaAllEdited.length; i++) {
+        if (formaFarmaceutica == formaFarmaceuticaAllEdited[i]) {
+            formaFarmaceuticaAllEdited.splice(i, 1);
+        }
+    }
+
+    var formaFarmaceuticaSubgrupoAllEdited = formaFarmaceuticaSubgrupoAll;
+    if (formaFarmaceuticaSubgrupoAllEdited[formaFarmaceutica].includes(formaFarmaceuticaSubgrupo)) {
+        var idx = formaFarmaceuticaSubgrupoAllEdited[formaFarmaceutica].indexOf(formaFarmaceuticaSubgrupo);
+        formaFarmaceuticaSubgrupoAllEdited[formaFarmaceutica].splice(idx, 1);
+        formaFarmaceuticaSubgrupoAllEdited[formaFarmaceutica] = [formaFarmaceuticaSubgrupo].concat(formaFarmaceuticaSubgrupoAllEdited[formaFarmaceutica]);
+    }
+
+    var embalagensEdited = [embalagemNome].concat(... new Set(embalagens));
+    for (let i = 1; i < embalagensEdited.length; i++) {
+        if (embalagemNome == embalagensEdited[i]) {
+            embalagensEdited.splice(i, 1);
+        }
+    }
+
+    var excipientesEdited = [excipienteNome].concat(... new Set(excipientes));
+    for (let i = 1; i < excipientesEdited.length; i++) {
+        if (excipienteNome == excipientesEdited[i]) {
+            excipientesEdited.splice(i, 1);
+        }
+    }
+
+    var unidadesEdited = {
+        'embalagem': [... new Set([embalagem.unidade].concat(unidades))],
+        'excipiente': [... new Set([excipiente.unidade].concat(unidades))],
+        'capsula': [... new Set([capsula.unidade].concat(unidades))],
+        'ativos': [],
+    }
+    for (let i = 0; i < ativos.length; i++) {
+        unidadesEdited['ativos'] = unidadesEdited['ativos'].concat([[... new Set([ativos[i].unidade].concat(unidades))]]);
+    }
+    const orcamento_edit = {
+        nomeCliente: orcamento['nomeCliente'],
+        nomeMedico: orcamento['nomeMedico'],
+        dosagem: orcamento['dosagem'],
+        formaFarmaceuticaAll: formaFarmaceuticaAllEdited,
+        formaFarmaceuticaSubgrupoAll: formaFarmaceuticaSubgrupoAllEdited,
+        tipoCapsulas: tipoCapsulas,
+        embalagens: embalagensEdited,
+        excipientes: excipientesEdited,
+        unidades: unidadesEdited,
+        formaFarmaceutica: formaFarmaceutica,
+        formaFarmaceuticaSubgrupo: formaFarmaceuticaSubgrupo,
+        ativos: ativos,
+        embalagem: embalagem,
+        excipiente: excipiente,
+        capsula: capsula,
+        custoFixo: orcamento['custoFixo'],
     };
     res.render("orcamento_edit.ejs", orcamento_edit);
 })
 
 app.post('/orcamento/result', (req, res) => {
     const editted_orcamento = JSON.parse(req.body['submited_orcamento']);
-    
+
     res.render("orcamento.ejs", editted_orcamento);
 });
 
