@@ -16,7 +16,7 @@ class preOrcamentoClass(BaseModel):
     sub_forma_farmaceutica: str = ''
     dosagem: int = 0
     excipiente: str = ''
-    
+
     def __init__(
         self,
         ativos,
@@ -96,7 +96,7 @@ class preOrcamentoClass(BaseModel):
                     'opcoes': [
                         {
                             'nome': '',
-                            'preco': '-',
+                            'preco': 0.0,
                         }
                     ],
                 }
@@ -120,21 +120,21 @@ class preOrcamentoClass(BaseModel):
                 'nome': '',
                 'unidade': '-',
                 'quantidade': '-',
-                'preco': '-',
+                'preco': 0.0,
             },
             'excipiente': {
                 'nome': self.excipiente.name,
                 'unidade': 'MG',
                 'quantidade': '-',
-                'preco': '-',
+                'preco': 0.0,
             },
-            'capsula': {
+            'capsulas': [{
                 'quantidade': self.dosagem,
                 'unidade': 'UN',
                 'tipo': 'INCOLOR',
                 'nome': '-',
                 'contem': '-',
-                'preco': '-',
-            },
+                'preco': 0.0,
+            }],
             'custoFixo': self.get_custo_fixo(),
         }

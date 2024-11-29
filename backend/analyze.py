@@ -37,7 +37,9 @@ def extract_prescription(input_file):
 
     system_prompt = """
     Você é um atendente de farmácia com habilidades para extrair informações de receitas médicas e convertê-las em um formato JSON específico.
-    Analise o texto abaixo da receita e extraia as fórmulas descritas.\n\n
+    Caso o nome do medicamento/suplemento não esteja antecedido por 'Fórmula', considere que é um produto da Essential Nutrition e não o considere na
+    lista de produtos prescritos.
+    Analise o texto abaixo da receita e extraia as fórmulas descritas.\n\n 
     """
     prompt = ChatPromptTemplate([
         ("system", system_prompt),
@@ -46,16 +48,15 @@ def extract_prescription(input_file):
 
     chain = prompt | llm_structured
 
+    print("Extracting prescription from ", input_file)
     text = extract_text(input_file)
-    print(text)
+
     if len(text) == 0:
+        print("Empty text extracted from file")
         return None
+    
+    print("Analyzing text (LLM)...")
     response = chain.invoke({"input": text})
-    print(response)
-    filename = input_file.split("/")[-1].split(".")[0]
-    rootpath = "/".join(input_file.split("/")[:-2])
-    with open(f"{rootpath}/processed/{filename}.json", "w") as f:
-        json.dump(response.dict(), f, indent=4)
     
     return response.dict()
 
