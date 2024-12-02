@@ -117,7 +117,7 @@ class preOrcamentoClass(BaseModel):
             'formaFarmaceuticaSubgrupo': self.sub_forma_farmaceutica,
             'ativos': ativos,
             'embalagem': {
-                'nome': '',
+                'nome': '-',
                 'unidade': '-',
                 'quantidade': '-',
                 'preco': 0.0,

@@ -61,7 +61,7 @@ app.post("/calculate", upload.single("prescription"), (req, res, next) => {
 });
 
 app.get('/events', async function (req, res) {
-    var loading_status = "Fazendo upload do arquivo... (1/3)";
+    var loading_status = "Fazendo upload do arquivo... (1/2)";
     var loading_code = 0;
 
     console.log("Current status", loading_status);
@@ -105,7 +105,7 @@ app.get('/events', async function (req, res) {
                 console.log("Looking for file: " + directory + filename + curr_ext);
                 curr_ext = ".json";
                 directory = __dirname + "/processed/";
-                loading_status = "Identificando medicamentos... (1/2)";
+                loading_status = "Identificando medicamentos... (2/2)";
                 loading_code = 2;
                 console.log("Looking for file: " + directory + filename + curr_ext);
             }
@@ -149,6 +149,15 @@ async function extractPrescription(pdf_path) {
 }
 
 app.get("/orcamento", function (req, res, next) {
+    var json_path = path.join(__dirname + "/processed/", req.query.filename.split('.')[0] + ".json");
+    if (fs.existsSync(json_path)) {
+        var content = fs.readFileSync(json_path);
+        var data = JSON.parse(content);
+        console.log(data);
+        res.render("orcamento.ejs", data);
+        return;
+    }
+
     var pdf_path = path.join(__dirname + "/uploads/", req.query.filename);
     console.log("check existing file " + pdf_path);
     do {
@@ -182,7 +191,8 @@ app.post("/orcamento/edit", (req, res) => {
         excipientes,
         unidades,
     } = require('./constants');
-    const orcamento = req.body;
+    const orcamento = JSON.parse(req.body['orcamento']);
+    console.log(orcamento);
     const formaFarmaceutica = orcamento['formaFarmaceutica'];
     const formaFarmaceuticaSubgrupo = orcamento['formaFarmaceuticaSubgrupo'];
     const embalagemNome = orcamento['embalagem']['nome'];
