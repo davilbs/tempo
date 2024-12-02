@@ -14,8 +14,8 @@
         <table>
             <tbody>
                 <tr>
-                    <td>Nome Cliente: <input id="nome_cliente" type="text" value="<%= nomeMedico %>" /></td>
-                    <td>Nome Médico: <input id="nome_medico" type="text" value="<%= nomeCliente %>" /></td>
+                    <td>Nome Cliente: <input id="nome_cliente" type="text" value="<%= nomeCliente %>" /></td>
+                    <td>Nome Médico: <input id="nome_medico" type="text" value="<%= nomeMedico %>" /></td>
                 </tr>
             </tbody>
         </table>
@@ -220,7 +220,7 @@
 
     </div>
     <script>
-        const formaFarmaceuticaSubgrupoAll = <%- JSON.stringify(formaFarmaceuticaSubgrupoAll) %>;
+        const formaFarmaceuticaSubgrupoAll = '<%- JSON.stringify(formaFarmaceuticaSubgrupoAll) %>';
     </script>
     <script src="/scripts/orcamento_edited.js"></script>
 </body>

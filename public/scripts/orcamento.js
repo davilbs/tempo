@@ -142,9 +142,11 @@ function parse_orcamento() {
     var capsula = {}
     const rows = document.querySelectorAll("table tbody tr");
     var ativoCounter = 0;
+    const ativosAll = JSON.parse(ativosList);
     rows.forEach((tr) => {
         var ativo = {};
         var tds = tr.querySelectorAll('td');
+        console.log("Loading tr", tr.id);
         if (tr.id == 'ativo') {
             tds.forEach((td) => {
                 if (td.querySelector('select')) {
@@ -180,6 +182,7 @@ function parse_orcamento() {
                 else if (td.querySelector('input')) {
                     td = td.querySelector('input');
                 }
+                console.log("EMBALAGEM", td);
                 if (td.id.includes('embalagem-nome')) {
                     embalagem['nome'] = td.innerText;
                 }
