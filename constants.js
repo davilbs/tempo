@@ -8,12 +8,12 @@ const formaFarmaceuticaAll = [
 ];
 
 const formaFarmaceuticaSubgrupoAll = {
-    '1 - Cápsula': ['Slow Release', 'Sublingual', 'Combo', 'Lipofílica/Oleosa', 'Complexo B'],
+    '1 - Cápsula': ['', 'Slow Release', 'Sublingual', 'Combo', 'Lipofílica/Oleosa', 'Complexo B'],
     '2 - Cremes': [''],
     '3 - Loções': [''],
     '4 - Shampoo': [''],
     '5 - Outros': [''],
-    '6 - Envase / Produtos Heel / Fisioquantic / Oli Vera Cha Verde / Repelente / Teloactive / Comprimido': ['Envase', 'Produtos Heel', 'Fisioquantic', 'Repelente']
+    '6 - Envase / Produtos Heel / Fisioquantic / Oli Vera Cha Verde / Repelente / Teloactive / Comprimido': ['', 'Envase', 'Produtos Heel', 'Fisioquantic', 'Repelente']
 };
 
 const tipoCapsulas = [
