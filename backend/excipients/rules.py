@@ -30,6 +30,7 @@ class excipientRules:
                 return self.iodo(ativos)
             elif self.sub_forma_farmaceutica == "Lipofílica / Oleosa":
                 return self.lipofilico_oleosa(ativos)
+        return 'EXCIPIENTE PADRÃO CÁPSULAS'
 
     def lipofilico_oleosa(self, ativos: list[ativoClass]):
         for ativo in ativos:
