@@ -154,7 +154,7 @@ app.get("/orcamento", function (req, res, next) {
         var content = fs.readFileSync(json_path);
         var data = JSON.parse(content);
         console.log(data);
-        res.render("orcamento.ejs", data);
+        res.render("orcamento_edit.ejs", formatOrcamentoEdited(data));
         return;
     }
 
@@ -175,14 +175,14 @@ app.get("/orcamento", function (req, res, next) {
             console.log(data);
         
             // Render the page with the data 
-            res.render("orcamento.ejs", data);
+            res.render("orcamento_edit.ejs", formatOrcamentoEdited(data));
         })
         .catch((err) => {
-            console.log("Errow");
+            console.log("Error");
         });
 })
 
-app.post("/orcamento/edit", (req, res) => {
+function formatOrcamentoEdited(orcamento) {
     const {
         formaFarmaceuticaAll,
         formaFarmaceuticaSubgrupoAll,
@@ -191,8 +191,6 @@ app.post("/orcamento/edit", (req, res) => {
         excipientes,
         unidades,
     } = require('./constants');
-    const orcamento = JSON.parse(req.body['orcamento']);
-    console.log(orcamento);
     const formaFarmaceutica = orcamento['formaFarmaceutica'];
     const formaFarmaceuticaSubgrupo = orcamento['formaFarmaceuticaSubgrupo'];
     const embalagemNome = orcamento['embalagem']['nome'];
@@ -202,18 +200,11 @@ app.post("/orcamento/edit", (req, res) => {
     const excipiente = orcamento['excipiente'];
     const capsula = orcamento['capsula'];
 
-    var formaFarmaceuticaAllEdited = [formaFarmaceutica].concat(formaFarmaceuticaAll);
-    for (let i = 1; i < formaFarmaceuticaAllEdited.length; i++) {
-        if (formaFarmaceutica == formaFarmaceuticaAllEdited[i]) {
-            formaFarmaceuticaAllEdited.splice(i, 1);
-        }
-    }
+    var formaFarmaceuticaAllEdited = [... new Set([formaFarmaceutica].concat(formaFarmaceuticaAll))];
 
     var formaFarmaceuticaSubgrupoAllEdited = formaFarmaceuticaSubgrupoAll;
     if (formaFarmaceuticaSubgrupoAllEdited[formaFarmaceutica].includes(formaFarmaceuticaSubgrupo)) {
-        var idx = formaFarmaceuticaSubgrupoAllEdited[formaFarmaceutica].indexOf(formaFarmaceuticaSubgrupo);
-        formaFarmaceuticaSubgrupoAllEdited[formaFarmaceutica].splice(idx, 1);
-        formaFarmaceuticaSubgrupoAllEdited[formaFarmaceutica] = [formaFarmaceuticaSubgrupo].concat(formaFarmaceuticaSubgrupoAllEdited[formaFarmaceutica]);
+        formaFarmaceuticaSubgrupoAllEdited[formaFarmaceutica] = [... new Set([formaFarmaceuticaSubgrupo].concat(formaFarmaceuticaSubgrupoAllEdited[formaFarmaceutica]))];
     }
 
     var embalagensEdited = [embalagemNome].concat(... new Set(embalagens));
@@ -257,6 +248,12 @@ app.post("/orcamento/edit", (req, res) => {
         capsula: capsula,
         custoFixo: orcamento['custoFixo'],
     };
+    return orcamento_edit;
+}
+
+app.post("/orcamento/edit", (req, res) => {
+    const orcamento = JSON.parse(req.body['orcamento']);
+    orcamento_edit = formatOrcamentoEdited(orcamento);
     res.render("orcamento_edit.ejs", orcamento_edit);
 })
 
