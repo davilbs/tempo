@@ -41,7 +41,7 @@ class orcamentoClass(BaseModel):
         self.choose_capsule(orcamento_values['capsula']['tipo'])
         self.choose_excipiente(orcamento_values)
         self.choose_embalagem(orcamento_values)
-        
+
     def create_orcamento(self):
         orcamento = {
             'nomeCliente': self.nome_cliente,
@@ -124,7 +124,7 @@ class orcamentoClass(BaseModel):
                 row = row[1].to_dict()
                 if ativo_volume <= (row['VOLINTERNO'] * number_of_capsule):
                     capsule = capsuleClass(
-                        row['DESCRICAO'],
+                        capsule_type,
                         row['DESC_COR'],
                         row['VOLINTERNO'],
                         row['VOLEXTERNO'],
@@ -158,7 +158,9 @@ class orcamentoClass(BaseModel):
 
     def choose_embalagem(self, orcamento_values):
         self.embalagem = embalagemClass(None, orcamento_values['embalagem']['nome'])
-        self.embalagem.set_orcamento_values(orcamento_values['embalagem']['quantidade'], 'UN')
+        self.embalagem.set_orcamento_values(
+            orcamento_values['embalagem']['quantidade'], 'UN'
+        )
         self.embalagem.calc_price()
 
     def choose_excipiente(self, orcamento_values):
