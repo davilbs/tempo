@@ -2,15 +2,42 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from analyze import extract_prescription
 from pre_orcamento import preOrcamentoClass
-import json
-import os
+from orcamento import orcamentoClass
+from fastapi.middleware.cors import CORSMiddleware
+
+import json, os, utils
+
 if not os.path.exists("processed"):
     os.makedirs("processed")
 
 app = FastAPI()
 
+origins = [
+    "http://localhost",
+    "http://localhost:8080",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 class File(BaseModel):
     filename: str
+
+class Orcamento(BaseModel):
+    nome_cliente: str
+    nome_medico: str
+    dosagem: int
+    forma_farmaceutica: str
+    sub_forma_farmaceutica: str
+    ativos: list[dict]
+    embalagem: dict
+    excipiente: dict
+    capsula: dict
 
 @app.get("/")
 def root():
@@ -29,36 +56,60 @@ def extract_prescription_route(file: File):
         forma_farmaceutica = None
         sub_forma_farmaceutica = None
         for medicamento in result['medicamentos']:
-            if forma_farmaceutica is None:
-                forma_farmaceutica = medicamento['excipiente']
-            if sub_forma_farmaceutica is None:
-                sub_forma_farmaceutica = medicamento['sub_excipiente']
-            qtd = medicamento['quantidade']
-            for ingrediente in medicamento['ingredientes']:
-                ativo = {
-                    'nome': ingrediente['nome'],
-                    'unidade': ingrediente['unidade'],
-                    'quantidade': int(ingrediente['dosagem'].replace('.', '')),
-                }
-                ativos.append(ativo)
+            try:
+                if forma_farmaceutica is None:
+                    forma_farmaceutica = medicamento['excipiente']
+                if sub_forma_farmaceutica is None:
+                    sub_forma_farmaceutica = medicamento['sub_excipiente']
+                qtd = medicamento['quantidade']
+                for ingrediente in medicamento['ingredientes']:
+                    ativo = {
+                        'nome': ingrediente['nome'],
+                        'unidade': ingrediente['unidade'],
+                        'quantidade': float(ingrediente['dosagem'].replace(',', '.')),
+                    }
+                    ativos.append(ativo)
 
-        orcamento = preOrcamentoClass(
-            ativos,
-            qtd,
-            forma_farmaceutica=forma_farmaceutica,
-            sub_forma_farmaceutica='',
-            nome_medico=result['medico'],
-            nome_cliente=result['paciente'],
-        )
-        # Create pre_orcamento
-        orcamento_result = orcamento.create_pre_orcamento()
+                orcamento = preOrcamentoClass(
+                    ativos,
+                    qtd,
+                    forma_farmaceutica=forma_farmaceutica,
+                    sub_forma_farmaceutica=sub_forma_farmaceutica,
+                    nome_medico=result['medico'],
+                    nome_cliente=result['paciente'],
+                )
+                # Create pre_orcamento
+                orcamento_result = orcamento.create_pre_orcamento()
 
-        filename = file.filename.split("/")[-1].split(".")[0]
-        rootpath = "/".join(file.filename.split("/")[:-2])
-        print("Saving prescription to ", f"{rootpath}/processed/{filename}.json")
-        with open(f"{rootpath}/processed/{filename}.json", "w") as f:
-            json.dump(orcamento_result, f, indent=4)
-            print(orcamento_result)
-        # Enviar orçamento para o front-end
-        return {"status": "success", "result": orcamento_result}
+                filename = file.filename.split("\\")[-1].split(".")[0]
+                rootpath = "\\".join(file.filename.split("\\")[:-2])
+                print("Saving prescription to ", f"{rootpath}/processed/{filename}.json")
+                with open(f"{rootpath}/processed/{filename}.json", "w") as f:
+                    json.dump(orcamento_result, f, indent=4)
+                    print(orcamento_result)
+                # Enviar orçamento para o front-end
+                return {"status": "success", "result": orcamento_result}
+            except:
+                return {"status": "error", "result": "Error when identifying the prescription"}
     return {"status": "error", "result": "No prescription found"}
+
+def parse_orcamento(orcamento: Orcamento):
+    return {
+        'nome_cliente': orcamento.nome_cliente,
+        'nome_medico': orcamento.nome_medico,
+        'dosagem': orcamento.dosagem,
+        'forma_farmaceutica': orcamento.forma_farmaceutica,
+        'sub_forma_farmaceutica': orcamento.sub_forma_farmaceutica,
+        'ativos': orcamento.ativos,
+        'embalagem': orcamento.embalagem,
+        'excipiente': orcamento.excipiente,
+        'capsula': orcamento.capsula,
+    }
+
+@app.post("/update_orcamento")
+def update_orcamento_route(orcamento: Orcamento):
+    body = parse_orcamento(orcamento)
+    print(body)
+    result = orcamentoClass(body).create_orcamento()
+    value_return = utils.make_lambda_response(utils.HTTP_STATUS_OK, {'result': result})
+    return value_return
