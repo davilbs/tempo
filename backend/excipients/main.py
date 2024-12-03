@@ -3,14 +3,17 @@ import pandas as pd
 from excipients.rules import excipientRules
 from ativo.main import ativoClass
 
-class excipientClass(ativoClass):
 
-    def __init__(self, sub_forma_farmaceutica, ativos, name = '') -> None:
+class excipientClass(ativoClass):
+    def __init__(
+        self,
+        sub_forma_farmaceutica,
+        ativos,
+        name='',
+    ) -> None:
         if name == '':
-            name = "EXCIPIENTE CAPSULA SUBLINGUAL"
-            # rule = excipientRules(sub_forma_farmaceutica)
-            # name = rule.get_excipiente(ativos)
-        print(name)
+            rule = excipientRules(sub_forma_farmaceutica)
+            name = rule.get_excipiente(ativos)
         super().__init__(name)
 
     def set_values(self):
