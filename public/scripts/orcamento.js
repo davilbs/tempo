@@ -251,7 +251,8 @@ function parse_orcamento() {
     return {
         "nomeCliente": document.getElementById('nome-cliente').innerText,
         "nomeMedico": document.getElementById('nome-medico').innerText,
-        "custoFixo": parseInt(document.getElementById('quantidade-orcamento').innerText),
+        "dosagem": parseInt(document.getElementById('quantidade-orcamento').innerText),
+        "custoFixo": parseFloat(document.getElementById('preco-custo-fixo').innerText.replace("R$", "")),
         "formaFarmaceutica": document.getElementById('forma-farmaceutica').innerText,
         "formaFarmaceuticaSubgrupo": document.getElementById('forma-farmaceutica-subgrupo').innerText,
         "ativos": ativos,
