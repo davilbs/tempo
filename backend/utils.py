@@ -1,4 +1,4 @@
-import simplejson as json, re
+import simplejson as json, re, pandas as pd
 
 from ativo.main import ativoClass
 
@@ -12,35 +12,26 @@ HTTP_STATUS_FORBIDDEN = 403
 HTTP_STATUS_NOT_FOUND = 404
 HTTP_STATUS_INTERNAL_SERVER_ERROR = 500
 
+
 def respond_not_found(error='not found'):
-    return make_lambda_response(
-        HTTP_STATUS_NOT_FOUND,
-        {'error': error}
-    )
+    return make_lambda_response(HTTP_STATUS_NOT_FOUND, {'error': error})
+
 
 def respond_bad_request(error='bad request'):
-    return make_lambda_response(
-        HTTP_STATUS_BAD_REQUEST,
-        {'error': error}
-    )
+    return make_lambda_response(HTTP_STATUS_BAD_REQUEST, {'error': error})
+
 
 def respond_unauthorized(error='unauthorized'):
-    return make_lambda_response(
-        HTTP_STATUS_UNAUTHORIZED,
-        {'error': error}
-    )
+    return make_lambda_response(HTTP_STATUS_UNAUTHORIZED, {'error': error})
+
 
 def respond_forbidden(error='forbidden'):
-    return make_lambda_response(
-        HTTP_STATUS_FORBIDDEN,
-        {'error': error}
-    )
+    return make_lambda_response(HTTP_STATUS_FORBIDDEN, {'error': error})
+
 
 def respond_internal_server_error(error='internal server error'):
-    return make_lambda_response(
-        HTTP_STATUS_INTERNAL_SERVER_ERROR,
-        {'error': error}
-    )
+    return make_lambda_response(HTTP_STATUS_INTERNAL_SERVER_ERROR, {'error': error})
+
 
 def make_lambda_response(status_code, body=None, headers={}, multi_value_headers={}):
     response = {
@@ -48,17 +39,18 @@ def make_lambda_response(status_code, body=None, headers={}, multi_value_headers
     }
     if 'content-type' not in [k.lower() for k in headers.keys()]:
         headers['Content-Type'] = DEFAULT_CONTENT_TYPE
-    if ("Access-Control-Allow-Origin" not in headers):
+    if "Access-Control-Allow-Origin" not in headers:
         headers["Access-Control-Allow-Origin"] = "*"
-    if ("Access-Control-Allow-Headers" not in headers):
+    if "Access-Control-Allow-Headers" not in headers:
         headers["Access-Control-Allow-Headers"] = "Origin, Content-Type, Accept"
-    if ("Access-Control-Allow-Methods" not in headers):
+    if "Access-Control-Allow-Methods" not in headers:
         headers["Access-Control-Allow-Methods"] = "GET,OPTIONS,PUT"
     response['headers'] = headers
     response['multiValueHeaders'] = multi_value_headers
     if body is not None:
         response['body'] = json.dumps(body)
     return response
+
 
 def unityCalcConversion(unity: str):
     unity = unity.upper()
@@ -74,38 +66,67 @@ def unityCalcConversion(unity: str):
         return 1000
     else:
         return 1
-    
-def do_descr_match(target, df):
+
+
+def do_descr_match(target, df, starts_with = False):
+    if starts_with:
+        if df['DESCR'].str.lower().str.startswith(target, na=False).any():
+            return df[df['DESCR'].str.lower().str.startswith(target, na=False)]
+    else:        
         if df['DESCR'].str.contains(target, regex=False, case=False, na=False).any():
             return df[df['DESCR'].str.contains(target, regex=False, case=False, na=False)]
-        return []
+    return []
 
-def find_closest_match_contains(df, target, exact = False):
+
+def remove_not_used(all_matchs):
+    return all_matchs[~all_matchs['DESCR'].str.contains('|'.join(['ñ usar', 'n usar', 'nao usar', 'não usar']), case=False, na=False)]
+
+def find_closest_match_contains(df, target):
     # Exact match
-    if exact:
-        return df[df['DESCR'] == target]
+    if len(df[df['DESCR'].str.lower() == target.lower()]) > 0:
+        return df[df['DESCR'].str.lower() == target.lower()]
+
+    all_matchs = pd.DataFrame()
 
     # Step 1: Full match
     matchs = do_descr_match(target, df)
     if len(matchs) > 0:
-        return matchs
+        all_matchs = pd.concat([all_matchs, matchs])
 
-    # Step 2: Remove words progressively
+    # Step 2: Match between combinations using 2 words with at least 
+    # 3 letters of each one when possible
     words = target.split()
-    for i in range(len(words) - 1, 0, -1):
-        shortened_name = re.escape(" ".join(words[:i]))
-        matchs = do_descr_match(shortened_name, df)
-        if len(matchs) > 0:
-            return matchs
+    if len(words) > 1:
+        words = words[0:2]
+        if len(words[1]) >= 3:
+            for i in range(len(words[1]), 2, -1):
+                word_1 = re.escape(words[1][:i])
+                for j in range(len(words[0]), 2, -1):
+                    shortened_name = f"{re.escape(words[0][:j])} {word_1}"
+                    matchs = do_descr_match(shortened_name, df)
+                    if len(matchs) > 0:
+                        all_matchs = pd.concat([all_matchs, matchs])
+        else:
+            for i in range(len(words[0]), 2, -1):
+                shortened_name = f"{re.escape(words[0][:i])} {re.escape(words[1])}"
+                matchs = do_descr_match(shortened_name, df)
+                if len(matchs) > 0:
+                    all_matchs = pd.concat([all_matchs, matchs])
 
-    # Step 3: Remove letters progressively
-    for i in range(len(target) - 1, 0, -1):
-        shortened_name = re.escape(target[:i])
-        matchs = do_descr_match(shortened_name, df)
+    if len(all_matchs) > 0:
+        all_matchs = remove_not_used(all_matchs)
+        return all_matchs
+    
+    # Step 3: Match with the first word using at least 3 letters
+    for i in range(len(words[0]), 2, -1):
+        shortened_name = re.escape(words[0][:i]).lower()
+        matchs = do_descr_match(shortened_name, df, starts_with=True)
         if len(matchs) > 0:
-            return matchs
+            all_matchs = pd.concat([all_matchs, matchs])
 
-    return None  # No match found
+    all_matchs = remove_not_used(all_matchs)
+    return all_matchs.drop_duplicates()
+
 
 def calc_price(ativo: ativoClass, forma_farmaceutica: str, dosagem: int):
     ativo.orcamento.price = (
