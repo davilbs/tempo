@@ -223,9 +223,8 @@ function parse_orcamento_editted() {
         }
     });
     return {
-        "nome_cliente": document.getElementById('quantidade-orcamento').value,
-        "nome_medico": document.getElementById('quantidade-orcamento').value,
-        "dosagem": parseInt(document.getElementById('quantidade-orcamento').value),
+        "nome_cliente": document.getElementById('nome_cliente').value,
+        "nome_medico": document.getElementById('nome_medico').value,
         "dosagem": parseInt(document.getElementById('quantidade-orcamento').value),
         "forma_farmaceutica": document.getElementById('forma-farmaceutica').value,
         "sub_forma_farmaceutica": document.getElementById('forma-farmaceutica-subgrupo').value,
@@ -239,15 +238,16 @@ function parse_orcamento_editted() {
 document.getElementById('submit_orcamento').addEventListener('click', async () => {
     orcamento = parse_orcamento_editted();
 
-    const response = await fetch("http://127.0.0.1:5000/update_orcamento", {
+    const response = await fetch("http://127.0.0.1:8000/update_orcamento", {
         method: "POST",
-        "body": JSON.stringify({
-            orcamento
-        }),
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orcamento),
     });
     if (response.ok) {
         const result = JSON.parse((await response.json())['body'])['result'];
-        
+
         // Create a form for POST redirection
         const form = document.createElement('form');
         form.method = 'POST';
