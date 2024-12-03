@@ -103,8 +103,11 @@ class orcamentoClass(BaseModel):
     def calc_volume_ativos(self):
         ativos_volume = 0
         for ativo in self.ativos:
-            ativos_volume += (ativo.orcamento.quantity * ativo.dilution) / (
-                ativo.unity_value_conversion * ativo.density
+            ativos_volume += (
+                1000
+                * utils.unityCalcConversion(ativo.orcamento.unity)
+                * (ativo.orcamento.quantity * ativo.dilution)
+                / (ativo.unity_value_conversion * ativo.density)
             )
 
         return ativos_volume * self.compression_factor
