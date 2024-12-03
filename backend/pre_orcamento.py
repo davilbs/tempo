@@ -1,7 +1,6 @@
 import pandas as pd, utils, re
 from pydantic import BaseModel
 from typing import List, Dict
-from typing_extensions import TypedDict
 
 from ativo.main import ativoClass
 from excipients.main import excipientClass
@@ -15,7 +14,7 @@ class preOrcamentoClass(BaseModel):
     forma_farmaceutica: str = ''
     sub_forma_farmaceutica: str = ''
     dosagem: int = 0
-    excipiente: str = ''
+    excipiente: excipientClass = None
 
     def __init__(
         self,
@@ -117,9 +116,9 @@ class preOrcamentoClass(BaseModel):
             'formaFarmaceuticaSubgrupo': self.sub_forma_farmaceutica,
             'ativos': ativos,
             'embalagem': {
-                'nome': '-',
+                'nome': '',
                 'unidade': '-',
-                'quantidade': '-',
+                'quantidade': '',
                 'preco': 0.0,
             },
             'excipiente': {
@@ -128,13 +127,13 @@ class preOrcamentoClass(BaseModel):
                 'quantidade': '-',
                 'preco': 0.0,
             },
-            'capsulas': [{
+            'capsula': {
                 'quantidade': self.dosagem,
                 'unidade': 'UN',
                 'tipo': 'INCOLOR',
                 'nome': '-',
                 'contem': '-',
                 'preco': 0.0,
-            }],
+            },
             'custoFixo': self.get_custo_fixo(),
         }
