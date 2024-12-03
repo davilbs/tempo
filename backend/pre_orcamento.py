@@ -53,7 +53,6 @@ class preOrcamentoClass(BaseModel):
 
     def parse_ativo_fields(self, row, ativo):
         possible_ativo = ativoClass(row['DESCR'])
-        possible_ativo.set_values()
         possible_ativo.set_orcamento_values(
             ativo['quantidade'], ativo['unidade']
         )
@@ -101,11 +100,10 @@ class preOrcamentoClass(BaseModel):
                 }
             )
             for ativo in ativosAll:
-                utils.calc_price(ativo, self.forma_farmaceutica, self.dosagem)
                 ativos[-1]['opcoes'].append(
                     {
                         'nome': ativo.name,
-                        'preco': ativo.orcamento.price,
+                        'preco': 0.0,
                     }
                 )
         return {
