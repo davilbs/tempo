@@ -5,43 +5,61 @@ from orcamento import orcamentoClass
 if __name__ == '__main__':
     ativos = [
         {
-            'nome': 'FENUGREEK (50% FENUSIDEOS)',
-            'unidade': 'MG',
+            'nome': 'Vitamina A (50% Retinol + 50% Betacaroteno)',
+            'unidade': 'UI',
+            'quantidade': 5000,
+        },
+        {
+            'nome': 'VIT D3',
+            'unidade': 'UI',
+            'quantidade': 5000,
+        },
+        {
+            'nome': 'Alfatocoferol (mix)',
+            'unidade': 'UI',
             'quantidade': 200,
         },
-        {'nome': 'MACA', 'unidade': 'MG', 'quantidade': 500},
         {
-            'nome': 'GINKGO',
-            'unidade': 'MG',
-            'quantidade': 100,
+            'nome': 'Vitamina K2 (Mk7)',
+            'unidade': 'UI',
+            'quantidade': 200,
         },
     ]
     orcamento = preOrcamentoClass(
         ativos,
-        60,
+        30,
         forma_farmaceutica='1 - Cápsulas',
-        sub_forma_farmaceutica='Slow Release',
-        nome_medico='João',
-        nome_cliente='Maria',
+        sub_forma_farmaceutica='',
+        nome_medico='',
+        nome_cliente='Marcos Andrei Schwinden',
     )
-    orcamento.create_pre_orcamento()
+    print(orcamento.create_pre_orcamento())
     orcamento_body = {
         'nome_cliente': 'Maria',
         'nome_medico': 'João',
-        'dosagem': 60,
+        'dosagem': 30,
         'forma_farmaceutica': '1 - Cápsula',
         'sub_forma_farmaceutica': 'Slow Release',
         'ativos': [
             {
-                'nome': 'FENUGREEK (50% FENUSIDEOS)',
-                'unidade': 'MG',
+                'nome': 'VIT A (RETINOL)',
+                'unidade': 'UI',
+                'quantidade': 5000,
+            },
+            {
+                'nome': 'VIT D3 5000UI-CAPS',
+                'unidade': 'UN',
+                'quantidade': 1,
+            },
+            {
+                'nome': 'ALFA TOCOFEROL',
+                'unidade': 'UI',
                 'quantidade': 200,
             },
-            {'nome': 'MACA', 'unidade': 'MG', 'quantidade': 500},
             {
-                'nome': 'GINKGO BILOBA EXTRACT 2:1',
-                'unidade': 'MG',
-                'quantidade': 100,
+                'nome': 'MK7 VIT K2',
+                'unidade': 'MCG',
+                'quantidade': 200,
             },
         ],
         'embalagem': {'nome': 'POTE CAPS 310ML', 'quantidade': 1},
@@ -50,10 +68,9 @@ if __name__ == '__main__':
             'unidade': 'MG',
             'quantidade': '-',
         },
-        'capsula': {'tipo': 'INCOLOR', 'unidade': 'UN', 'quantidade': 60},
+        'capsula': {'tipo': 'INCOLOR', 'unidade': 'UN', 'quantidade': 30},
     }
     orcamento = orcamentoClass(
         orcamento_body,
     )
-    orcamento.create_orcamento()
-    
+    print(orcamento.create_orcamento())
