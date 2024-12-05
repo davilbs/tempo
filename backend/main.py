@@ -52,10 +52,11 @@ def extract_prescription_route(file: File):
 
     if result:
         # Formatar orçamento para o front-end
-        ativos = []
-        forma_farmaceutica = None
-        sub_forma_farmaceutica = None
+        orcamentos = []
         for medicamento in result['medicamentos']:
+            forma_farmaceutica = None
+            sub_forma_farmaceutica = None
+            ativos = []
             try:
                 if forma_farmaceutica is None:
                     forma_farmaceutica = medicamento['excipiente']
@@ -80,17 +81,16 @@ def extract_prescription_route(file: File):
                 )
                 # Create pre_orcamento
                 orcamento_result = orcamento.create_pre_orcamento()
-
-                filename = file.filename.split("\\")[-1].split(".")[0]
-                rootpath = "\\".join(file.filename.split("\\")[:-2])
-                print("Saving prescription to ", f"{rootpath}/processed/{filename}.json")
-                with open(f"{rootpath}/processed/{filename}.json", "w") as f:
-                    json.dump(orcamento_result, f, indent=4)
-                    print(orcamento_result)
-                # Enviar orçamento para o front-end
-                return {"status": "success", "result": orcamento_result}
+                orcamentos.append(orcamento_result)
             except:
                 return {"status": "error", "result": "Error when identifying the prescription"}
+        filename = file.filename.split("\\")[-1].split(".")[0]
+        rootpath = "\\".join(file.filename.split("\\")[:-2])
+        print("Saving prescription to ", f"{rootpath}/processed/{filename}.json")
+        with open(f"{rootpath}/processed/{filename}.json", "w") as f:
+            json.dump(orcamentos, f, indent=4)
+        # Enviar orçamento para o front-end
+        return {"status": "success", "result": orcamentos}
     return {"status": "error", "result": "No prescription found"}
 
 def parse_orcamento(orcamento: Orcamento):
@@ -107,9 +107,9 @@ def parse_orcamento(orcamento: Orcamento):
     }
 
 @app.post("/update_orcamento")
-def update_orcamento_route(orcamento: Orcamento):
-    body = parse_orcamento(orcamento)
-    print(body)
-    result = orcamentoClass(body).create_orcamento()
-    value_return = utils.make_lambda_response(utils.HTTP_STATUS_OK, {'result': result})
-    return value_return
+def update_orcamento_route(orcamentos: list[Orcamento]):
+    results = []
+    for orcamento in orcamentos:
+        body = parse_orcamento(orcamento)
+        results.append(orcamentoClass(body).create_orcamento())
+    return utils.make_lambda_response(utils.HTTP_STATUS_OK, {'result': results})
