@@ -88,7 +88,6 @@ class orcamentoClass(BaseModel):
                     'preco': capsula.orcamento.price,
                 }
             )
-        print(orcamento)
         return orcamento
 
     def parse_ativo_fields(self, ativo: ativoClass):
