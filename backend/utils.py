@@ -1,6 +1,7 @@
 import simplejson as json, re, pandas as pd
 
 from ativo.main import ativoClass
+from unidecode import unidecode
 
 
 DEFAULT_CONTENT_TYPE = 'application/json'
@@ -70,21 +71,28 @@ def unityCalcConversion(unity: str):
 
 def do_descr_match(target, df, starts_with = False):
     if starts_with:
-        if df['DESCR'].str.lower().str.startswith(target, na=False).any():
-            return df[df['DESCR'].str.lower().str.startswith(target, na=False)]
+        if df['DESCR'].astype(str).apply(unidecode).str.lower().str.startswith(target, na=False).any():
+            return df[df['DESCR'].astype(str).apply(unidecode).str.lower().str.startswith(target, na=False)]
     else:        
-        if df['DESCR'].str.contains(target, regex=False, case=False, na=False).any():
-            return df[df['DESCR'].str.contains(target, regex=False, case=False, na=False)]
+        if df['DESCR'].astype(str).apply(unidecode).str.lower().str.contains(target, regex=False, case=False, na=False).any():
+            return df[df['DESCR'].astype(str).apply(unidecode).str.lower().str.contains(target, regex=False, case=False, na=False)]
     return []
 
 
-def remove_not_used(all_matchs):
-    return all_matchs[~all_matchs['DESCR'].str.contains('|'.join(['ñ usar', 'n usar', 'nao usar', 'não usar']), case=False, na=False)]
+def parse_matchs(all_matchs):
+    if len(all_matchs) == 0:
+        return all_matchs
+    all_matchs = all_matchs[~all_matchs['DESCR'].str.contains('|'.join(['ñ usar', 'n usar', 'nao usar', 'não usar']), case=False, na=False)]
+    all_matchs = all_matchs.drop_duplicates()
+    all_matchs = all_matchs.sort_values(by='DESCR')
+    return all_matchs
+    
 
 def find_closest_match_contains(df, target):
+    target = unidecode(target.lower())
     # Exact match
-    if len(df[df['DESCR'].str.lower() == target.lower()]) > 0:
-        return df[df['DESCR'].str.lower() == target.lower()]
+    if len(df[df['DESCR'].astype(str).apply(unidecode).str.lower() == target]) > 0:
+        return df[df['DESCR'].astype(str).apply(unidecode).str.lower() == target]
 
     all_matchs = pd.DataFrame()
 
@@ -114,7 +122,7 @@ def find_closest_match_contains(df, target):
                     all_matchs = pd.concat([all_matchs, matchs])
 
     if len(all_matchs) > 0:
-        all_matchs = remove_not_used(all_matchs)
+        all_matchs = parse_matchs(all_matchs)
         return all_matchs
     
     # Step 3: Match with the first word using at least 3 letters
@@ -124,8 +132,8 @@ def find_closest_match_contains(df, target):
         if len(matchs) > 0:
             all_matchs = pd.concat([all_matchs, matchs])
 
-    all_matchs = remove_not_used(all_matchs)
-    return all_matchs.drop_duplicates()
+    all_matchs = parse_matchs(all_matchs)
+    return all_matchs
 
 
 def calc_price(ativo: ativoClass, forma_farmaceutica: str, dosagem: int):
