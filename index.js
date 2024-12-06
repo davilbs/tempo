@@ -8,7 +8,7 @@ const md5 = require("md5");
 const session = require('express-session');
 
 var app = express();
-const port = 8080;
+const port = 3000;
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -266,17 +266,6 @@ app.post('/orcamento/result', (req, res) => {
     res.render("orcamento.ejs", editted_orcamento);
 })
 
-app.listen(port, () => {
+app.listen(port,"127.0.0.1", () => {
     console.log(`Server started on port ${port}`);
 })
-
-//  https.createServer(
-//      {
-//          key: fs.readFileSync('/etc/letsencrypt/live/quoter-mvp.anaai.com.br/privkey.pem'),
-//          cert: fs.readFileSync('/etc/letsencrypt/live/quoter-mvp.anaai.com.br/cert.pem'),
-//          ca: fs.readFileSync('/etc/letsencrypt/live/quoter-mvp.anaai.com.br/chain.pem'),
-//      },
-//      app
-//  ).listen(443, () => {
-//      console.log("Server running also on 443")
-//  })
