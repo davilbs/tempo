@@ -19,12 +19,12 @@ class capsuleClass(ativoClass):
         priority,
         name,
     ) -> None:
+        super().__init__(name)
         self.type = type
         self.color = color
-        self.internal_volume = internal_volume
-        self.external_volume = external_volume
-        self.priority = priority
-        super().__init__(name)
+        self.internal_volume = int(internal_volume)
+        self.external_volume = int(external_volume)
+        self.priority = int(priority)
 
     def set_values(self):
         df_ativos = pd.read_csv(

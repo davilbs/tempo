@@ -1,17 +1,20 @@
 import pandas as pd, utils, re
+from pydantic import BaseModel
+from typing import List, Dict
 
 from ativo.main import ativoClass
 from excipients.main import excipientClass
 
 
-class preOrcamentoClass:
-    ativos: list[dict] = []
-    possible_ativos: dict[str : list[ativoClass]] = {}
-    nome_cliente = ''
-    nome_medico = ''
-    forma_farmaceutica = ''
-    sub_forma_farmaceutica = ''
-    dosagem = 0
+class preOrcamentoClass(BaseModel):
+    ativos: List[Dict] = []
+    possible_ativos: Dict[str, List[ativoClass]] = {}
+    nome_cliente: str = ''
+    nome_medico: str = ''
+    forma_farmaceutica: str = ''
+    sub_forma_farmaceutica: str = ''
+    dosagem: int = 0
+    excipiente: excipientClass = None
 
     def __init__(
         self,
@@ -22,6 +25,7 @@ class preOrcamentoClass:
         nome_cliente='',
         nome_medico='',
     ) -> None:
+        super().__init__()
         self.ativos = []
         for ativoRaw in ativos:
             ativo = {
@@ -49,7 +53,6 @@ class preOrcamentoClass:
 
     def parse_ativo_fields(self, row, ativo):
         possible_ativo = ativoClass(row['DESCR'])
-        possible_ativo.set_values()
         possible_ativo.set_orcamento_values(
             ativo['quantidade'], ativo['unidade']
         )
@@ -91,17 +94,16 @@ class preOrcamentoClass:
                     'opcoes': [
                         {
                             'nome': '',
-                            'preco': '-',
+                            'preco': 0.0,
                         }
                     ],
                 }
             )
             for ativo in ativosAll:
-                utils.calc_price(ativo, self.forma_farmaceutica, self.dosagem)
                 ativos[-1]['opcoes'].append(
                     {
                         'nome': ativo.name,
-                        'preco': ativo.orcamento.price,
+                        'preco': 0.0,
                     }
                 )
         return {
@@ -114,14 +116,14 @@ class preOrcamentoClass:
             'embalagem': {
                 'nome': '',
                 'unidade': '-',
-                'quantidade': '-',
-                'preco': '-',
+                'quantidade': '',
+                'preco': 0.0,
             },
             'excipiente': {
                 'nome': self.excipiente.name,
                 'unidade': 'MG',
                 'quantidade': '-',
-                'preco': '-',
+                'preco': 0.0,
             },
             'capsula': {
                 'quantidade': self.dosagem,
@@ -129,7 +131,7 @@ class preOrcamentoClass:
                 'tipo': 'INCOLOR',
                 'nome': '-',
                 'contem': '-',
-                'preco': '-',
+                'preco': 0.0,
             },
             'custoFixo': self.get_custo_fixo(),
         }

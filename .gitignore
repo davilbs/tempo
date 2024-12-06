@@ -98,3 +98,6 @@ Thumbs.db
 
 # setting file
 launch.json
+*.json
+*.pdf
+.calculadora

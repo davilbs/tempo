@@ -1,5 +1,7 @@
 import pandas as pd, re
 import utils
+from pydantic import BaseModel
+from typing import Sequence
 
 from ativo.main import ativoClass, ativoOrcamentoClass
 from excipients.main import excipientClass
@@ -7,20 +9,21 @@ from capsules.main import capsuleClass
 from embalagens.main import embalagemClass
 
 
-class orcamentoClass:
+class orcamentoClass(BaseModel):
     compression_factor: float = 0.8
-    ativos: list[ativoClass] = []
+    ativos: Sequence[ativoClass] = []
     dosagem: int = 0
     number_of_capsule: int = 1
     nome_cliente: str = ''
     nome_medico: str = ''
     forma_farmaceutica: str = ''
     sub_forma_farmaceutica: str = ''
-    capsulas: list[capsuleClass] = []
+    capsulas: Sequence[capsuleClass] = []
     excipiente: excipientClass = None
     embalagem: embalagemClass = None
 
     def __init__(self, orcamento_values) -> None:
+        super().__init__()
         self.ativos = []
         for ativoRaw in orcamento_values['ativos']:
             ativo = ativoClass(
@@ -38,7 +41,7 @@ class orcamentoClass:
         self.choose_capsule(orcamento_values['capsula']['tipo'])
         self.choose_excipiente(orcamento_values)
         self.choose_embalagem(orcamento_values)
-        
+
     def create_orcamento(self):
         orcamento = {
             'nomeCliente': self.nome_cliente,
@@ -85,7 +88,6 @@ class orcamentoClass:
                     'preco': capsula.orcamento.price,
                 }
             )
-        print(orcamento)
         return orcamento
 
     def parse_ativo_fields(self, ativo: ativoClass):
@@ -100,8 +102,11 @@ class orcamentoClass:
     def calc_volume_ativos(self):
         ativos_volume = 0
         for ativo in self.ativos:
-            ativos_volume += (ativo.orcamento.quantity * ativo.dilution) / (
-                ativo.unity_value_conversion * ativo.density
+            ativos_volume += (
+                1000
+                * utils.unityCalcConversion(ativo.orcamento.unity)
+                * (ativo.orcamento.quantity * ativo.dilution)
+                / (ativo.unity_value_conversion * ativo.density)
             )
 
         return ativos_volume * self.compression_factor
@@ -121,7 +126,7 @@ class orcamentoClass:
                 row = row[1].to_dict()
                 if ativo_volume <= (row['VOLINTERNO'] * number_of_capsule):
                     capsule = capsuleClass(
-                        row['DESCRICAO'],
+                        capsule_type,
                         row['DESC_COR'],
                         row['VOLINTERNO'],
                         row['VOLEXTERNO'],
@@ -155,7 +160,9 @@ class orcamentoClass:
 
     def choose_embalagem(self, orcamento_values):
         self.embalagem = embalagemClass(None, orcamento_values['embalagem']['nome'])
-        self.embalagem.set_orcamento_values(orcamento_values['embalagem']['quantidade'], 'UN')
+        self.embalagem.set_orcamento_values(
+            orcamento_values['embalagem']['quantidade'], 'UN'
+        )
         self.embalagem.calc_price()
 
     def choose_excipiente(self, orcamento_values):

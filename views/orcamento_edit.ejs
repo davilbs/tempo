@@ -14,213 +14,233 @@
         <table>
             <tbody>
                 <tr>
-                    <td>Nome Cliente: <input id="nome_cliente" type="text" value="<%= nomeMedico %>" /></td>
-                    <td>Nome Médico: <input id="nome_medico" type="text" value="<%= nomeCliente %>" /></td>
+                    <td>Nome Cliente: <input id="nome_cliente" type="text"
+                            value="<%= orcamentos_edited[0].nomeCliente %>" /></td>
+                    <td>Nome Médico: <input id="nome_medico" type="text"
+                            value="<%= orcamentos_edited[0].nomeMedico %>" /></td>
                 </tr>
             </tbody>
         </table>
-        <table>
-            <tbody>
-                <tr>
-                    <td class="required">Quantidade: <input id="quantidade-orcamento" type="text" value="<%= dosagem %>" /></td>
-                    <td class="required">Forma Farmacêutica:
-                        <select id="forma-farmaceutica" name="forma-farmaceutica" onchange="updateSubgrupoDropdown()">
-                            <% formaFarmaceuticaAll.forEach(function(forma, index) { %>
-                                <option value="<%= forma %>" <%=index===0 ? 'selected' : '' %>>
-                                    <%= forma %>
-                                </option>
-                                <% }) %>
-                        </select>
-                    </td>
-                    <td class="required">Forma Farmacêutica (Subgrupo):
-                        <select id="forma-farmaceutica-subgrupo" name="forma-farmaceutica-subgrupo">
-                            <% formaFarmaceuticaSubgrupoAll[formaFarmaceuticaAll[0]].forEach(function(subgrupo, index) {
-                                %>
-                                <option value="<%= subgrupo %>" <%=index===0 ? 'selected' : '' %>>
-                                    <%= subgrupo %>
-                                </option>
-                                <% }) %>
-                        </select>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <% orcamentos_edited.forEach(function(orcamento, indexOrcamento) { %>
+            <div id="orcamento-<%= indexOrcamento %>">
+                <table>
+                    <tbody>
+                        <tr>
+                            <td class="required">Quantidade: <input id="quantidade-orcamento" type="text"
+                                    value="<%= orcamento.dosagem %>" /></td>
+                            <td class="required">Forma Farmacêutica:
+                                <select id="forma-farmaceutica" name="forma-farmaceutica"
+                                    onchange="updateSubgrupoDropdown()">
+                                    <% orcamento.formaFarmaceuticaAll.forEach(function(forma, index) { %>
+                                        <option value="<%= forma %>" <%=index===0 ? 'selected' : '' %>>
+                                            <%= forma %>
+                                        </option>
+                                        <% }) %>
+                                </select>
+                            </td>
+                            <td class="required">Forma Farmacêutica (Subgrupo):
+                                <select id="forma-farmaceutica-subgrupo" name="forma-farmaceutica-subgrupo">
+                                    <% orcamento.formaFarmaceuticaSubgrupoAll[orcamento.formaFarmaceuticaAll[0]].forEach(function(subgrupo,
+                                        index) { %>
+                                        <option value="<%= subgrupo %>" <%=index===0 ? 'selected' : '' %>>
+                                            <%= subgrupo %>
+                                        </option>
+                                        <% }) %>
+                                </select>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
 
-        <!-- Main Table with Dynamic Rows -->
-        <table>
-            <thead>
-                <tr class="header-row">
-                    <th>Ativo Puro</th>
-                    <th>Unidade</th>
-                    <th>Quantidade</th>
-                    <th>Preço</th>
-                </tr>
-            </thead>
-            <tbody>
-                <% ativos.forEach(function(ativo, rowIndex) { %>
-                    <tr id="ativo">
-                        <td class="required">
-                            <select name="ativoPuro" id="ativoPuro-<%= rowIndex %>"
-                                onchange='handleAtivoChange("<%= rowIndex %>")'>
-                                <% ativo.opcoes.forEach(function(opcao) { %>
-                                    <option value="<%= opcao.nome %>" data-preco="<%= opcao.preco %>">
-                                        <%= opcao.nome || "Selecione" %>
-                                    </option>
-                                    <% }) %>
-                            </select>
-                        </td>
-                        <td class="required">
-                            <select id="ativo-unidade" name="ativo-unidade-<%= rowIndex %>">
-                                <% unidades.ativos[rowIndex].forEach(function(unidade) { %>
-                                    <option value="<%= unidade %>">
-                                        <%= unidade %>
-                                    </option>
-                                    <% }) %>
-                            </select>
-                        </td>
-                        <td class="required" id="ativo-quantidade-<%= rowIndex %>">
-                            <input id="ativo-quantidade" type="text" value="<%= ativo.quantidade %>" />
-                        </td>
-                        <td id="preco-ativo-<%= rowIndex %>" class="price-column">
-                            <%= ativo.opcoes[0].preco !=='-' ? `R$${parseFloat(ativo.opcoes[0].preco).toFixed(2)}` :
-                                ativo.opcoes[0].preco %>
+                <!-- Main Table with Dynamic Rows -->
+                <table>
+                    <thead>
+                        <tr class="header-row">
+                            <th>Ativo Puro</th>
+                            <th>Unidade</th>
+                            <th>Quantidade</th>
+                            <th>Preço</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% orcamento.ativos.forEach(function(ativo, rowIndex) { %>
+                            <tr id="ativo">
+                                <td class="required">
+                                    <select name="ativoPuro" id="ativoPuro-<%= rowIndex %>">
+                                        <% ativo.opcoes.forEach(function(opcao) { %>
+                                            <option value="<%= opcao.nome %>" data-preco="<%= opcao.preco %>">
+                                                <%= opcao.nome || "Selecione" %>
+                                            </option>
+                                            <% }) %>
+                                    </select>
+                                </td>
+                                <td class="required">
+                                    <select id="ativo-unidade" name="ativo-unidade-<%= rowIndex %>">
+                                        <% orcamento.unidades.ativos[rowIndex].forEach(function(unidade) { %>
+                                            <option value="<%= unidade %>">
+                                                <%= unidade %>
+                                            </option>
+                                            <% }) %>
+                                    </select>
+                                </td>
+                                <td class="required" id="ativo-quantidade-<%= rowIndex %>">
+                                    <input id="ativo-quantidade" type="text" value="<%= ativo.quantidade %>" />
+                                </td>
+                                <td id="preco-ativo-<%= rowIndex %>" class="price-column">
+                                    <%= ativo.opcoes[0].preco !=='-' ?
+                                        `R$${parseFloat(ativo.opcoes[0].preco).toFixed(2)}` : ativo.opcoes[0].preco %>
+                                </td>
+                            </tr>
+                            <% }) %>
+                    </tbody>
+                </table>
+
+                <!-- Packaging Information -->
+                <table>
+                    <thead>
+                        <tr class="header-row">
+                            <th>Embalagem</th>
+                            <th>Nº Embalagens</th>
+                            <th>Preço</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr id="embalagem">
+                            <td class="required">
+                                <datalist name="embalagens" id="embalagens">
+                                    <% orcamento.embalagens.forEach(function(embalagem) { %>
+                                        <option value="<%= embalagem %>">
+                                            <%= embalagem %>
+                                        </option>
+                                        <% }) %>
+                                </datalist>
+                                <input id="embalagem-nome" autoComplete="on" list="embalagens"
+                                    value="<%= orcamento.embalagem.nome %>" />
+                            </td>
+                            <td class="required">
+                                <input id="embalagem-quantidade" type="text"
+                                    value="<%= orcamento.embalagem.quantidade %>" />
+                            </td>
+                            <td id="preco-embalagem" class="price-column">
+                                <%= orcamento.embalagem.preco !=='-' ? `R$${orcamento.embalagem.preco.toFixed(2)}` :
+                                    orcamento.embalagem.preco %>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- Additional Details -->
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Excipiente</th>
+                            <th>Unidade</th>
+                            <th>Quantidade</th>
+                            <th>Preço</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr id="excipiente">
+                            <td>
+                                <datalist name="excipientes" id="excipientes">
+                                    <% orcamento.excipientes.forEach(function(excipiente) { %>
+                                        <option value="<%= excipiente %>">
+                                            <%= excipiente %>
+                                        </option>
+                                        <% }) %>
+                                </datalist>
+                                <input id="excipiente-nome" autoComplete="on" list="excipientes"
+                                    value="<%= orcamento.excipiente.nome %>" />
+                            </td>
+                            <td id="excipiente-unidade">
+                                <%= orcamento.excipiente.unidade %>
+                            </td>
+                            <td id="excipiente-quantidade">
+                                <%= orcamento.excipiente.quantidade %>
+                            </td>
+                            <td id="preco-excipiente" class="price-column">
+                                <%= orcamento.excipiente.preco !=='-' ? `R$${orcamento.excipiente.preco.toFixed(2)}` :
+                                    orcamento.excipiente.preco %>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- Capsule Information -->
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tipo Cápsula</th>
+                            <th>Cápsula</th>
+                            <th>Unidade</th>
+                            <th>Quantidade</th>
+                            <th>Contém</th>
+                            <th>Preço</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr id="capsula">
+                            <td class="required">
+                                <select id="capsula-tipo" name="capsula-tipo" onchange="updateCapsulaDropdown()">
+                                    <% orcamento.tipoCapsulas.forEach(function(tipo, index) { %>
+                                        <option value="<%= tipo %>" <%=index===0 ? 'selected' : '' %>>
+                                            <%= tipo %>
+                                        </option>
+                                        <% }) %>
+                                </select>
+                            </td>
+                            <td>-</td>
+                            <td>
+                                <select id="capsula-unidade" name="capsula-unidade">
+                                    <% orcamento.unidades.capsula.forEach(function(unidade) { %>
+                                        <option value="<%= unidade %>">
+                                            <%= unidade %>
+                                        </option>
+                                        <% }) %>
+                                </select>
+                            <td id="capsula-quantidade">
+                                <%= orcamento.capsula.quantidade %>
+                            </td>
+                            </td>
+                            <td id="capsula-contem" name="capsula-contem">
+                                <%= orcamento.capsula.contem %>
+                            </td>
+                            <td id="preco-capsula" class="price-column">
+                                <%= orcamento.capsula.preco !=='-' ? `R$${orcamento.capsula.preco.toFixed(2)}` :
+                                    orcamento.capsula.preco %>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- Totals -->
+                <table>
+                    <tr class="total-row">
+                        <td colspan="3">Custo Fixo</td>
+                        <td class="price-column">R$<%= orcamento.custoFixo.toFixed(2) %>
                         </td>
                     </tr>
-                    <% }) %>
-            </tbody>
-        </table>
-
-        <!-- Packaging Information -->
-        <table>
-            <thead>
-                <tr class="header-row">
-                    <th>Embalagem</th>
-                    <th>Nº Embalagens</th>
-                    <th>Preço</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr id="embalagem">
-                    <td class="required">
-                        <datalist name="embalagens" id="embalagens">
-                            <% embalagens.forEach(function(embalagem) { %>
-                                <option value="<%= embalagem %>">
-                                    <%= embalagem %>
-                                </option>
-                                <% }) %>
-                        </datalist>
-                        <input id="embalagem-nome" autoComplete="on" list="embalagens" value="<%= embalagem.nome %>" />
-                    </td>
-                    <td class="required">
-                        <input id="embalagem-quantidade" type="text" value="<%= embalagem.quantidade %>" />
-                    </td>
-                    <td id="preco-embalagem" class="price-column">
-                        <%= embalagem.preco !=='-' ? `R$${embalagem.preco.toFixed(2)}` : embalagem.preco %>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-
-        <!-- Additional Details -->
-        <table>
-            <thead>
-                <tr>
-                    <th>Excipiente</th>
-                    <th>Unidade</th>
-                    <th>Quantidade</th>
-                    <th>Preço</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr id="excipiente">
-                    <td>
-                        <datalist name="excipientes" id="excipientes">
-                            <% excipientes.forEach(function(excipiente) { %>
-                                <option value="<%= excipiente %>">
-                                    <%= excipiente %>
-                                </option>
-                                <% }) %>
-                        </datalist>
-                        <input id="excipiente-nome" autoComplete="on" list="excipientes"
-                            value="<%= excipiente.nome %>" />
-                    </td>
-                    <td id="excipiente-unidade">
-                        <%= excipiente.unidade %>
-                    </td>
-                    <td id="excipiente-quantidade">
-                        <%= excipiente.quantidade %>
-                    </td>
-                    <td id="preco-excipiente" class="price-column">
-                        <%= excipiente.preco !=='-' ? `R$${excipiente.preco.toFixed(2)}` : excipiente.preco %>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-
-        <!-- Capsule Information -->
-        <table>
-            <thead>
-                <tr>
-                    <th>Tipo Cápsula</th>
-                    <th>Cápsula</th>
-                    <th>Unidade</th>
-                    <th>Quantidade</th>
-                    <th>Contém</th>
-                    <th>Preço</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr id="capsula">
-                    <td class="required">
-                        <select id="capsula-tipo" name="capsula-tipo" onchange="updateCapsulaDropdown()">
-                            <% tipoCapsulas.forEach(function(tipo, index) { %>
-                                <option value="<%= tipo %>" <%=index===0 ? 'selected' : '' %>>
-                                    <%= tipo %>
-                                </option>
-                                <% }) %>
-                        </select>
-                    </td>
-                    <td>-</td>
-                    <td>
-                        <select id="capsula-unidade" name="capsula-unidade">
-                            <% unidades.capsula.forEach(function(unidade) { %>
-                                <option value="<%= unidade %>">
-                                    <%= unidade %>
-                                </option>
-                                <% }) %>
-                        </select>
-                    <td id="capsula-quantidade">
-                        <%= capsula.quantidade %>
-                    </td>
-                    </td>
-                    <td id="capsula-contem" name="capsula-contem">
-                        <%= capsula.contem %>
-                    </td>
-                    <td id="preco-capsula" class="price-column">
-                        <%= capsula.preco !=='-' ? `R$${capsula.preco.toFixed(2)}` : capsula.preco %>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-
-        <!-- Totals -->
-        <table>
-            <tr class="total-row">
-                <td colspan="3">Custo Fixo</td>
-                <td class="price-column">R$<%= custoFixo.toFixed(2) %>
-                </td>
-            </tr>
-            <tr class="total-row">
-                <td colspan="3">Total</td>
-                <td id="total-preco" class="price-column">R$0.00</td>
-            </tr>
-        </table>
-
-        <button type="button" id="submit_orcamento" class="upload-button">Salvar</button>
+                    <tr class="total-row">
+                        <td colspan="3">Total</td>
+                        <td id="total-preco" class="price-column">R$0.00</td>
+                    </tr>
+                </table>
+            </div>
+            <% }) %>
+                <button type="button" id="submit_orcamento" class="upload-button">Salvar</button>
 
     </div>
     <script>
-        const formaFarmaceuticaSubgrupoAll = <%- JSON.stringify(formaFarmaceuticaSubgrupoAll) %>;
+        const formaFarmaceuticaSubgrupoAll = '<%- JSON.stringify(orcamentos_edited[0].formaFarmaceuticaSubgrupoAll) %>';
+        <% var allAtivos = [] %>;
+        <% orcamentos_edited.forEach((orcamento) => { %>
+            <% var ativos = [] %>;
+            <% orcamento.ativos.forEach((ativo) => { %>
+                <% ativos.push(ativo.opcoes) %>;
+                <% }) %>;
+                <% allAtivos.push(ativos) %>;
+        <% }) %>;
+        const ativosOrcamento = '<%- JSON.stringify(allAtivos) %>';
     </script>
     <script src="/scripts/orcamento_edited.js"></script>
 </body>

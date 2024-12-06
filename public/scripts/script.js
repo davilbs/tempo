@@ -13,7 +13,7 @@ function ekUpload() {
     }
 
     var i = 0;
-    var curr_width = 0;
+    var curr_width = 10;
     function updateBar(target, delay) {
         i = 1;
         var elem = document.getElementById("progress-bar");
@@ -40,13 +40,13 @@ function ekUpload() {
             console.log("received message", message);
             var data_json = JSON.parse(message.data)
             console.log(i)
-            var delay = 100;
+            var delay = 20;
             var delta = (data_json.status_code + 1) * 33;
             if (i == 0) {
                 console.log(data_json)
                 if (data_json.status_code == 2){
                     delta -= 5;
-                    delay = 1500;
+                    delay = 100;
                 }
                 updateBar(delta, delay);
             }

@@ -1,0 +1,11 @@
+langchain
+langgraph
+fastapi
+python-dotenv
+langchain-community
+langchain-openai
+uvicorn
+pdfminer.six
+pandas
+simplejson
+unidecode
