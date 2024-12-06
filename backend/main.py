@@ -84,8 +84,8 @@ def extract_prescription_route(file: File):
                 orcamentos.append(orcamento_result)
             except:
                 return {"status": "error", "result": "Error when identifying the prescription"}
-        filename = file.filename.split("\\")[-1].split(".")[0]
-        rootpath = "\\".join(file.filename.split("\\")[:-2])
+        filename = file.filename.split("/")[-1].split(".")[0]
+        rootpath = "/".join(file.filename.split("/")[:-2])
         print("Saving prescription to ", f"{rootpath}/processed/{filename}.json")
         with open(f"{rootpath}/processed/{filename}.json", "w") as f:
             json.dump(orcamentos, f, indent=4)
