@@ -28,10 +28,9 @@ app.use(session({ secret: 'keyboard cat', resave: false, saveUninitialized: true
 const spawn = require('child_process').spawn;
 
 app.get("/", (req, res) => {
-    if(req.session.salt)
-    {
+    if (req.session.salt) {
         console.log("Salt already setup");
-    }else{
+    } else {
         req.session.salt = md5(Date.now())
         console.log("Setup salt to", req.session.salt)
     }
@@ -210,17 +209,310 @@ app.get("/results", async function (req, res, next) {
     }
 })
 
+app.get("/orcamento", async function (req, res, next) {
+    res.render("orcamento.ejs", {
+        nomeCliente: 'Maria',
+        dosagem: 60,
+        nomeMedico: 'João',
+        formaFarmaceutica: '1 - Cápsula',
+        formaFarmaceuticaSubgrupo: 'Slow Release',
+        ativos: [
+            {
+                'unidade': 'MG',
+                'quantidade': 200,
+                'opcoes': [
+                    {
+                        'nome': '',
+                        'preco': '-'
+                    },
+                    {
+                        'nome': 'FENUGREEK (50% FENUSIDEOS)',
+                        'preco': 47.85
+                    }
+                ]
+            },
+            {
+                'unidade': 'MG',
+                'quantidade': 500,
+                'opcoes': [
+                    {
+                        'nome': '',
+                        'preco': '-'
+                    },
+                    {
+                        'nome': 'MACA',
+                        'preco': 36.88
+                    },
+                    {
+                        'nome': 'VINAGRE MACA',
+                        'preco': 36.84
+                    }
+                ]
+            },
+            {
+                'unidade': 'MG',
+                'quantidade': 100,
+                'opcoes': [
+                    {
+                        'nome': '',
+                        'preco': '-'
+                    },
+                    {
+                        'nome': 'GINKGO BILOBA EXTRACT 2:1',
+                        'preco': 7.55
+                    },
+                    {
+                        'nome': 'EXT GLICOL GINKGO BILOBA',
+                        'preco': 2.66
+                    }
+                ]
+            }
+        ],
+        embalagem: {
+            'nome': 'POTE CAPS 310ML',
+            'unidade': 'MG',
+            'quantidade': 1,
+            'preco': 21.88,
+        },
+        excipiente: {
+            'nome': 'EXCIPIENTE PADRÃO CÁPSULAS',
+            'unidade': 'MG',
+            'quantidade': 173.79,
+            'preco': 2.60,
+        },
+        capsulas: [
+            {
+                'quantidade': 60,
+                'unidade': 'UN',
+                'tipo': 'INCOLOR',
+                'nome': 'CAP INCOLOR 0',
+                'contem': 3,
+                'preco': 30.15
+            },
+        ],
+        custoFixo: 7.80,
+        total: 494.10,
+        parseError: false,
+    });
+})
+
+// This route exists only for demonstration while the integration
+// with the recipe extraction doesn't work
+app.get("/pre_orcamento", async function (req, res, next) {
+    const pre_orcamento = {
+        dosagem: 60,
+        nome_cliente: 'Maria',
+        nome_medico: 'João',
+        forma_farmaceutica: '1 - Cápsula',
+        sub_forma_farmaceutica: 'Slow Release',
+        ativos: [
+            {
+                'unidade': 'MG',
+                'quantidade': 200,
+                'nome': 'FENUGREEK (50% FENUSIDEOS)',
+
+            },
+            {
+                'unidade': 'MG',
+                'quantidade': 500,
+                'nome': 'MACA',
+            },
+            {
+                'unidade': 'MG',
+                'quantidade': 100,
+                'nome': 'GINKGO',
+
+            }
+        ],
+    };
+    var response = await fetch("http://127.0.0.1:5000/calculate_orcamento", {
+        method: "POST",
+        "body": JSON.stringify({
+            pre_orcamento
+        }),
+    });
+    if (response.ok) {
+        const result = JSON.parse((await response.json())['body'])['result'];
+        response = process_orcamento(result);
+    } else {
+        console.log('Failed to process data. Try again.');
+    }
+    console.log(response);
+    res.render("orcamento_edit.ejs", response);
+})
+
+// This function exists only for demonstration while the integration
+// with the recipe extraction doesn't work
+function process_orcamento(orcamento) {
+    const {
+        formaFarmaceuticaAll,
+        formaFarmaceuticaSubgrupoAll,
+        tipoCapsulas,
+        embalagens,
+        excipientes,
+        unidades,
+    } = require('./constants');
+    const formaFarmaceutica = orcamento['formaFarmaceutica'];
+    const formaFarmaceuticaSubgrupo = orcamento['formaFarmaceuticaSubgrupo'];
+    const embalagemNome = orcamento['embalagem']['nome'];
+    const excipienteNome = orcamento['excipiente']['nome'];
+    const ativos = orcamento['ativos'];
+    const embalagem = orcamento['embalagem'];
+    const excipiente = orcamento['excipiente'];
+    const capsula = orcamento['capsula'];
+
+    var formaFarmaceuticaAllEdited = [formaFarmaceutica].concat(formaFarmaceuticaAll);
+    for (let i = 1; i < formaFarmaceuticaAllEdited.length; i++) {
+        if (formaFarmaceutica == formaFarmaceuticaAllEdited[i]) {
+            formaFarmaceuticaAllEdited.splice(i, 1);
+        }
+    }
+
+    var formaFarmaceuticaSubgrupoAllEdited = formaFarmaceuticaSubgrupoAll;
+    if (formaFarmaceuticaSubgrupoAllEdited[formaFarmaceutica].includes(formaFarmaceuticaSubgrupo)) {
+        var idx = formaFarmaceuticaSubgrupoAllEdited[formaFarmaceutica].indexOf(formaFarmaceuticaSubgrupo);
+        formaFarmaceuticaSubgrupoAllEdited[formaFarmaceutica].splice(idx, 1);
+        formaFarmaceuticaSubgrupoAllEdited[formaFarmaceutica] = [formaFarmaceuticaSubgrupo].concat(formaFarmaceuticaSubgrupoAllEdited[formaFarmaceutica]);
+    }
+
+    var embalagensEdited = [embalagemNome].concat(... new Set(embalagens));
+    for (let i = 1; i < embalagensEdited.length; i++) {
+        if (embalagemNome == embalagensEdited[i]) {
+            embalagensEdited.splice(i, 1);
+        }
+    }
+
+    var excipientesEdited = [excipienteNome].concat(... new Set(excipientes));
+    for (let i = 1; i < excipientesEdited.length; i++) {
+        if (excipienteNome == excipientesEdited[i]) {
+            excipientesEdited.splice(i, 1);
+        }
+    }
+
+    var unidadesEdited = {
+        'embalagem': [... new Set([embalagem.unidade].concat(unidades))],
+        'excipiente': [... new Set([excipiente.unidade].concat(unidades))],
+        'capsula': [... new Set([capsula.unidade].concat(unidades))],
+        'ativos': [],
+    }
+    for (let i = 0; i < ativos.length; i++) {
+        unidadesEdited['ativos'] = unidadesEdited['ativos'].concat([[... new Set([ativos[i].unidade].concat(unidades))]]);
+    }
+    const orcamento_edit = {
+        nomeCliente: orcamento['nomeCliente'],
+        nomeMedico: orcamento['nomeMedico'],
+        dosagem: orcamento['dosagem'],
+        formaFarmaceuticaAll: formaFarmaceuticaAllEdited,
+        formaFarmaceuticaSubgrupoAll: formaFarmaceuticaSubgrupoAllEdited,
+        tipoCapsulas: tipoCapsulas,
+        embalagens: embalagensEdited,
+        excipientes: excipientesEdited,
+        unidades: unidadesEdited,
+        formaFarmaceutica: formaFarmaceutica,
+        formaFarmaceuticaSubgrupo: formaFarmaceuticaSubgrupo,
+        ativos: ativos,
+        embalagem: embalagem,
+        excipiente: excipiente,
+        capsula: capsula,
+        custoFixo: orcamento['custoFixo'],
+    };
+    return orcamento_edit;
+}
+
+app.post("/orcamento/edit", (req, res) => {
+    const {
+        formaFarmaceuticaAll,
+        formaFarmaceuticaSubgrupoAll,
+        tipoCapsulas,
+        embalagens,
+        excipientes,
+        unidades,
+    } = require('./constants');
+    const orcamento = req.body;
+    const formaFarmaceutica = orcamento['formaFarmaceutica'];
+    const formaFarmaceuticaSubgrupo = orcamento['formaFarmaceuticaSubgrupo'];
+    const embalagemNome = orcamento['embalagem']['nome'];
+    const excipienteNome = orcamento['excipiente']['nome'];
+    const ativos = orcamento['ativos'];
+    const embalagem = orcamento['embalagem'];
+    const excipiente = orcamento['excipiente'];
+    const capsula = orcamento['capsula'];
+
+    var formaFarmaceuticaAllEdited = [formaFarmaceutica].concat(formaFarmaceuticaAll);
+    for (let i = 1; i < formaFarmaceuticaAllEdited.length; i++) {
+        if (formaFarmaceutica == formaFarmaceuticaAllEdited[i]) {
+            formaFarmaceuticaAllEdited.splice(i, 1);
+        }
+    }
+
+    var formaFarmaceuticaSubgrupoAllEdited = formaFarmaceuticaSubgrupoAll;
+    if (formaFarmaceuticaSubgrupoAllEdited[formaFarmaceutica].includes(formaFarmaceuticaSubgrupo)) {
+        var idx = formaFarmaceuticaSubgrupoAllEdited[formaFarmaceutica].indexOf(formaFarmaceuticaSubgrupo);
+        formaFarmaceuticaSubgrupoAllEdited[formaFarmaceutica].splice(idx, 1);
+        formaFarmaceuticaSubgrupoAllEdited[formaFarmaceutica] = [formaFarmaceuticaSubgrupo].concat(formaFarmaceuticaSubgrupoAllEdited[formaFarmaceutica]);
+    }
+
+    var embalagensEdited = [embalagemNome].concat(... new Set(embalagens));
+    for (let i = 1; i < embalagensEdited.length; i++) {
+        if (embalagemNome == embalagensEdited[i]) {
+            embalagensEdited.splice(i, 1);
+        }
+    }
+
+    var excipientesEdited = [excipienteNome].concat(... new Set(excipientes));
+    for (let i = 1; i < excipientesEdited.length; i++) {
+        if (excipienteNome == excipientesEdited[i]) {
+            excipientesEdited.splice(i, 1);
+        }
+    }
+
+    var unidadesEdited = {
+        'embalagem': [... new Set([embalagem.unidade].concat(unidades))],
+        'excipiente': [... new Set([excipiente.unidade].concat(unidades))],
+        'capsula': [... new Set([capsula.unidade].concat(unidades))],
+        'ativos': [],
+    }
+    for (let i = 0; i < ativos.length; i++) {
+        unidadesEdited['ativos'] = unidadesEdited['ativos'].concat([[... new Set([ativos[i].unidade].concat(unidades))]]);
+    }
+    const orcamento_edit = {
+        nomeCliente: orcamento['nomeCliente'],
+        nomeMedico: orcamento['nomeMedico'],
+        dosagem: orcamento['dosagem'],
+        formaFarmaceuticaAll: formaFarmaceuticaAllEdited,
+        formaFarmaceuticaSubgrupoAll: formaFarmaceuticaSubgrupoAllEdited,
+        tipoCapsulas: tipoCapsulas,
+        embalagens: embalagensEdited,
+        excipientes: excipientesEdited,
+        unidades: unidadesEdited,
+        formaFarmaceutica: formaFarmaceutica,
+        formaFarmaceuticaSubgrupo: formaFarmaceuticaSubgrupo,
+        ativos: ativos,
+        embalagem: embalagem,
+        excipiente: excipiente,
+        capsula: capsula,
+        custoFixo: orcamento['custoFixo'],
+    };
+    res.render("orcamento_edit.ejs", orcamento_edit);
+})
+
+app.post('/orcamento/result', (req, res) => {
+    const editted_orcamento = JSON.parse(req.body['submited_orcamento']);
+
+    res.render("orcamento.ejs", editted_orcamento);
+});
+
 app.listen(port, () => {
     console.log(`Server started on port ${port}`);
 })
 
- https.createServer(
-     {
-         key: fs.readFileSync('/etc/letsencrypt/live/quoter-mvp.anaai.com.br/privkey.pem'),
-         cert: fs.readFileSync('/etc/letsencrypt/live/quoter-mvp.anaai.com.br/cert.pem'),
-         ca: fs.readFileSync('/etc/letsencrypt/live/quoter-mvp.anaai.com.br/chain.pem'),
-     },
-     app
- ).listen(443, () => {
-     console.log("Server running also on 443")
- })
+//  https.createServer(
+//      {
+//          key: fs.readFileSync('/etc/letsencrypt/live/quoter-mvp.anaai.com.br/privkey.pem'),
+//          cert: fs.readFileSync('/etc/letsencrypt/live/quoter-mvp.anaai.com.br/cert.pem'),
+//          ca: fs.readFileSync('/etc/letsencrypt/live/quoter-mvp.anaai.com.br/chain.pem'),
+//      },
+//      app
+//  ).listen(443, () => {
+//      console.log("Server running also on 443")
+//  })
