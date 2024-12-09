@@ -94,10 +94,10 @@ Thumbs.db
 *.pyc
 
 # csv
-*.csv
+# *.csv
 
 # setting file
 launch.json
 *.json
 *.pdf
-.calculadora
+.venv
