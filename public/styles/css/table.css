@@ -6,7 +6,7 @@
     background-color: var(--color-primary);
     color: var(--color-white);
     padding: 0.5rem 1rem;
-    font-size: 0.875rem;
+    font-size: 1.125rem;
     font-weight: 500;
 }
 
@@ -14,7 +14,7 @@ thead tr th {
     background-color: #BBA263;
     color: var(--color-white);
     padding: 0.5rem 1rem;
-    font-size: 0.875rem;
+    font-size: 1rem;
     font-weight: 500;
 }
 
@@ -22,16 +22,39 @@ tbody tr td.line1 {
     background-color: #F3F0EA;
     color: var(--color-black);
     padding: 0.5rem 1rem;
-    font-size: 0.875rem;
-    font-weight: 500;
+    font-size: 1rem;
 }
 
 tbody tr td.line2 {
     background-color: #F3F0EA66;
     color: var(--color-black);
     padding: 0.5rem 1rem;
-    font-size: 0.875rem;
-    font-weight: 500;
+    font-size: 1rem;
+}
+
+.price-table-title {
+    text-align: right;
+}
+
+.price-table-value {
+    text-align: right;
+    font-weight: 600;
+}
+
+.text {
+    color: #847F7A;
+}
+
+.number {
+    font-weight: 600;
+}
+
+input {
+    color: black;
+}
+
+.right-line {
+    border-right: 1px solid white;
 }
 
 .table-container {

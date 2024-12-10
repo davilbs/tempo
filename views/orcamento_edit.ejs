@@ -23,13 +23,13 @@
         </header>
         <form class="customer-form" id="customerForm">
             <div class="form-group">
-                <label for="customerName">Nome Cliente:</label>
-                <input type="text" id="customerName" name="customerName"
+                <label for="nome_cliente">Nome Cliente:</label>
+                <input type="text" id="nome_cliente" name="nome_cliente"
                     value="<%= orcamentos_edited[0].nomeCliente %>">
             </div>
             <div class="form-group">
-                <label for="doctorName">Nome Médico:</label>
-                <input type="text" id="doctorName" name="doctorName" value="<%= orcamentos_edited[0].nomeMedico %>">
+                <label for="nome_medico">Nome Médico:</label>
+                <input type="text" id="nome_medico" name="nome_medico" value="<%= orcamentos_edited[0].nomeMedico %>">
             </div>
         </form>
         <div class="budget-table">
@@ -39,9 +39,11 @@
                     <table>
                         <tbody>
                             <tr>
-                                <td class="required line1">Quantidade: <input id="quantidade-orcamento" type="text"
-                                        value="<%= orcamento.dosagem %>" /></th>
-                                <td class="required line1">Forma Farmacêutica:
+                                <td class="required line1 right-line">Quantidade
+                                    <input id="quantidade-orcamento" type="text" value="<%= orcamento.dosagem %>"
+                                        size="10" />
+                                </td>
+                                <td class="required line1 right-line">Forma Farmacêutica
                                     <select id="forma-farmaceutica" name="forma-farmaceutica"
                                         onchange="updateSubgrupoDropdown()">
                                         <% orcamento.formaFarmaceuticaAll.forEach(function(forma, index) { %>
@@ -50,8 +52,8 @@
                                             </option>
                                             <% }) %>
                                     </select>
-                                    </th>
-                                <td class="required line1">Forma Farmacêutica (Subgrupo):
+                                </td>
+                                <td class="required line1">Forma Farmacêutica (Subgrupo)
                                     <select id="forma-farmaceutica-subgrupo" name="forma-farmaceutica-subgrupo">
                                         <% orcamento.formaFarmaceuticaSubgrupoAll[orcamento.formaFarmaceuticaAll[0]].forEach(function(subgrupo,
                                             index) { %>
@@ -60,7 +62,7 @@
                                             </option>
                                             <% }) %>
                                     </select>
-                                    </th>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -69,16 +71,16 @@
                     <table>
                         <thead class="table-title">
                             <tr class="header-row">
-                                <th class="table-title-columns">Ativo Puro</th>
-                                <th>Unidade</th>
-                                <th>Quantidade</th>
-                                <th>Preço</th>
+                                <th class="line1 right-line" style="width: 604px;">Ativo Puro</th>
+                                <th class="line1 right-line" style="width: 180px;">Unidade</th>
+                                <th class="line1 right-line" style="width: 150px;">Quantidade</th>
+                                <th class="price-table-title">Preço</th>
                             </tr>
                         </thead>
                         <tbody>
                             <% orcamento.ativos.forEach(function(ativo, rowIndex) { %>
                                 <tr id="ativo">
-                                    <td class="required line<%= (rowIndex%2)+1 %>">
+                                    <td class="required right-line text line<%= (rowIndex%2)+1 %>">
                                         <select name="ativoPuro" id="ativoPuro-<%= rowIndex %>">
                                             <% ativo.opcoes.forEach(function(opcao) { %>
                                                 <option value="<%= opcao.nome %>" data-preco="<%= opcao.preco %>">
@@ -87,7 +89,7 @@
                                                 <% }) %>
                                         </select>
                                     </td>
-                                    <td class="required line<%= (rowIndex%2)+1 %>">
+                                    <td class="required right-line text line<%= (rowIndex%2)+1 %>">
                                         <select id="ativo-unidade" name="ativo-unidade-<%= rowIndex %>">
                                             <% orcamento.unidades.ativos[rowIndex].forEach(function(unidade) { %>
                                                 <option value="<%= unidade %>">
@@ -96,14 +98,14 @@
                                                 <% }) %>
                                         </select>
                                     </td>
-                                    <td class="required line<%= (rowIndex%2)+1 %>"
+                                    <td class="number right-line required line<%= (rowIndex%2)+1 %>"
                                         id="ativo-quantidade-<%= rowIndex %>">
-                                        <input id="ativo-quantidade" type="text" value="<%= ativo.quantidade %>" />
+                                        <input id="ativo-quantidade" type="text" value="<%= ativo.quantidade %>" size="10"/>
                                     </td>
-                                    <td id="preco-ativo-<%= rowIndex %>" class="line<%= (rowIndex%2)+1 %> price-column">
-                                        <%= ativo.opcoes[0].preco !=='-' ?
-                                            `R$ ${parseFloat(ativo.opcoes[0].preco).toFixed(2).replace('.',',')}` : ativo.opcoes[0].preco
-                                            %>
+                                    <td id="preco-ativo-<%= rowIndex %>" class="price-table-value line<%= (rowIndex%2)+1 %>">
+                                        <%= ativo.opcoes[0].preco !=='-' ? `R$
+                                            ${parseFloat(ativo.opcoes[0].preco).toFixed(2).replace('.',',')}` :
+                                            ativo.opcoes[0].preco %>
                                     </td>
                                 </tr>
                                 <% }) %>
@@ -114,14 +116,14 @@
                     <table>
                         <thead>
                             <tr class="header-row">
-                                <th>Embalagem</th>
-                                <th>Nº Embalagens</th>
-                                <th>Preço</th>
+                                <th class="line1 right-line" style="width: 604px;">Embalagem</th>
+                                <th class="line1 right-line" style="width: 330px; text-align: center;">Nº Embalagens</th>
+                                <th class="line1 price-table-title">Preço</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr id="embalagem">
-                                <td class="required">
+                                <td class="required right-line line1">
                                     <datalist name="embalagens" id="embalagens">
                                         <% orcamento.embalagens.forEach(function(embalagem) { %>
                                             <option value="<%= embalagem %>">
@@ -132,12 +134,13 @@
                                     <input id="embalagem-nome" autoComplete="on" list="embalagens"
                                         value="<%= orcamento.embalagem.nome %>" />
                                 </td>
-                                <td class="required">
-                                    <input id="embalagem-quantidade" type="text"
+                                <td class="required line1 right-line" style="text-align: center;">
+                                    <input class="number" id="embalagem-quantidade" type="text"
                                         value="<%= orcamento.embalagem.quantidade %>" />
                                 </td>
-                                <td id="preco-embalagem" class="price-column">
-                                    <%= orcamento.embalagem.preco !=='-' ? `R$ ${orcamento.embalagem.preco.toFixed(2).replace('.',',')}` :
+                                <td id="preco-embalagem" class="price-table-value line1">
+                                    <%= orcamento.embalagem.preco !=='-' ? `R$
+                                        ${orcamento.embalagem.preco.toFixed(2).replace('.',',')}` :
                                         orcamento.embalagem.preco %>
                                 </td>
                             </tr>
@@ -148,15 +151,15 @@
                     <table>
                         <thead>
                             <tr>
-                                <th>Excipiente</th>
-                                <th>Unidade</th>
-                                <th>Quantidade</th>
-                                <th>Preço</th>
+                                <th class="line1 right-line" style="width: 604px;">Excipiente</th>
+                                <th class="line1 right-line" style="width: 180px; text-align: center;">Unidade</th>
+                                <th class="line1 right-line" style="width: 150px; text-align: center;">Quantidade</th>
+                                <th class="price-table-title">Preço</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr id="excipiente">
-                                <td>
+                                <td class="line1 right-line">
                                     <datalist name="excipientes" id="excipientes">
                                         <% orcamento.excipientes.forEach(function(excipiente) { %>
                                             <option value="<%= excipiente %>">
@@ -167,15 +170,16 @@
                                     <input id="excipiente-nome" autoComplete="on" list="excipientes"
                                         value="<%= orcamento.excipiente.nome %>" />
                                 </td>
-                                <td id="excipiente-unidade">
+                                <td class="line1 right-line" id="excipiente-unidade" style="text-align: center;">
                                     <%= orcamento.excipiente.unidade %>
                                 </td>
-                                <td id="excipiente-quantidade">
+                                <td class="number line1 right-line" id="excipiente-quantidade" style="text-align: center;">
                                     <%= orcamento.excipiente.quantidade %>
                                 </td>
-                                <td id="preco-excipiente" class="price-column">
-                                    <%= orcamento.excipiente.preco !=='-' ? `R$ ${orcamento.excipiente.preco.toFixed(2).replace('.',',')}`
-                                        : orcamento.excipiente.preco %>
+                                <td id="preco-excipiente" class="line1 price-table-value">
+                                    <%= orcamento.excipiente.preco !=='-' ? `R$
+                                        ${orcamento.excipiente.preco.toFixed(2).replace('.',',')}` :
+                                        orcamento.excipiente.preco %>
                                 </td>
                             </tr>
                         </tbody>
@@ -185,17 +189,17 @@
                     <table>
                         <thead>
                             <tr>
-                                <th>Tipo Cápsula</th>
-                                <th>Cápsula</th>
-                                <th>Unidade</th>
-                                <th>Quantidade</th>
-                                <th>Contém</th>
-                                <th>Preço</th>
+                                <th class="line1 right-line" style="width: 404px;">Tipo Cápsula</th>
+                                <th class="line1 right-line" style="width: 200px; text-align: center;">Cápsula</th>
+                                <th class="line1 right-line" style="width: 180px; text-align: center;">Unidade</th>
+                                <th class="line1 right-line" style="width: 150px; text-align: center;">Quantidade</th>
+                                <th class="line1 right-line" style="width: 120px; text-align: center;">Contém</th>
+                                <th class="price-table-title">Preço</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr id="capsula">
-                                <td class="required">
+                                <td class="required line1 right-line">
                                     <select id="capsula-tipo" name="capsula-tipo" onchange="updateCapsulaDropdown()">
                                         <% orcamento.tipoCapsulas.forEach(function(tipo, index) { %>
                                             <option value="<%= tipo %>" <%=index===0 ? 'selected' : '' %>>
@@ -204,8 +208,8 @@
                                             <% }) %>
                                     </select>
                                 </td>
-                                <td>-</td>
-                                <td>
+                                <td class="line1 right-line" style="text-align: center;">-</td>
+                                <td class="line1 right-line" style="text-align: center;">
                                     <select id="capsula-unidade" name="capsula-unidade">
                                         <% orcamento.unidades.capsula.forEach(function(unidade) { %>
                                             <option value="<%= unidade %>">
@@ -213,15 +217,15 @@
                                             </option>
                                             <% }) %>
                                     </select>
-                                <td id="capsula-quantidade">
+                                <td class="line1 number right-line" id="capsula-quantidade" style="text-align: center;">
                                     <%= orcamento.capsula.quantidade %>
                                 </td>
-                                </td>
-                                <td id="capsula-contem" name="capsula-contem">
+                                <td class="line1 number right-line" id="capsula-contem" name="capsula-contem" style="text-align: center;">
                                     <%= orcamento.capsula.contem %>
                                 </td>
-                                <td id="preco-capsula" class="price-column">
-                                    <%= orcamento.capsula.preco !=='-' ? `R$ ${orcamento.capsula.preco.toFixed(2).replace('.',',')}` :
+                                <td id="preco-capsula" class="line1 price-table-value">
+                                    <%= orcamento.capsula.preco !=='-' ? `R$
+                                        ${orcamento.capsula.preco.toFixed(2).replace('.',',')}` :
                                         orcamento.capsula.preco %>
                                 </td>
                             </tr>
@@ -232,18 +236,18 @@
                     <div class="total-section">
                         <div class="total-row">
                             <span>Custo Fixo</span>
-                            <span class="price-column">R$ <%= orcamento.custoFixo.toFixed(2).replace('.',',') %>
+                            <span class="number">R$ <%= orcamento.custoFixo.toFixed(2).replace('.',',') %>
                             </span>
                         </div>
                         <div class="total-row">
                             <span>Total</span>
-                            <span id="total-preco" class="price-column">R$ 0,00</span>
+                            <span id="total-preco" class="number">R$ 0,00</span>
                         </div>
                     </div>
                 </div>
                 <% }) %>
                     <div class="button-container">
-                        <button id="submit_orcamento" class="edit-button">Salvar</button>
+                        <button id="submit_orcamento" class="submit-button">SALVAR</button>
                     </div>
         </div>
     </div>

@@ -1,8 +1,7 @@
 .total-section {
-    margin-top: 1.5rem;
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 1px;
 }
 
 .total-row {
@@ -20,17 +19,19 @@
     margin-top: 1rem;
 }
 
-.edit-button {
-    background-color: var(--color-primary);
-    color: var(--color-white);
-    padding: 0.5rem 2rem;
-    border: none;
-    border-radius: 0.375rem;
-    font-weight: 500;
+.submit-button {
+    background: #BBA263;
+    border-radius: 4px;
+    border: 0;
+    float: left;
     cursor: pointer;
-    transition: background-color 0.2s;
+    font: normal normal bold 18px/22px Proxima Nova Condensed;
+    padding: 13px 31px 13px 32px;
+    color: white;
+    letter-spacing: 0px;
+    opacity: 1;
 }
 
-.edit-button:hover {
-    background-color: var(--color-primary-dark);
+.submit-button:hover {
+    background: #847F7A 0% 0% no-repeat padding-box;
 }

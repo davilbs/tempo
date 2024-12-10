@@ -66,11 +66,6 @@ h1 {
   background-color: transparent;
 }
 
-.table-title {
-  color: #FFFFFF;
-  margin-bottom: 40px;
-}
-
 .profile {
   height: 200px;
   width: 200px;
@@ -299,6 +294,10 @@ textarea {
   padding: 20px 49px 20px 52px;
   margin-left: 10px;
   font-weight: 700;
+}
+
+.upload-button:hover {
+  background-color: var(--color-primary-dark);
 }
 
 .hidden {
