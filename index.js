@@ -122,7 +122,7 @@ async function extractPrescription(pdf_path) {
     var content = JSON.stringify({ "filename": pdf_path });
     var options = {
         hostname: 'localhost',
-        port: 8000,
+        port: 8001,
         path: "/extract_prescription",
         method: 'POST',
         headers: {
@@ -177,6 +177,7 @@ app.get("/orcamento", function (req, res, next) {
         })
         .catch((err) => {
             console.log("Error");
+            res.render("index.ejs", { parseError: true });
         });
 })
 
