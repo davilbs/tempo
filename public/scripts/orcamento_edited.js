@@ -127,7 +127,7 @@ document.getElementById('submit_orcamento').addEventListener('click', async () =
 
     orcamentos = parse_orcamento_editted();
 
-    const response = await fetch("http://127.0.0.1:8000/update_orcamento", {
+    const response = await fetch("http://127.0.0.1:8001/update_orcamento", {
         method: "POST",
         headers: {
             'Content-Type': 'application/json',
