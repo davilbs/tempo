@@ -100,7 +100,7 @@
                                     </td>
                                     <td class="number right-line required line<%= (rowIndex%2)+1 %>"
                                         id="ativo-quantidade-<%= rowIndex %>">
-                                        <input id="ativo-quantidade" type="text" value="<%= formatNumber(ativo.quantidade) %>" size="10"/>
+                                        <input id="ativo-quantidade" type="text" value="<%= formatNumber(ativo.quantidade) %>" size="8"/>
                                     </td>
                                     <td id="preco-ativo-<%= rowIndex %>" class="price-table-value line<%= (rowIndex%2)+1 %>">
                                         <%= ativo.opcoes[0].preco !=='-' ? `R$

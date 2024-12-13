@@ -103,7 +103,7 @@
                                 <td class="right-line line1" id="embalagem-nome">
                                     <%= orcamento.embalagem.nome %>
                                 </td>
-                                <td class="required line1 right-line" style="text-align: center;" id="embalagem-quantidade">
+                                <td class="line1 right-line" style="text-align: center;" id="embalagem-quantidade">
                                     <%= formatNumber(orcamento.embalagem.quantidade) %>
                                 </td>
                                 <td id="preco-embalagem" class="price-table-value line1">R$ <%=
@@ -156,7 +156,7 @@
                         <tbody>
                             <tr id="capsula">
                                 <% orcamento.capsulas.forEach(function(capsula, index) { %>
-                                    <td class="required line1 right-line" id="capsula-tipo" name="capsula-tipo">
+                                    <td class="line1 right-line" id="capsula-tipo" name="capsula-tipo">
                                         <%= capsula.tipo %>
                                     </td>
                                     <td class="line1 right-line" style="text-align: center;">
