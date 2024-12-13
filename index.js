@@ -6,6 +6,7 @@ const http = require('http');
 const https = require('https');
 const md5 = require("md5");
 const session = require('express-session');
+const { formatNumber } = require('./public/scripts/utils');
 
 var app = express();
 const port = 3000;
@@ -153,7 +154,8 @@ app.get("/orcamento", function (req, res, next) {
     if (fs.existsSync(json_path)) {
         var content = fs.readFileSync(json_path);
         var data = JSON.parse(content);
-        res.render("orcamento_edit.ejs", formatOrcamentoEdited(data));
+        orcamentos_edited = formatOrcamentoEdited(data);
+        res.render("orcamento_edit.ejs", { orcamentos_edited, formatNumber });
         return;
     }
 
@@ -168,12 +170,13 @@ app.get("/orcamento", function (req, res, next) {
             // Wait for the file to be processed
             console.log("File processed");
             var json_path = path.join(__dirname + "/processed/", req.query.filename.split('.')[0] + ".json");
-        
+
             var content = fs.readFileSync(json_path);
             var data = JSON.parse(content);
-        
+
             // Render the page with the data 
-            res.render("orcamento_edit.ejs", formatOrcamentoEdited(data));
+            orcamentos_edited = formatOrcamentoEdited(data);
+            res.render("orcamento_edit.ejs", { orcamentos_edited, formatNumber });
         })
         .catch((err) => {
             console.log("Error");
@@ -256,17 +259,18 @@ function formatOrcamentoEdited(orcamentos) {
 
 app.post("/orcamento/edit", (req, res) => {
     const orcamento = JSON.parse(req.body['orcamento']);
-    orcamento_edit = formatOrcamentoEdited(orcamento);
-    
-    res.render("orcamento_edit.ejs", orcamento_edit);
+    orcamentos_edited = formatOrcamentoEdited(orcamento);
+
+    res.render("orcamento_edit.ejs", { orcamentos_edited, formatNumber });
 })
 
 app.post('/orcamento/result', (req, res) => {
-    const editted_orcamento = JSON.parse(req.body['submited_orcamento']);
+    const orcamentos_edited = JSON.parse(req.body['submited_orcamento']);
 
-    res.render("orcamento.ejs", editted_orcamento);
+    res.render("orcamento.ejs", { orcamentos_edited, formatNumber });
 })
 
-app.listen(port,"127.0.0.1", () => {
+
+app.listen(port, "127.0.0.1", () => {
     console.log(`Server started on port ${port}`);
 })

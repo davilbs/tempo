@@ -5,11 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Essentia Pharma - Orçamento Smart</title>
-    <link rel="stylesheet" href="styles/css/styles.css">
-    <link rel="stylesheet" href="styles/css/header.css">
-    <link rel="stylesheet" href="styles/css/form.css">
-    <link rel="stylesheet" href="styles/css/table.css">
-    <link rel="stylesheet" href="styles/css/total.css">
+    <link rel="stylesheet" href="/styles/css/styles.css">
+    <link rel="stylesheet" href="/styles/css/header.css">
+    <link rel="stylesheet" href="/styles/css/form.css">
+    <link rel="stylesheet" href="/styles/css/table.css">
+    <link rel="stylesheet" href="/styles/css/total.css">
 </head>
 
 <body>
@@ -23,24 +23,24 @@
         </header>
         <form class="customer-form" id="customerForm">
             <div class="form-group">
-                <label for="nome_cliente">Nome Cliente:</label>
-                <input type="text" id="nome_cliente" name="nome_cliente"
-                    value="<%= orcamentos_edited[0].nomeCliente %>">
+                <label for="nome-cliente">Nome Cliente:</label>
+                <input type="text" id="nome-cliente" name="nome-cliente"
+                    value="<%= orcamentos_edited.orcamentos_edited[0].nomeCliente %>">
             </div>
             <div class="form-group">
-                <label for="nome_medico">Nome Médico:</label>
-                <input type="text" id="nome_medico" name="nome_medico" value="<%= orcamentos_edited[0].nomeMedico %>">
+                <label for="nome-medico">Nome Médico:</label>
+                <input type="text" id="nome-medico" name="nome-medico" value="<%= orcamentos_edited.orcamentos_edited[0].nomeMedico %>">
             </div>
         </form>
         <div class="budget-table">
-            <% orcamentos_edited.forEach(function(orcamento, indexOrcamento) { %>
+            <% orcamentos_edited.orcamentos_edited.forEach(function(orcamento, indexOrcamento) { %>
                 <h2 class="table-title" style="margin-top: 1.5rem;">Nome Fórmula</h2>
                 <div class="table-container" id="orcamento-<%= indexOrcamento %>">
                     <table>
                         <tbody>
                             <tr>
                                 <td class="required line1 right-line">Quantidade
-                                    <input id="quantidade-orcamento" type="text" value="<%= orcamento.dosagem %>"
+                                    <input id="quantidade-orcamento" type="text" value="<%= formatNumber(orcamento.dosagem) %>"
                                         size="10" />
                                 </td>
                                 <td class="required line1 right-line">Forma Farmacêutica
@@ -100,11 +100,11 @@
                                     </td>
                                     <td class="number right-line required line<%= (rowIndex%2)+1 %>"
                                         id="ativo-quantidade-<%= rowIndex %>">
-                                        <input id="ativo-quantidade" type="text" value="<%= ativo.quantidade %>" size="10"/>
+                                        <input id="ativo-quantidade" type="text" value="<%= formatNumber(ativo.quantidade) %>" size="8"/>
                                     </td>
                                     <td id="preco-ativo-<%= rowIndex %>" class="price-table-value line<%= (rowIndex%2)+1 %>">
                                         <%= ativo.opcoes[0].preco !=='-' ? `R$
-                                            ${parseFloat(ativo.opcoes[0].preco).toFixed(2).replace('.',',')}` :
+                                            ${formatNumber(ativo.opcoes[0].preco, true)}` :
                                             ativo.opcoes[0].preco %>
                                     </td>
                                 </tr>
@@ -136,11 +136,11 @@
                                 </td>
                                 <td class="required line1 right-line" style="text-align: center;">
                                     <input class="number" id="embalagem-quantidade" type="text"
-                                        value="<%= orcamento.embalagem.quantidade %>" />
+                                        value="<%= formatNumber(orcamento.embalagem.quantidade) %>" />
                                 </td>
                                 <td id="preco-embalagem" class="price-table-value line1">
                                     <%= orcamento.embalagem.preco !=='-' ? `R$
-                                        ${orcamento.embalagem.preco.toFixed(2).replace('.',',')}` :
+                                        ${formatNumber(orcamento.embalagem.preco, true)}` :
                                         orcamento.embalagem.preco %>
                                 </td>
                             </tr>
@@ -174,11 +174,11 @@
                                     <%= orcamento.excipiente.unidade %>
                                 </td>
                                 <td class="number line1 right-line" id="excipiente-quantidade" style="text-align: center;">
-                                    <%= orcamento.excipiente.quantidade %>
+                                    <%= formatNumber(orcamento.excipiente.quantidade) %>
                                 </td>
                                 <td id="preco-excipiente" class="line1 price-table-value">
                                     <%= orcamento.excipiente.preco !=='-' ? `R$
-                                        ${orcamento.excipiente.preco.toFixed(2).replace('.',',')}` :
+                                        ${formatNumber(orcamento.excipiente.preco, true)}` :
                                         orcamento.excipiente.preco %>
                                 </td>
                             </tr>
@@ -189,11 +189,11 @@
                     <table>
                         <thead>
                             <tr>
-                                <th class="line1 right-line" style="width: 404px;">Tipo Cápsula</th>
-                                <th class="line1 right-line" style="width: 200px; text-align: center;">Cápsula</th>
+                                <th class="line1 right-line" style="width: 304px;">Tipo Cápsula</th>
+                                <th class="line1 right-line" style="width: 300px; text-align: center;">Cápsula</th>
                                 <th class="line1 right-line" style="width: 180px; text-align: center;">Unidade</th>
                                 <th class="line1 right-line" style="width: 150px; text-align: center;">Quantidade</th>
-                                <th class="line1 right-line" style="width: 120px; text-align: center;">Contém</th>
+                                <th class="line1 right-line" style="text-align: center;">Contém</th>
                                 <th class="price-table-title">Preço</th>
                             </tr>
                         </thead>
@@ -218,14 +218,14 @@
                                             <% }) %>
                                     </select>
                                 <td class="line1 number right-line" id="capsula-quantidade" style="text-align: center;">
-                                    <%= orcamento.capsula.quantidade %>
+                                    <%= formatNumber(orcamento.capsula.quantidade) %>
                                 </td>
                                 <td class="line1 number right-line" id="capsula-contem" name="capsula-contem" style="text-align: center;">
-                                    <%= orcamento.capsula.contem %>
+                                    <%= formatNumber(orcamento.capsula.contem) %>
                                 </td>
                                 <td id="preco-capsula" class="line1 price-table-value">
                                     <%= orcamento.capsula.preco !=='-' ? `R$
-                                        ${orcamento.capsula.preco.toFixed(2).replace('.',',')}` :
+                                        ${formatNumber(orcamento.capsula.preco)}` :
                                         orcamento.capsula.preco %>
                                 </td>
                             </tr>
@@ -236,7 +236,7 @@
                     <div class="total-section">
                         <div class="total-row">
                             <span>Custo Fixo</span>
-                            <span class="number">R$ <%= orcamento.custoFixo.toFixed(2).replace('.',',') %>
+                            <span class="number">R$ <%= formatNumber(orcamento.custoFixo) %>
                             </span>
                         </div>
                         <div class="total-row">
@@ -252,9 +252,9 @@
         </div>
     </div>
     <script>
-        const formaFarmaceuticaSubgrupoAll = '<%- JSON.stringify(orcamentos_edited[0].formaFarmaceuticaSubgrupoAll) %>';
+        const formaFarmaceuticaSubgrupoAll = '<%- JSON.stringify(orcamentos_edited.orcamentos_edited[0].formaFarmaceuticaSubgrupoAll) %>';
         <% var allAtivos = [] %>;
-        <% orcamentos_edited.forEach((orcamento) => { %>
+        <% orcamentos_edited.orcamentos_edited.forEach((orcamento) => { %>
             <% var ativos = [] %>;
             <% orcamento.ativos.forEach((ativo) => { %>
                 <% ativos.push(ativo.opcoes) %>;
@@ -264,6 +264,7 @@
         const ativosOrcamento = '<%- JSON.stringify(allAtivos) %>';
     </script>
     <script src="/scripts/orcamento_edited.js"></script>
+    <script src="/scripts/utils.js"></script>
 </body>
 
 </html>

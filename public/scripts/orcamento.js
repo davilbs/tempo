@@ -17,7 +17,7 @@ function updateTotal() {
                 const precoText = tds[tds.length - 1].innerText;
 
                 if (precoText && precoText.startsWith("R$")) {
-                    const preco = parseFloat(precoText.replace("R$", "").replace(",", "."));
+                    const preco = parseFloat(precoText.replace("R$", "").replace(".", "").replace(",", "."));
                     if (!isNaN(preco)) {
                         total += preco;
                     }
@@ -26,12 +26,12 @@ function updateTotal() {
         });
 
         // Get preço custo fixo
-        const precoFixo = parseFloat(table.querySelector("span[id='preco-custo-fixo']").innerText.replace("R$", "").replace(",", "."));
+        const precoFixo = parseFloat(table.querySelector("span[id='preco-custo-fixo']").innerText.replace("R$", "").replace(".", "").replace(".", "."));
         total += precoFixo;
-        
+
         // Update the Total cell
         const totalCell = table.querySelector("span[id='total-preco']");
-        totalCell.innerText = `R$ ${total.toFixed(2)}`;
+        totalCell.innerText = `R$ ${formatNumber(total)}`;
     });
 }
 
@@ -107,7 +107,7 @@ function updateCapsulaPrice() {
         }
     }
 
-    document.getElementById('capsula-preco').innerText = `R$${capsulaPrice.toFixed(2)}`;
+    document.getElementById('capsula-preco').innerText = `R$ ${formatNumber(capsulaPrice)}`;
 }
 
 function parse_orcamento() {
@@ -135,7 +135,7 @@ function parse_orcamento() {
                         ];
                         for (let i = 0; i < ativosAll[orcamentoCounter][ativoCounter].length; i++) {
                             var element = ativosAll[orcamentoCounter][ativoCounter][i];
-                            if (element.nome != ''){
+                            if (element.nome != '') {
                                 ativo['opcoes'].push(element);
                             }
                         }
@@ -145,7 +145,7 @@ function parse_orcamento() {
                         ativo['unidade'] = td.innerText;
                     }
                     else if (td.id.includes('ativo-quantidade')) {
-                        ativo['quantidade'] = parseFloat(td.innerText);
+                        ativo['quantidade'] = parseFloat(td.innerText.replace('.', '').replace(',', '.'));
                     }
                 });
                 ativo['opcoes'] = ativo['opcoes'].filter((item, index, self) =>
@@ -164,14 +164,11 @@ function parse_orcamento() {
                     if (td.id.includes('embalagem-nome')) {
                         embalagem['nome'] = td.innerText;
                     }
-                    else if (td.id.includes('embalagem-unidade')) {
-                        embalagem['unidade'] = td.innerText;
-                    }
                     else if (td.id.includes('embalagem-quantidade')) {
-                        embalagem['quantidade'] = parseFloat(td.innerText);
+                        embalagem['quantidade'] = parseFloat(td.innerText.replace('.', '').replace(',', '.'));
                     }
                     else if (td.id.includes('preco-embalagem')) {
-                        embalagem['preco'] = parseFloat(td.innerText.replace("R$", ""));
+                        embalagem['preco'] = parseFloat(td.innerText.replace("R$", "").replace('.', '').replace(',', '.'));
                     }
                 });
             }
@@ -190,10 +187,10 @@ function parse_orcamento() {
                         excipiente['unidade'] = td.innerText;
                     }
                     else if (td.id.includes('excipiente-quantidade')) {
-                        excipiente['quantidade'] = parseFloat(td.innerText);
+                        excipiente['quantidade'] = parseFloat(td.innerText.replace('.', '').replace(',', '.'));
                     }
                     else if (td.id.includes('preco-excipiente')) {
-                        excipiente['preco'] = parseFloat(td.innerText.replace("R$", ""));
+                        excipiente['preco'] = parseFloat(td.innerText.replace("R$", "").replace('.', '').replace(',', '.'));
                     }
                 });
             }
@@ -218,26 +215,27 @@ function parse_orcamento() {
                         capsula['unidade'] = td.innerText;
                     }
                     else if (td.id.includes('capsula-quantidade')) {
-                        capsula['quantidade'] = parseFloat(td.innerText);
+                        capsula['quantidade'] = parseFloat(td.innerText.replace('.', '').replace(',', '.'));
                     }
                     else if (td.id.includes('preco-capsula')) {
-                        capsula['preco'] = parseFloat(td.innerText.replace("R$", ""));
+                        capsula['preco'] = parseFloat(td.innerText.replace("R$", "").replace('.', '').replace(',', '.'));
                     }
                 });
             }
         });
-        orcamentos.push({
-            "nomeCliente": document.getElementById('nome-cliente').innerText,
-            "nomeMedico": document.getElementById('nome-medico').innerText,
-            "dosagem": parseFloat(document.getElementById('quantidade-orcamento').innerText),
-            "custoFixo": parseFloat(document.getElementById('preco-custo-fixo').innerText.replace("R$", "")),
+        var orcamento = {
+            "nomeCliente": document.getElementById('nome-cliente').value,
+            "nomeMedico": document.getElementById('nome-medico').value,
+            "dosagem": parseFloat(document.getElementById('quantidade-orcamento').innerText.replace('.', '').replace(',', '.')),
+            "custoFixo": parseFloat(document.getElementById('preco-custo-fixo').innerText.replace("R$", "").replace('.', '').replace(',', '.')),
             "formaFarmaceutica": document.getElementById('forma-farmaceutica').innerText,
             "formaFarmaceuticaSubgrupo": document.getElementById('forma-farmaceutica-subgrupo').innerText,
             "ativos": ativos,
             "embalagem": embalagem,
             "excipiente": excipiente,
             "capsula": capsula,
-        });
+        };
+        orcamentos.push(orcamento);
         orcamentoCounter += 1;
     });
 
