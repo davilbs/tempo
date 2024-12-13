@@ -43,7 +43,7 @@ function parse_orcamento_editted() {
                         ativo['unidade'] = td.value;
                     }
                     else if (td.id.includes('ativo-quantidade')) {
-                        ativo['quantidade'] = parseFloat(td.value);
+                        ativo['quantidade'] = parseFloat(td.value.replace('.', '').replace(',', '.'));
                     }
                 });
                 ativos = ativos.concat(ativo);
@@ -63,7 +63,7 @@ function parse_orcamento_editted() {
                         embalagem['unidade'] = td.value;
                     }
                     else if (td.id.includes('embalagem-quantidade')) {
-                        embalagem['quantidade'] = parseFloat(td.value);
+                        embalagem['quantidade'] = parseFloat(td.value.replace(',', '.'));
                     }
                 });
             }
@@ -82,7 +82,7 @@ function parse_orcamento_editted() {
                         excipiente['unidade'] = td.value;
                     }
                     else if (td.id.includes('excipiente-quantidade')) {
-                        excipiente['quantidade'] = parseFloat(td.value);
+                        excipiente['quantidade'] = td.value;
                     }
                 });
             }
@@ -101,16 +101,16 @@ function parse_orcamento_editted() {
                         capsula['unidade'] = td.value;
                     }
                     else if (td.id.includes('capsula-quantidade')) {
-                        capsula['quantidade'] = parseFloat(td.value);
+                        capsula['quantidade'] = parseFloat(td.innerText.replace(',', '.'));
                     }
                 });
             }
         });
 
         orcamentos.push({
-            "nome_cliente": document.getElementById('nome_cliente').value,
-            "nome_medico": document.getElementById('nome_medico').value,
-            "dosagem": parseFloat(document.getElementById('quantidade-orcamento').value),
+            "nome_cliente": document.getElementById('nome-cliente').value,
+            "nome_medico": document.getElementById('nome-medico').value,
+            "dosagem": parseFloat(document.getElementById('quantidade-orcamento').value.replace(',', '.')),
             "forma_farmaceutica": document.getElementById('forma-farmaceutica').value,
             "sub_forma_farmaceutica": document.getElementById('forma-farmaceutica-subgrupo').value,
             "ativos": ativos,
