@@ -117,6 +117,7 @@ function parse_orcamento_editted() {
             "embalagem": embalagem,
             "excipiente": excipiente,
             "capsula": capsula,
+            "nome_formula": document.getElementById('nome-formula').innerText,
         });
     });
     return orcamentos;

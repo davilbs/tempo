@@ -234,6 +234,7 @@ function parse_orcamento() {
             "embalagem": embalagem,
             "excipiente": excipiente,
             "capsula": capsula,
+            "nomeFormula": document.getElementById('nome-formula').innerText,
         };
         orcamentos.push(orcamento);
         orcamentoCounter += 1;

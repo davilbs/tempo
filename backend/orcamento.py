@@ -21,6 +21,7 @@ class orcamentoClass(BaseModel):
     capsulas: Sequence[capsuleClass] = []
     excipiente: excipientClass = None
     embalagem: embalagemClass = None
+    nome_formula: str = ''
 
     def __init__(self, orcamento_values) -> None:
         super().__init__()
@@ -36,7 +37,8 @@ class orcamentoClass(BaseModel):
         self.sub_forma_farmaceutica = orcamento_values['sub_forma_farmaceutica']
         self.nome_cliente = orcamento_values['nome_cliente']
         self.nome_medico = orcamento_values['nome_medico']
-
+        self.nome_formula = orcamento_values['nome_formula']
+        
         self.calc_price_ativos()
         self.choose_capsule(orcamento_values['capsula']['tipo'])
         self.choose_excipiente(orcamento_values)
@@ -64,6 +66,7 @@ class orcamentoClass(BaseModel):
             },
             'capsulas': [],
             'custoFixo': 7.80,
+            'nomeFormula': self.nome_formula,
         }
         for ativo in self.ativos:
             orcamento['ativos'].append(
