@@ -38,6 +38,7 @@ class Orcamento(BaseModel):
     embalagem: dict
     excipiente: dict
     capsula: dict
+    nome_formula: str
 
 @app.get("/")
 def root():
@@ -81,6 +82,7 @@ def extract_prescription_route(file: File):
                 )
                 # Create pre_orcamento
                 orcamento_result = orcamento.create_pre_orcamento()
+                orcamento_result['nomeFormula'] = medicamento['nome']
                 orcamentos.append(orcamento_result)
             except:
                 return {"status": "error", "result": "Error when identifying the prescription"}
@@ -104,6 +106,7 @@ def parse_orcamento(orcamento: Orcamento):
         'embalagem': orcamento.embalagem,
         'excipiente': orcamento.excipiente,
         'capsula': orcamento.capsula,
+        'nome_formula': orcamento.nome_formula,
     }
 
 @app.post("/update_orcamento")

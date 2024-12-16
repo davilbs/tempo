@@ -250,6 +250,7 @@ function formatOrcamentoEdited(orcamentos) {
             excipiente: excipiente,
             capsula: capsula,
             custoFixo: orcamento['custoFixo'],
+            nomeFormula: orcamento['nomeFormula'],
         });
     });
 
@@ -293,7 +294,6 @@ app.post('/orcamento/result', (req, res) => {
     request.then(function (body) {
         var orcamentos_edited = JSON.parse(body)['result'];
         orcamentos_edited = { "orcamentos_edited": orcamentos_edited };
-        
         res.render("orcamento.ejs", { orcamentos_edited, formatNumber });
     })
         .catch((err) => {
