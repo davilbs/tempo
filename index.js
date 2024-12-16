@@ -63,13 +63,10 @@ app.post("/calculate", upload.single("prescription"), (req, res, next) => {
 app.get('/events', async function (req, res) {
     var loading_status = "Fazendo upload do arquivo... (1/2)";
     var loading_code = 0;
-
-    console.log("Current status", loading_status);
-    console.log('Got /events with argument ' + req.query.filename);
     let filename = md5(req.query.filename + req.session.salt);
     let curr_ext = path.extname(req.query.filename);
     let directory = __dirname + "/uploads/";
-    console.log("Filename: " + filename)
+    
     res.set({
         'Cache-Control': 'no-cache',
         'Content-Type': 'text/event-stream',
@@ -80,19 +77,9 @@ app.get('/events', async function (req, res) {
     // Tell the client to retry every 10 seconds if connectivity is lost
     res.write('retry: 10000\n\n');
 
-    let connected = true;
-    req.on("close", () => {
-        console.log("Final status", loading_status);
-        console.log("Connection ended unexpectedly");
-        connected = false;
-    })
-    req.on("end", () => {
-        console.log("Final status", loading_status);
-        console.log("Connection ended normally");
-        connected = false;
-    })
     console.log("Looking for file: " + directory + filename + curr_ext);
-    while (connected) {
+    while (true) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
         if (fs.existsSync(directory + filename + curr_ext)) {
             console.log('Progress ... ', directory + filename + curr_ext);
             if (curr_ext == ".json") {
@@ -101,7 +88,6 @@ app.get('/events', async function (req, res) {
                 connected = false;
             }
             else {
-                await new Promise(resolve => setTimeout(resolve, 1000));
                 console.log("Looking for file: " + directory + filename + curr_ext);
                 curr_ext = ".json";
                 directory = __dirname + "/processed/";
@@ -109,8 +95,6 @@ app.get('/events', async function (req, res) {
                 loading_code = 2;
                 console.log("Looking for file: " + directory + filename + curr_ext);
             }
-        } else {
-            await new Promise(resolve => setTimeout(resolve, 1000));
         }
         res.write(`data: {"status_text": "${loading_status}", "status_code": ${loading_code}}\n\n`);
     }
