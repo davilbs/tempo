@@ -1,0 +1,37 @@
+.total-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.total-row {
+    background-color: var(--color-black);
+    color: var(--color-white);
+    padding: 0.5rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+.submit-button {
+    background: #BBA263;
+    border-radius: 4px;
+    border: 0;
+    float: left;
+    cursor: pointer;
+    font: normal normal bold 18px/22px Proxima Nova Condensed;
+    padding: 13px 31px 13px 32px;
+    color: white;
+    letter-spacing: 0px;
+    opacity: 1;
+}
+
+.submit-button:hover {
+    background: #847F7A 0% 0% no-repeat padding-box;
+}

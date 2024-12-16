@@ -6,6 +6,7 @@ const http = require('http');
 const https = require('https');
 const md5 = require("md5");
 const session = require('express-session');
+const { formatNumber } = require('./public/scripts/utils');
 
 var app = express();
 const port = 3000;
@@ -101,12 +102,11 @@ app.get('/events', async function (req, res) {
 
 })
 
-
 async function extractPrescription(pdf_path) {
     var content = JSON.stringify({ "filename": pdf_path });
     var options = {
         hostname: 'localhost',
-        port: 8000,
+        port: 8001,
         path: "/extract_prescription",
         method: 'POST',
         headers: {
@@ -137,7 +137,8 @@ app.get("/orcamento", function (req, res, next) {
     if (fs.existsSync(json_path)) {
         var content = fs.readFileSync(json_path);
         var data = JSON.parse(content);
-        res.render("orcamento_edit.ejs", formatOrcamentoEdited(data));
+        orcamentos_edited = formatOrcamentoEdited(data);
+        res.render("orcamento_edit.ejs", { orcamentos_edited, formatNumber });
         return;
     }
 
@@ -152,15 +153,17 @@ app.get("/orcamento", function (req, res, next) {
             // Wait for the file to be processed
             console.log("File processed");
             var json_path = path.join(__dirname + "/processed/", req.query.filename.split('.')[0] + ".json");
-        
+
             var content = fs.readFileSync(json_path);
             var data = JSON.parse(content);
-        
+
             // Render the page with the data 
-            res.render("orcamento_edit.ejs", formatOrcamentoEdited(data));
+            orcamentos_edited = formatOrcamentoEdited(data);
+            res.render("orcamento_edit.ejs", { orcamentos_edited, formatNumber });
         })
         .catch((err) => {
             console.log("Error");
+            res.render("index.ejs", { parseError: true });
         });
 })
 
@@ -231,6 +234,7 @@ function formatOrcamentoEdited(orcamentos) {
             excipiente: excipiente,
             capsula: capsula,
             custoFixo: orcamento['custoFixo'],
+            nomeFormula: orcamento['nomeFormula'],
         });
     });
 
@@ -239,17 +243,50 @@ function formatOrcamentoEdited(orcamentos) {
 
 app.post("/orcamento/edit", (req, res) => {
     const orcamento = JSON.parse(req.body['orcamento']);
-    orcamento_edit = formatOrcamentoEdited(orcamento);
-    
-    res.render("orcamento_edit.ejs", orcamento_edit);
+    orcamentos_edited = formatOrcamentoEdited(orcamento);
+
+    res.render("orcamento_edit.ejs", { orcamentos_edited, formatNumber });
 })
 
 app.post('/orcamento/result', (req, res) => {
-    const editted_orcamento = JSON.parse(req.body['submited_orcamento']);
-
-    res.render("orcamento.ejs", editted_orcamento);
+    var content = req.body.orcamentos;
+    var options = {
+        hostname: 'localhost',
+        port: 8001,
+        path: "/update_orcamento",
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': Buffer.byteLength(content)
+        }
+    };
+    var request = new Promise(function (resolve, reject) {
+        console.log("Sending request to extract prescription");
+        let r = http.request(options, function (res) {
+            res.setEncoding('utf8');
+            res.on('data', (data) => {
+                resolve(data);
+            });
+            if (res.statusCode != 200) {
+                console.log("Got ERROR");
+                reject(res.err);
+            }
+        });
+        r.write(content);
+        r.end();
+    });
+    request.then(function (body) {
+        var orcamentos_edited = JSON.parse(body)['result'];
+        orcamentos_edited = { "orcamentos_edited": orcamentos_edited };
+        res.render("orcamento.ejs", { orcamentos_edited, formatNumber });
+    })
+        .catch((err) => {
+            console.log("Error");
+            res.render("index.ejs", { parseError: true });
+        });
 })
 
-app.listen(port,"127.0.0.1", () => {
+
+app.listen(port, "127.0.0.1", () => {
     console.log(`Server started on port ${port}`);
 })

@@ -35,7 +35,10 @@ function ekUpload() {
     }
 
     function AddLoading(filename) {
-        var source = new EventSource("/events?filename=" + filename);
+        console.log("Adding loading for ", filename)
+        var protocol = window.location.protocol === 'https:' ? 'https://' : 'http://';
+        var host = window.location.host;
+        var source = new EventSource(protocol + host + "/events?filename=" + filename);
         source.addEventListener('message', (message) => {
             console.log("received message", message);
             var data_json = JSON.parse(message.data)
