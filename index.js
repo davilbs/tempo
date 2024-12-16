@@ -265,7 +265,6 @@ app.post("/orcamento/edit", (req, res) => {
 
 app.post('/orcamento/result', (req, res) => {
     var content = req.body.orcamentos;
-    console.log(content);
     var options = {
         hostname: 'localhost',
         port: 8001,
