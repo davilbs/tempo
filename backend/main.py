@@ -14,7 +14,6 @@ app = FastAPI()
 
 origins = [
     "http://localhost",
-    "http://localhost:8000",
     "http://localhost:3000",
 ]
 
@@ -113,4 +112,4 @@ def update_orcamento_route(orcamentos: list[Orcamento]):
     for orcamento in orcamentos:
         body = parse_orcamento(orcamento)
         results.append(orcamentoClass(body).create_orcamento())
-    return utils.make_lambda_response(utils.HTTP_STATUS_OK, {'result': results})
+    return {"status": "success", "result": results}
