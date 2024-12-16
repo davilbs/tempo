@@ -118,7 +118,6 @@ app.get('/events', async function (req, res) {
 
 })
 
-
 async function extractPrescription(pdf_path) {
     var content = JSON.stringify({ "filename": pdf_path });
     var options = {
@@ -265,9 +264,43 @@ app.post("/orcamento/edit", (req, res) => {
 })
 
 app.post('/orcamento/result', (req, res) => {
-    const orcamentos_edited = JSON.parse(req.body['submited_orcamento']);
-
-    res.render("orcamento.ejs", { orcamentos_edited, formatNumber });
+    var content = req.body.orcamentos;
+    console.log(content);
+    var options = {
+        hostname: 'localhost',
+        port: 8000,
+        path: "/update_orcamento",
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': Buffer.byteLength(content)
+        }
+    };
+    var request = new Promise(function (resolve, reject) {
+        console.log("Sending request to extract prescription");
+        let r = http.request(options, function (res) {
+            res.setEncoding('utf8');
+            res.on('data', (data) => {
+                resolve(data);
+            });
+            if (res.statusCode != 200) {
+                console.log("Got ERROR");
+                reject(res.err);
+            }
+        });
+        r.write(content);
+        r.end();
+    });
+    request.then(function (body) {
+        var orcamentos_edited = JSON.parse(body)['result'];
+        orcamentos_edited = { "orcamentos_edited": orcamentos_edited };
+        
+        res.render("orcamento.ejs", { orcamentos_edited, formatNumber });
+    })
+        .catch((err) => {
+            console.log("Error");
+            res.render("index.ejs", { parseError: true });
+        });
 })
 
 
