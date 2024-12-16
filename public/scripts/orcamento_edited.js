@@ -141,5 +141,5 @@ document.getElementById('submit_orcamento').addEventListener('click', async () =
 
     // Append the form to the body and submit it
     document.body.appendChild(form);
-    form.submit();
+    form.submit(); 
 });
