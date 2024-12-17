@@ -1,4 +1,4 @@
-import pandas as pd
+import pandas as pd, re
 from pydantic import BaseModel
 
 class ativoOrcamentoClass(BaseModel):
@@ -38,7 +38,7 @@ class ativoClass(BaseModel):
         df_ativos = pd.read_csv(
             './orcamento_tables/smart/ativos_joined_FCerta_SMART_2024.csv'
         )
-        row = df_ativos[df_ativos['DESCR'] == self.name].iloc[0].to_dict()
+        row = df_ativos[df_ativos['DESCR'].str.strip().apply(lambda x: re.sub(r'\s+', ' ', x)) == re.sub(r'\s+', ' ', self.name.strip())].iloc[0].to_dict()
         self.price = row['PRVEN']
         self.equivalency = row['EQUIV']
         self.dilution = row['DILUICAO']
