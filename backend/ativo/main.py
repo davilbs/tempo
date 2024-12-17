@@ -38,7 +38,7 @@ class ativoClass(BaseModel):
         df_ativos = pd.read_csv(
             './orcamento_tables/smart/ativos_joined_FCerta_SMART_2024.csv'
         )
-        row = df_ativos[df_ativos['DESCR'].str.strip().apply(lambda x: re.sub(r'\s+', ' ', x)) == re.sub(r'\s+', ' ', self.name.strip())].iloc[0].to_dict()
+        row = df_ativos[df_ativos['DESCR'].str.strip().apply(lambda x: re.sub(r'\s+', ' ', x) if isinstance(x, str) else x) == re.sub(r'\s+', ' ', self.name.strip())].iloc[0].to_dict()
         self.price = row['PRVEN']
         self.equivalency = row['EQUIV']
         self.dilution = row['DILUICAO']

@@ -31,7 +31,7 @@ class capsuleClass(ativoClass):
             './orcamento_tables/smart/outros_ativos_joined_FCerta_SMART_2024.csv'
         )
         row = (
-            df_ativos[df_ativos['DESCR'].str.strip().apply(lambda x: re.sub(r'\s+', ' ', x)) == re.sub(r'\s+', ' ', self.name.strip())]
+            df_ativos[df_ativos['DESCR'].str.strip().apply(lambda x: re.sub(r'\s+', ' ', x) if isinstance(x, str) else x) == re.sub(r'\s+', ' ', self.name.strip())]
             .drop('Unnamed: 0', axis=1)
             .drop_duplicates()
             .iloc[0].to_dict()
