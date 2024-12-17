@@ -65,7 +65,7 @@ class orcamentoClass(BaseModel):
                 'preco': self.excipiente.orcamento.price,
             },
             'capsulas': [],
-            'custoFixo': 7.80,
+            'custoFixo': self.get_custo_fixo(),
             'nomeFormula': self.nome_formula,
         }
         for ativo in self.ativos:
@@ -177,3 +177,14 @@ class orcamentoClass(BaseModel):
             self.ativos,
         )
         self.get_excipiente_qnt_price()
+        
+    def get_custo_fixo(self):
+        df_custos = pd.read_csv(
+            './orcamento_tables/smart/custo_fixo_FCerta_SMART_2024.csv'
+        )
+        forma_farmaceutica_id = re.split(r'(\d+)', self.forma_farmaceutica)[1]
+        return float(
+            df_custos[df_custos['forma_farmaceutica'] == forma_farmaceutica_id][
+                'custo_fixo'
+            ].iloc[0]
+        )
