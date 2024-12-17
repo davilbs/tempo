@@ -35,32 +35,33 @@
         </form>
         <div class="budget-table">
             <% orcamentos_edited.orcamentos_edited.forEach(function(orcamento, indexOrcamento) { %>
-                <h2 id="nome-formula" class="table-title" style="margin-top: 1.5rem;">
-                    <%= orcamento.nomeFormula %>
-                </h2>
                 <div class="table-container" id="orcamento-<%= indexOrcamento %>">
+                    <h2 id="nome-formula" class="table-title" style="margin-top: 1.5rem;">
+                        <%= orcamento.nomeFormula %>
+                    </h2>
                     <table>
                         <tbody>
                             <tr>
                                 <td class="required line1 right-line">Quantidade
-                                    <input id="quantidade-orcamento" type="text"
+                                    <input id="quantidade-orcamento-<%= indexOrcamento %>" type="text"
                                         value="<%= formatNumber(orcamento.dosagem) %>" size="10" />
                                 </td>
                                 <td class="required line1 right-line">Forma Farmacêutica
-                                    <select id="forma-farmaceutica" name="forma-farmaceutica"
-                                        onchange="updateSubgrupoDropdown()">
+                                    <select id="forma-farmaceutica-<%= indexOrcamento %>" name="forma-farmaceutica"
+                                        onchange="updateSubgrupoDropdown(<%=indexOrcamento%>)">
                                         <% orcamento.formaFarmaceuticaAll.forEach(function(forma, index) { %>
-                                            <option value="<%= forma %>" <%=index===0 ? 'selected' : '' %>>
+                                            <option value="<%= forma %>">
                                                 <%= forma %>
                                             </option>
                                             <% }) %>
                                     </select>
                                 </td>
                                 <td class="required line1">Forma Farmacêutica (Subgrupo)
-                                    <select id="forma-farmaceutica-subgrupo" name="forma-farmaceutica-subgrupo">
+                                    <select id="forma-farmaceutica-subgrupo-<%= indexOrcamento %>"
+                                        name="forma-farmaceutica-subgrupo" style="width: 180px;">
                                         <% orcamento.formaFarmaceuticaSubgrupoAll[orcamento.formaFarmaceuticaAll[0]].forEach(function(subgrupo,
                                             index) { %>
-                                            <option value="<%= subgrupo %>" <%=index===0 ? 'selected' : '' %>>
+                                            <option value="<%= subgrupo %>">
                                                 <%= subgrupo %>
                                             </option>
                                             <% }) %>
@@ -87,12 +88,11 @@
                                         <datalist id="ativo-nome-<%= indexOrcamento %>-<%= rowIndex %>">
                                             <% ativo.opcoes.forEach(function(opcao) { %>
                                                 <option value="<%= opcao.nome %>" data-preco="<%= opcao.preco %>">
-                                                <% }) %>
+                                                    <% }) %>
                                         </datalist>
-                                            <input id="ativo-puro-<%= indexOrcamento %>-<%= rowIndex %>"
-                                                autoComplete="on"
-                                                list="ativo-nome-<%= indexOrcamento %>-<%= rowIndex %>" size="50"
-                                                value="<%= ativo.opcoes.size != 1 ? ativo.opcoes[0].nome : '' %>" />
+                                        <input id="ativo-puro-<%= indexOrcamento %>-<%= rowIndex %>" autoComplete="on"
+                                            list="ativo-nome-<%= indexOrcamento %>-<%= rowIndex %>" size="50"
+                                            value="<%= ativo.opcoes.size != 1 ? ativo.opcoes[0].nome : '' %>" />
                                     </td>
                                     <td class="required right-line text line<%= (rowIndex%2)+1 %>">
                                         <select id="ativo-unidade" name="ativo-unidade-<%= rowIndex %>">

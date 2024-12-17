@@ -1,10 +1,10 @@
-function updateSubgrupoDropdown() {
-    const formaFarmaceutica = document.getElementById('forma-farmaceutica').value;
-    const subgrupoDropdown = document.getElementById('forma-farmaceutica-subgrupo');
+function updateSubgrupoDropdown(indexOrcamento) {
+    const formaFarmaceutica = document.getElementById('forma-farmaceutica-' + indexOrcamento).value;
+    const subgrupoDropdown = document.getElementById('forma-farmaceutica-subgrupo-' + indexOrcamento);
 
     subgrupoDropdown.innerHTML = '';
 
-    const subgrupoOptions = formaFarmaceuticaSubgrupoAll[formaFarmaceutica];
+    const subgrupoOptions = JSON.parse(formaFarmaceuticaSubgrupoAll)[formaFarmaceutica];
     subgrupoOptions.forEach((subgrupo, index) => {
         const option = document.createElement('option');
         option.value = subgrupo;
@@ -18,6 +18,7 @@ function updateSubgrupoDropdown() {
 
 function parse_orcamento_editted() {
     var orcamentos = []
+    var orcamento_index = 0;
     const tables = document.querySelectorAll("div[id^='orcamento-']")
     tables.forEach((table) => {
         var ativos = [];
@@ -110,15 +111,16 @@ function parse_orcamento_editted() {
         orcamentos.push({
             "nome_cliente": document.getElementById('nome-cliente').value,
             "nome_medico": document.getElementById('nome-medico').value,
-            "dosagem": parseFloat(document.getElementById('quantidade-orcamento').value.replace(',', '.')),
-            "forma_farmaceutica": document.getElementById('forma-farmaceutica').value,
-            "sub_forma_farmaceutica": document.getElementById('forma-farmaceutica-subgrupo').value,
+            "dosagem": parseFloat(document.getElementById('quantidade-orcamento-' + orcamento_index).value.replace(',', '.')),
+            "forma_farmaceutica": document.getElementById('forma-farmaceutica-' + orcamento_index).value,
+            "sub_forma_farmaceutica": document.getElementById('forma-farmaceutica-subgrupo-' + orcamento_index).value,
             "ativos": ativos,
             "embalagem": embalagem,
             "excipiente": excipiente,
             "capsula": capsula,
-            "nome_formula": document.getElementById('nome-formula').innerText,
+            "nome_formula": table.querySelector('h2[id="nome-formula"]').innerText,
         });
+        orcamento_index += 1;
     });
     return orcamentos;
 }
@@ -127,7 +129,7 @@ document.getElementById('submit_orcamento').addEventListener('click', async () =
     sessionStorage.setItem('ativos', ativosOrcamento);
 
     orcamentos = parse_orcamento_editted();
-    
+
     // Create a form for POST redirection
     const form = document.createElement('form');
     form.method = 'POST';
@@ -142,5 +144,5 @@ document.getElementById('submit_orcamento').addEventListener('click', async () =
 
     // Append the form to the body and submit it
     document.body.appendChild(form);
-    form.submit(); 
+    form.submit();
 });
