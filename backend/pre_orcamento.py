@@ -71,7 +71,7 @@ class preOrcamentoClass(BaseModel):
                 self.possible_ativos[ativo['nome']].append(possible_ativo)
 
     def choose_excipiente(self):
-        self.excipiente = excipientClass(self.sub_forma_farmaceutica, self.ativos)
+        self.excipiente = excipientClass()
 
     def get_custo_fixo(self):
         df_custos = pd.read_csv(
