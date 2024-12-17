@@ -36,8 +36,8 @@ function parse_orcamento_editted() {
                     else if (td.querySelector('input')) {
                         td = td.querySelector('input');
                     }
-                    if (td.id.includes('ativoPuro')) {
-                        ativo['nome'] = td.value == 'Selecione' ? '' : td.value;
+                    if (td.id.includes('ativo-puro')) {
+                        ativo['nome'] = td.value;
                     }
                     else if (td.id.includes('ativo-unidade')) {
                         ativo['unidade'] = td.value;
