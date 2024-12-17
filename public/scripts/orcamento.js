@@ -226,15 +226,15 @@ function parse_orcamento() {
         var orcamento = {
             "nomeCliente": document.getElementById('nome-cliente').value,
             "nomeMedico": document.getElementById('nome-medico').value,
-            "dosagem": parseFloat(document.getElementById('quantidade-orcamento').innerText.replace('.', '').replace(',', '.')),
-            "custoFixo": parseFloat(document.getElementById('preco-custo-fixo').innerText.replace("R$", "").replace('.', '').replace(',', '.')),
-            "formaFarmaceutica": document.getElementById('forma-farmaceutica').innerText,
-            "formaFarmaceuticaSubgrupo": document.getElementById('forma-farmaceutica-subgrupo').innerText,
+            "dosagem": parseFloat(table.querySelector('span[id="quantidade-orcamento"]').innerText.replace('.', '').replace(',', '.')),
+            "custoFixo": parseFloat(table.querySelector('span[id="preco-custo-fixo"]').innerText.replace("R$", "").replace('.', '').replace(',', '.')),
+            "formaFarmaceutica": table.querySelector('span[id="forma-farmaceutica"]').innerText,
+            "formaFarmaceuticaSubgrupo": table.querySelector('span[id="forma-farmaceutica-subgrupo"]').innerText,
             "ativos": ativos,
             "embalagem": embalagem,
             "excipiente": excipiente,
             "capsula": capsula,
-            "nomeFormula": document.getElementById('nome-formula').innerText,
+            "nomeFormula": table.querySelector('h2[id="nome-formula"]').innerText,
         };
         orcamentos.push(orcamento);
         orcamentoCounter += 1;
