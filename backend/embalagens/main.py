@@ -1,4 +1,4 @@
-import pandas as pd
+import pandas as pd, re
 
 from ativo.main import ativoClass
 
@@ -13,7 +13,7 @@ class embalagemClass(ativoClass):
         df_embalagens = pd.read_csv(
             './orcamento_tables/smart/embalagens_FCerta_SMART_2024.csv'
         )
-        embalagem = df_embalagens[df_embalagens['DESCR'] == self.name]
+        embalagem = df_embalagens[df_embalagens['DESCR'].str.strip().apply(lambda x: re.sub(r'\s+', ' ', x)) == re.sub(r'\s+', ' ', self.name.strip())]
         self.density = embalagem['DENSIDADE'].iloc[0] if len (embalagem['DENSIDADE']) > 0 else 1
         self.dilution = embalagem['DILUICAO'].iloc[0] if len (embalagem['DILUICAO']) > 0 else 1
         self.equivalency = embalagem['EQUIV'].iloc[0] if len (embalagem['EQUIV']) > 0 else 1

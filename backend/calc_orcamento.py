@@ -1,7 +1,6 @@
 from pre_orcamento import preOrcamentoClass
 from orcamento import orcamentoClass
 
-
 if __name__ == '__main__':
     ativos = [
         {
@@ -24,6 +23,11 @@ if __name__ == '__main__':
             'unidade': 'UI',
             'quantidade': 200,
         },
+        {
+            'nome': 'Ácido folínico',
+            'unidade': 'mg',
+            'quantidade': 0.5,
+        },
     ]
     orcamento = preOrcamentoClass(
         ativos,
@@ -33,7 +37,7 @@ if __name__ == '__main__':
         nome_medico='',
         nome_cliente='Marcos Andrei Schwinden',
     )
-    print(orcamento.create_pre_orcamento())
+    # print(orcamento.create_pre_orcamento())
     orcamento_body = {
         'nome_cliente': 'Maria',
         'nome_medico': 'João',
@@ -42,7 +46,7 @@ if __name__ == '__main__':
         'sub_forma_farmaceutica': 'Slow Release',
         'ativos': [
             {
-                'nome': 'VIT A (RETINOL)',
+                'nome': 'ALGINATO',
                 'unidade': 'UI',
                 'quantidade': 5000,
             },
@@ -62,6 +66,7 @@ if __name__ == '__main__':
                 'quantidade': 200,
             },
         ],
+        'nome_formula': 'TESTE',
         'embalagem': {'nome': 'POTE CAPS 310ML', 'quantidade': 1},
         'excipiente': {
             'nome': 'EXCIPIENTE PADRÃO CÁPSULAS',
