@@ -87,14 +87,12 @@
                                         <datalist id="ativo-nome-<%= indexOrcamento %>-<%= rowIndex %>">
                                             <% ativo.opcoes.forEach(function(opcao) { %>
                                                 <option value="<%= opcao.nome %>" data-preco="<%= opcao.preco %>">
-                                                    <%= opcao.nome %>
-                                                </option>
                                                 <% }) %>
                                         </datalist>
                                             <input id="ativo-puro-<%= indexOrcamento %>-<%= rowIndex %>"
                                                 autoComplete="on"
                                                 list="ativo-nome-<%= indexOrcamento %>-<%= rowIndex %>" size="50"
-                                                value="<%= ativo.opcoes[rowIndex] != undefined ? ativo.opcoes[rowIndex].nome : '' %>" />
+                                                value="<%= ativo.opcoes.size != 1 ? ativo.opcoes[0].nome : '' %>" />
                                     </td>
                                     <td class="required right-line text line<%= (rowIndex%2)+1 %>">
                                         <select id="ativo-unidade" name="ativo-unidade-<%= rowIndex %>">
