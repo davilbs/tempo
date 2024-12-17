@@ -194,18 +194,18 @@ function formatOrcamentoEdited(orcamentos) {
     } = require('./constants');
     var orcamentos_edited = [];
     orcamentos.forEach(orcamento => {
-        const formaFarmaceutica = orcamento['formaFarmaceutica'];
-        const formaFarmaceuticaSubgrupo = orcamento['formaFarmaceuticaSubgrupo'];
-        const embalagemNome = orcamento['embalagem']['nome'];
-        const excipienteNome = orcamento['excipiente']['nome'];
-        const ativos = orcamento['ativos'];
-        const embalagem = orcamento['embalagem'];
-        const excipiente = orcamento['excipiente'];
-        const capsula = orcamento['capsula'];
+        var formaFarmaceutica = orcamento['formaFarmaceutica'];
+        var formaFarmaceuticaSubgrupo = orcamento['formaFarmaceuticaSubgrupo'];
+        var embalagemNome = orcamento['embalagem']['nome'];
+        var excipienteNome = orcamento['excipiente']['nome'];
+        var ativos = orcamento['ativos'];
+        var embalagem = orcamento['embalagem'];
+        var excipiente = orcamento['excipiente'];
+        var capsula = orcamento['capsula'];
 
         var formaFarmaceuticaAllEdited = [... new Set([formaFarmaceutica].concat(formaFarmaceuticaAll))];
 
-        var formaFarmaceuticaSubgrupoAllEdited = formaFarmaceuticaSubgrupoAll;
+        var formaFarmaceuticaSubgrupoAllEdited = { ...formaFarmaceuticaSubgrupoAll };
         if (formaFarmaceuticaSubgrupoAllEdited[formaFarmaceutica].includes(formaFarmaceuticaSubgrupo)) {
             formaFarmaceuticaSubgrupoAllEdited[formaFarmaceutica] = [... new Set([formaFarmaceuticaSubgrupo].concat(formaFarmaceuticaSubgrupoAllEdited[formaFarmaceutica]))];
         }
