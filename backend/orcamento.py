@@ -38,7 +38,7 @@ class orcamentoClass(BaseModel):
         self.nome_cliente = orcamento_values['nome_cliente']
         self.nome_medico = orcamento_values['nome_medico']
         self.nome_formula = orcamento_values['nome_formula']
-        
+
         self.calc_price_ativos()
         self.choose_capsule(orcamento_values['capsula']['tipo'])
         self.choose_excipiente(orcamento_values)
@@ -170,8 +170,10 @@ class orcamentoClass(BaseModel):
 
     def choose_excipiente(self, orcamento_values):
         self.excipiente = excipientClass(
+            orcamento_values['excipiente']['nome'],
+        )
+        self.excipiente.get_excipiente(
             orcamento_values['sub_forma_farmaceutica'],
             self.ativos,
-            orcamento_values['excipiente']['nome'],
         )
         self.get_excipiente_qnt_price()
