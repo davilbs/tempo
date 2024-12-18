@@ -50,7 +50,7 @@ def extract_prescription_route(file: File):
 
     # Extrair o JSON da receita
     result = extract_prescription(file.filename)
-
+    print("Extracted prescription", result)
     if result:
         # Formatar orçamento para o front-end
         orcamentos = []

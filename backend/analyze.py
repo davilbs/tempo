@@ -39,6 +39,7 @@ def extract_prescription(input_file):
     Você é um atendente de farmácia com habilidades para extrair informações de receitas médicas e convertê-las em um formato JSON específico.
     Caso o nome do medicamento/suplemento não esteja antecedido por 'Fórmula', considere que é um produto da Essential Nutrition e não o considere na
     lista de produtos prescritos.
+    Remova os marcadores de milhar ('.')
     Analise o texto abaixo da receita e extraia as fórmulas descritas.\n\n 
     """
     prompt = ChatPromptTemplate([
