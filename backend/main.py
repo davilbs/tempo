@@ -5,7 +5,7 @@ from pre_orcamento import preOrcamentoClass
 from orcamento import orcamentoClass
 from fastapi.middleware.cors import CORSMiddleware
 
-import json, os, utils
+import json, os, utils, re
 
 if not os.path.exists("processed"):
     os.makedirs("processed")
@@ -25,8 +25,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 class File(BaseModel):
     filename: str
+
 
 class Orcamento(BaseModel):
     nome_cliente: str
@@ -40,9 +42,11 @@ class Orcamento(BaseModel):
     capsula: dict
     nome_formula: str
 
+
 @app.get("/")
 def root():
     return "API is running"
+
 
 @app.post("/extract_prescription")
 def extract_prescription_route(file: File):
@@ -68,7 +72,13 @@ def extract_prescription_route(file: File):
                     ativo = {
                         'nome': ingrediente['nome'],
                         'unidade': ingrediente['unidade'],
-                        'quantidade': float(ingrediente['dosagem'].replace(',', '.')),
+                        'quantidade': (
+                            float(ingrediente['dosagem'].replace(',', '.'))
+                            if not re.match(
+                                r'[\D\.]', ingrediente['dosagem'].replace(',', '.')
+                            )
+                            else 0
+                        ),
                     }
                     ativos.append(ativo)
 
@@ -85,6 +95,7 @@ def extract_prescription_route(file: File):
                 orcamento_result['nomeFormula'] = medicamento['nome']
                 orcamentos.append(orcamento_result)
             except:
+                print("Error parsing orcamento")
                 return {"status": "error", "result": "Error when identifying the prescription"}
         filename = file.filename.split("/")[-1].split(".")[0]
         rootpath = "/".join(file.filename.split("/")[:-2])
@@ -94,6 +105,7 @@ def extract_prescription_route(file: File):
         # Enviar orçamento para o front-end
         return {"status": "success", "result": orcamentos}
     return {"status": "error", "result": "No prescription found"}
+
 
 def parse_orcamento(orcamento: Orcamento):
     return {
@@ -108,6 +120,7 @@ def parse_orcamento(orcamento: Orcamento):
         'capsula': orcamento.capsula,
         'nome_formula': orcamento.nome_formula,
     }
+
 
 @app.post("/update_orcamento")
 def update_orcamento_route(orcamentos: list[Orcamento]):
