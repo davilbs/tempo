@@ -6,7 +6,7 @@ const http = require('http');
 const https = require('https');
 const md5 = require("md5");
 const session = require('express-session');
-const { formatNumber } = require('./public/scripts/utils').default;
+const { formatNumber } = require('./public/scripts/utils');
 
 var app = express();
 const port = 3000;
@@ -17,7 +17,7 @@ const storage = multer.diskStorage({
     },
     filename: function (req, file, cb) {
         console.log("Got filename salt", req.session.salt)
-        cb(null, md5(file.originalname + req.session.salt) + path.extname(file.originalname))
+        cb(null, md5(file.originalname) + path.extname(file.originalname))
     }
 })
 const upload = multer({ storage: storage })
@@ -118,7 +118,7 @@ app.get('/events', async function (req, res) {
 
     var loading_status = "Fazendo upload do arquivo... (1/2)";
     var loading_code = 1;
-    let filename = md5(req.query.filename + req.session.salt);
+    let filename = md5(req.query.filename);
     let curr_ext = path.extname(req.query.filename);
     let directory = __dirname + "/uploads/";
 
