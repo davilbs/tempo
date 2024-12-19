@@ -6,7 +6,7 @@ const http = require('http');
 const https = require('https');
 const md5 = require("md5");
 const session = require('express-session');
-const { formatNumber } = require('./public/scripts/utils');
+const { formatNumber } = require('./public/scripts/utils').default;
 
 var app = express();
 const port = 3000;
@@ -40,82 +40,7 @@ app.get("/", (req, res) => {
 })
 
 app.get("/table", (req, res) => {
-    const py = spawn('python', [__dirname + '/scripts/getmeds.py']);
-
-    let output = "";
-    py.stdout.on("data", (data) => {
-        output += data.toString();
-    });
-    py.on("close", () => {
-        res.send({ items: JSON.parse(output).items });
-    });
-})
-
-app.post("/calculate", upload.single("prescription"), (req, res, next) => {
-    const file = req.file;
-    if (!file) {
-        const error = new Error('Please upload a file')
-        error.httpStatusCode = 400
-        return next(error)
-    }
-    res.redirect("/orcamento?filename=" + req.file.filename);
-});
-
-app.get('/events', async function (req, res) {
-    var loading_status = "Fazendo upload do arquivo... (1/2)";
-    var loading_code = 0;
-
-    console.log("Current status", loading_status);
-    console.log('Got /events with argument ' + req.query.filename);
-    let filename = md5(req.query.filename + req.session.salt);
-    let curr_ext = path.extname(req.query.filename);
-    let directory = __dirname + "/uploads/";
-    console.log("Filename: " + filename)
-    res.set({
-        'Cache-Control': 'no-cache',
-        'Content-Type': 'text/event-stream',
-        'Connection': 'keep-alive'
-    });
-    res.flushHeaders();
-
-    // Tell the client to retry every 10 seconds if connectivity is lost
-    res.write('retry: 10000\n\n');
-
-    let connected = true;
-    req.on("close", () => {
-        console.log("Final status", loading_status);
-        console.log("Connection ended unexpectedly");
-        connected = false;
-    })
-    req.on("end", () => {
-        console.log("Final status", loading_status);
-        console.log("Connection ended normally");
-        connected = false;
-    })
-    console.log("Looking for file: " + directory + filename + curr_ext);
-    while (connected) {
-        if (fs.existsSync(directory + filename + curr_ext)) {
-            console.log('Progress ... ', directory + filename + curr_ext);
-            if (curr_ext == ".json") {
-                loading_status = "Processo finalizado!";
-                loading_code = 3;
-                connected = false;
-            }
-            else {
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                console.log("Looking for file: " + directory + filename + curr_ext);
-                curr_ext = ".json";
-                directory = __dirname + "/processed/";
-                loading_status = "Identificando medicamentos... (2/2)";
-                loading_code = 2;
-                console.log("Looking for file: " + directory + filename + curr_ext);
-            }
-        } else {
-            await new Promise(resolve => setTimeout(resolve, 1000));
-        }
-        res.write(`data: {"status_text": "${loading_status}", "status_code": ${loading_code}}\n\n`);
-    }
-
+    res.render("index.ejs", { parseError: false });
 })
 
 async function extractPrescription(pdf_path) {
@@ -148,9 +73,17 @@ async function extractPrescription(pdf_path) {
     });
 }
 
-app.get("/orcamento", function (req, res, next) {
-    var json_path = path.join(__dirname + "/processed/", req.query.filename.split('.')[0] + ".json");
+app.post("/calculate", upload.single("prescription"), (req, res, next) => {
+    const file = req.file;
+    if (!file) {
+        const error = new Error('Please upload a file')
+        error.httpStatusCode = 400
+        return next(error)
+    }
+
+    var json_path = path.join(__dirname + "/processed/", req.file.filename.split('.')[0] + ".json");
     if (fs.existsSync(json_path)) {
+        console.log("Found json file")
         var content = fs.readFileSync(json_path);
         var data = JSON.parse(content);
         orcamentos_edited = formatOrcamentoEdited(data);
@@ -158,7 +91,7 @@ app.get("/orcamento", function (req, res, next) {
         return;
     }
 
-    var pdf_path = path.join(__dirname + "/uploads/", req.query.filename);
+    var pdf_path = path.join(__dirname + "/uploads/", req.file.filename);
     console.log("check existing file " + pdf_path);
     do {
         console.log("waiting for file " + pdf_path);
@@ -168,19 +101,79 @@ app.get("/orcamento", function (req, res, next) {
         .then(function (body) {
             // Wait for the file to be processed
             console.log("File processed");
-            var json_path = path.join(__dirname + "/processed/", req.query.filename.split('.')[0] + ".json");
-
-            var content = fs.readFileSync(json_path);
-            var data = JSON.parse(content);
-
-            // Render the page with the data 
-            orcamentos_edited = formatOrcamentoEdited(data);
-            res.render("orcamento_edit.ejs", { orcamentos_edited, formatNumber });
         })
         .catch((err) => {
             console.log("Error");
-            res.render("index.ejs", { parseError: true });
         });
+
+    res.sendStatus(204);
+});
+
+app.get('/events', async function (req, res) {
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Connection', 'keep-alive');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.flushHeaders();
+
+    var loading_status = "Fazendo upload do arquivo... (1/2)";
+    var loading_code = 1;
+    let filename = md5(req.query.filename + req.session.salt);
+    let curr_ext = path.extname(req.query.filename);
+    let directory = __dirname + "/uploads/";
+
+    let counter = 0;
+    res.write(`data: {"status_text": "${loading_status}", "status_code": ${loading_code}}\n\n`);
+    console.log("Processing file: " + directory + filename + curr_ext);
+    let interValID = setInterval(() => {
+        if (fs.existsSync(directory + filename + curr_ext)) {
+            if (curr_ext == ".json") {
+                loading_status = "Processo finalizado!";
+                loading_code = 3;
+                res.write(`data: {"status_text": "${loading_status}", "status_code": ${loading_code}}\n\n`);
+            }
+            else {
+                curr_ext = ".json";
+                directory = __dirname + "/processed/";
+                loading_status = "Identificando medicamentos... (2/2)";
+                loading_code = 2;
+                counter = 0;
+                res.write(`data: {"status_text": "${loading_status}", "status_code": ${loading_code}}\n\n`);
+            }
+        }else{
+            counter++;
+            if (counter >= 20) {
+                clearInterval(interValID);
+                res.end();
+                return;
+            }
+        }
+    }, 1000);
+
+    req.on('close', () => {
+        console.log("Connection closed by client");
+        clearInterval(interValID);
+        res.end();
+    });
+})
+
+app.get("/orcamento", function (req, res, next) {
+    let filename = md5(req.query.filename + req.session.salt);
+    var json_path = path.join(__dirname + "/processed/", filename + ".json");
+
+    try {
+        var content = fs.readFileSync(json_path);
+        var data = JSON.parse(content);
+        
+        // Render the page with the data 
+        orcamentos_edited = formatOrcamentoEdited(data);
+        res.render("orcamento_edit.ejs", { orcamentos_edited, formatNumber });
+    } catch (error) {
+        // Return to the index page
+        console.log("Error reading file", error);
+        res.render("index.ejs", { parseError: true });
+    }
+
 })
 
 function formatOrcamentoEdited(orcamentos) {

@@ -35,25 +35,30 @@ function ekUpload() {
     }
 
     function AddLoading(filename) {
-        console.log("Adding loading for ", filename)
+        console.log("Adding loading for ", filename);
         var protocol = window.location.protocol === 'https:' ? 'https://' : 'http://';
         var host = window.location.host;
         var source = new EventSource(protocol + host + "/events?filename=" + filename);
         source.addEventListener('message', (message) => {
             console.log("received message", message);
-            var data_json = JSON.parse(message.data)
-            console.log(i)
+            var data_json = JSON.parse(message.data);
+            console.log(i);
             var delay = 20;
-            var delta = (data_json.status_code + 1) * 33;
+            var delta = Math.min(((data_json.status_code) * 33) + 20, 100);
             if (i == 0) {
-                console.log(data_json)
-                if (data_json.status_code == 2){
-                    delta -= 5;
+                console.log(data_json);
+                if (data_json.status_code == 2) {
                     delay = 100;
                 }
                 updateBar(delta, delay);
             }
-            document.querySelector('#updatable-content').innerHTML = data_json.status_text
+            document.querySelector('#updatable-content').innerHTML = data_json.status_text;
+    
+            // Check if loading is complete
+            if (data_json.status_code === 3 && delta >= 100) {
+                console.log("Loading complete, redirecting...");
+                window.location.href = "/orcamento?filename=" + filename;
+            }
         });
     }
 
@@ -117,6 +122,3 @@ function ekUpload() {
     }
 }
 ekUpload();
-// regras de associacao
-// predict potential top cluster prescriptors
-// semaforo de atendimento
