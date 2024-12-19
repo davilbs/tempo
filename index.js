@@ -158,7 +158,7 @@ app.get('/events', async function (req, res) {
 })
 
 app.get("/orcamento", function (req, res, next) {
-    let filename = md5(req.query.filename + req.session.salt);
+    let filename = md5(req.query.filename);
     var json_path = path.join(__dirname + "/processed/", filename + ".json");
 
     try {
