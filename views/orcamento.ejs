@@ -12,11 +12,11 @@
     <link rel="stylesheet" href="/styles/css/total.css">
 </head>
 
-<body>
+<body id="orcamento-page">
     <div class="container">
         <header class="header">
             <div class="header__logo">
-                <img src="/styles/Logo Essential.svg">
+                <img id="logo-essential" src="/styles/Logo Essential.svg">
                 <span class="header__title">ESSENTIA PHARMA</span>
             </div>
             <h1 class="header__subtitle">ORÇAMENTO SMART ESSENTIA PHARMA</h1>
@@ -209,7 +209,12 @@
                     <div class="button-container">
                         <button id="edit_orcamento" class="submit-button">EDITAR</button>
                     </div>
+                    <!-- <div class="button-container">
+                        <button id="save_orcamento" class="submit-button">GERAR PDF</button>
+                    </div> -->
         </div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
         <script src="/scripts/orcamento.js"></script>
         <script src="/scripts/utils.js"></script>
 </body>

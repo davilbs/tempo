@@ -258,3 +258,29 @@ document.getElementById('edit_orcamento').addEventListener('click', async () => 
     document.body.appendChild(form);
     form.submit();
 });
+
+document.getElementById('save_orcamento').addEventListener('click', async () => {
+    var content = document.getElementById("orcamento-page");
+    print(content);
+    // const { jsPDF } = window.jspdf;
+    // var doc = new jsPDF();
+
+    // let content = document.getElementById("orcamento-page");
+    // content.querySelector("img[id='logo-essential']").remove();
+    // content.querySelector("div[class='button-container']").remove();
+    // content.querySelector("div[class='button-container']").remove();
+    // doc.html(
+    //     content,
+    //     {
+    //         callback: function (doc) {
+    //             doc.save("orcamento.pdf");
+    //         },
+    //         x: 0,
+    //         y: 0,
+    //         html2canvas: {
+    //             scale: 0.15,
+    //         },
+    //     },
+    // );
+    
+});
