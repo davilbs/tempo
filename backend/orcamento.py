@@ -116,7 +116,7 @@ class orcamentoClass(BaseModel):
 
     def choose_capsule(self, capsule_type):
         df_capsule = pd.read_csv(
-            './orcamento_tables/smart/capsulas_FCerta_SMART_2024.csv'
+            '../orcamento_tables/smart/capsulas_FCerta_SMART_2024.csv'
         )
         capsules = df_capsule[df_capsule['DESCRICAO'] == capsule_type].sort_values(
             by='VOLINTERNO'
@@ -180,7 +180,7 @@ class orcamentoClass(BaseModel):
         
     def get_custo_fixo(self):
         df_custos = pd.read_csv(
-            './orcamento_tables/smart/custo_fixo_FCerta_SMART_2024.csv'
+            '../orcamento_tables/smart/custo_fixo_FCerta_SMART_2024.csv'
         )
         forma_farmaceutica_id = re.split(r'(\d+)', self.forma_farmaceutica)[1]
         return float(

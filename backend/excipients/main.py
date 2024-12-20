@@ -15,9 +15,9 @@ class excipientClass(ativoClass):
 
     def set_values(self):
         df_excipientes = pd.read_csv(
-            './orcamento_tables/smart/excipientes_FCerta_SMART_2024.csv'
+            '../orcamento_tables/smart/excipientes_FCerta_SMART_2024.csv'
         )
-        excipiente = df_excipientes[df_excipientes['DESCR'].str.strip().apply(lambda x: re.sub(r'\s+', ' ', x) if isinstance(x, str) else x) == re.sub(r'\s+', ' ', self.name.strip())]
+        excipiente = df_excipientes[df_excipientes['DESCR'] == self.name.strip().upper()]
         self.density = excipiente['DENSIDADE'].iloc[0]
         self.dilution = excipiente['DILUICAO'].iloc[0]
         self.equivalency = excipiente['EQUIV'].iloc[0]

@@ -1,4 +1,4 @@
-import simplejson as json, re, pandas as pd
+import simplejson as json, re, pandas as pd, os
 
 from ativo.main import ativoClass
 from unidecode import unidecode
@@ -69,30 +69,30 @@ def unityCalcConversion(unity: str):
         return 1
 
 
-def do_descr_match(target, df, starts_with = False):
+def do_descr_match(target, df: pd.DataFrame, starts_with = False):
     if starts_with:
-        if df['DESCR'].astype(str).apply(unidecode).str.lower().str.startswith(target, na=False).any():
-            return df[df['DESCR'].astype(str).apply(unidecode).str.lower().str.startswith(target, na=False)]
+        if df['DESCR'].str.startswith(target, na=False).any():
+            return df[df['DESCR'].str.startswith(target, na=False)]
     else:        
-        if df['DESCR'].astype(str).apply(unidecode).str.lower().str.contains(target, regex=False, case=False, na=False).any():
-            return df[df['DESCR'].astype(str).apply(unidecode).str.lower().str.contains(target, regex=False, case=False, na=False)]
+        if df['DESCR'].str.contains(target, regex=False, case=False, na=False).any():
+            return df[df['DESCR'].str.contains(target, regex=False, case=False, na=False)]
     return []
 
 
-def parse_matchs(all_matchs):
+def parse_matchs(all_matchs: pd.DataFrame):
     if len(all_matchs) == 0:
         return all_matchs
-    all_matchs = all_matchs[~all_matchs['DESCR'].str.contains('|'.join(['ñ usar', 'n usar', 'nao usar', 'não usar']), case=False, na=False)]
+    all_matchs = all_matchs[~all_matchs['DESCR'].str.contains('|'.join(['Ñ USAR', 'N USAR', 'NAO USAR', 'NÃO USAR']), case=False, na=False)]
     all_matchs = all_matchs.drop_duplicates()
     all_matchs = all_matchs.sort_values(by='DESCR')
     return all_matchs
     
 
-def find_closest_match_contains(df, target):
-    target = unidecode(target.lower())
+def find_closest_match_contains(df: pd.DataFrame, target: str):
+    target = unidecode(target.upper())
     # Exact match
-    if len(df[df['DESCR'].astype(str).apply(unidecode).str.lower() == target]) > 0:
-        return df[df['DESCR'].astype(str).apply(unidecode).str.lower() == target]
+    if len(df[df['DESCR'] == target]) > 0:
+        return df[df['DESCR'] == target]
 
     all_matchs = pd.DataFrame()
 
@@ -127,7 +127,7 @@ def find_closest_match_contains(df, target):
     
     # Step 3: Match with the first word using at least 3 letters
     for i in range(len(words[0]), 1, -1):
-        shortened_name = unidecode(words[0][:i].lower())
+        shortened_name = unidecode(words[0][:i])
         matchs = do_descr_match(shortened_name, df, starts_with=True)
         if len(matchs) > 0:
             all_matchs = pd.concat([all_matchs, matchs])
@@ -148,3 +148,22 @@ def calc_price(ativo: ativoClass, forma_farmaceutica: str, dosagem: int):
     if forma_farmaceutica not in ['']:
         ativo.orcamento.price *= dosagem
     ativo.orcamento.price = round(ativo.orcamento.price, 2)
+
+def adjust_csv(df: pd.DataFrame):
+    def transform_values(value):
+        if isinstance(value, str):
+            value = re.sub(r'\s+', ' ', value)
+            value = value.upper().strip()
+        return value
+    
+    df = df.map(transform_values)
+    return df
+
+if __name__ == '__main__':
+    folder_path = './orcamento_tables/smart'
+    for filename in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, filename)
+        if os.path.isfile(file_path):
+            df = pd.read_csv(file_path)
+            df = adjust_csv(df)
+            df.to_csv(file_path, index=False)

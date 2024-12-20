@@ -60,7 +60,7 @@ class preOrcamentoClass(BaseModel):
 
     def find_ativos(self):
         df_ativos = pd.read_csv(
-            './orcamento_tables/smart/ativos_joined_FCerta_SMART_2024.csv'
+            '../orcamento_tables/smart/ativos_joined_FCerta_SMART_2024.csv'
         )
         for ativo in self.ativos:
             df_match = utils.find_closest_match_contains(df_ativos, ativo['nome'])
@@ -75,7 +75,7 @@ class preOrcamentoClass(BaseModel):
 
     def get_custo_fixo(self):
         df_custos = pd.read_csv(
-            './orcamento_tables/smart/custo_fixo_FCerta_SMART_2024.csv'
+            '../orcamento_tables/smart/custo_fixo_FCerta_SMART_2024.csv'
         )
         forma_farmaceutica_id = re.split(r'(\d+)', self.forma_farmaceutica)[1]
         return float(
@@ -89,7 +89,7 @@ class preOrcamentoClass(BaseModel):
         for _, ativosAll in self.possible_ativos.items():
             ativos.append(
                 {
-                    'unidade': ativosAll[0].orcamento.unity,
+                    'unidade': ativosAll[0].orcamento.unity.upper(),
                     'quantidade': ativosAll[0].orcamento.quantity,
                     'opcoes': [
                         {
