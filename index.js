@@ -92,9 +92,8 @@ app.post("/calculate", upload.single("prescription"), (req, res, next) => {
     }
 
     var pdf_path = path.join(__dirname + "/uploads/", req.file.filename);
-    console.log("check existing file " + pdf_path);
     do {
-        console.log("waiting for file " + pdf_path);
+        console.log("Checking for file " + pdf_path);
     } while (!fs.existsSync(pdf_path))
 
     extractPrescription(pdf_path)
@@ -124,9 +123,9 @@ app.get('/events', async function (req, res) {
 
     let counter = 0;
     res.write(`data: {"status_text": "${loading_status}", "status_code": ${loading_code}}\n\n`);
-    console.log("Processing file: " + directory + filename + curr_ext);
     let interValID = setInterval(() => {
         if (fs.existsSync(directory + filename + curr_ext)) {
+            console.log("Found file: " + directory + filename + curr_ext);
             if (curr_ext == ".json") {
                 loading_status = "Processo finalizado!";
                 loading_code = 3;
@@ -135,17 +134,33 @@ app.get('/events', async function (req, res) {
             else {
                 curr_ext = ".json";
                 directory = __dirname + "/processed/";
-                loading_status = "Identificando medicamentos... (2/2)";
+                loading_status = "Analisando receita... (2/2)";
                 loading_code = 2;
                 counter = 0;
                 res.write(`data: {"status_text": "${loading_status}", "status_code": ${loading_code}}\n\n`);
             }
-        }else{
+        } else{
             counter++;
-            if (counter >= 20) {
+            if (counter >= 60) {
+                res.write(`data: {"status_text": "${loading_status}", "status_code": -1}\n\n`);
                 clearInterval(interValID);
                 res.end();
                 return;
+            } 
+            else if (counter >= 50) {
+                res.write(`data: {"status_text": "Finalizando processamento ... Aguarde um momento", "status_code": ${loading_code}}\n\n`);
+            }
+            else if (counter >= 45) {
+                res.write(`data: {"status_text": "Buscando informações adicionais ... Aguarde um momento", "status_code": ${loading_code}}\n\n`);
+            }
+            else if (counter >= 35) {
+                res.write(`data: {"status_text": "Identificando ativos... Aguarde um momento", "status_code": ${loading_code}}\n\n`);
+            }
+            else if (counter >= 20) {
+                res.write(`data: {"status_text": "Ajustando valores ... Aguarde um momento", "status_code": ${loading_code}}\n\n`);
+            }
+            else if (counter >= 10) {
+                res.write(`data: {"status_text": "Identificando medicamentos... Aguarde um momento", "status_code": ${loading_code}}\n\n`);
             }
         }
     }, 1000);
