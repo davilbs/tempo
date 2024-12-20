@@ -42,6 +42,17 @@ function ekUpload() {
         source.addEventListener('message', (message) => {
             console.log("received message", message);
             var data_json = JSON.parse(message.data);
+            if (data_json.status_code == -1) {
+                console.log("Error parsing file");
+                document.getElementById('parseError').classList.remove("hidden");
+                document.getElementById('form-container').classList.remove("upload-container");
+                document.getElementById('form-container').classList.add("upload-container-error");
+                document.getElementById("loading-container").classList.add("hidden");
+                document.querySelector('#updatable-content').innerHTML = "";
+                updateBar(0, 0);
+                source.close();
+                return;
+            }
             console.log(i);
             var delay = 20;
             var delta = Math.min(((data_json.status_code) * 33) + 20, 100);
