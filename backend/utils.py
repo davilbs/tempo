@@ -108,15 +108,15 @@ def find_closest_match_contains(df, target):
         words = words[0:2]
         if len(words[1]) >= 2:
             for i in range(len(words[1]), 1, -1):
-                word_1 = re.escape(words[1][:i])
+                word_1 = words[1][:i]
                 for j in range(len(words[0]), 1, -1):
-                    shortened_name = f"{re.escape(words[0][:j])} {word_1}"
+                    shortened_name = f"{words[0][:j]} {word_1}"
                     matchs = do_descr_match(shortened_name, df)
                     if len(matchs) > 0:
                         all_matchs = pd.concat([all_matchs, matchs])
         else:
             for i in range(len(words[0]), 1, -1):
-                shortened_name = f"{re.escape(words[0][:i])} {re.escape(words[1])}"
+                shortened_name = f"{words[0][:i]} {words[1]}"
                 matchs = do_descr_match(shortened_name, df)
                 if len(matchs) > 0:
                     all_matchs = pd.concat([all_matchs, matchs])
@@ -127,7 +127,7 @@ def find_closest_match_contains(df, target):
     
     # Step 3: Match with the first word using at least 3 letters
     for i in range(len(words[0]), 1, -1):
-        shortened_name = re.escape(words[0][:i]).lower()
+        shortened_name = unidecode(words[0][:i].lower())
         matchs = do_descr_match(shortened_name, df, starts_with=True)
         if len(matchs) > 0:
             all_matchs = pd.concat([all_matchs, matchs])
