@@ -85,9 +85,9 @@ app.post("/calculate", upload.single("prescription"), (req, res, next) => {
     if (fs.existsSync(json_path)) {
         console.log("Found json file")
         var content = fs.readFileSync(json_path);
-        var data = JSON.parse(content);
-        orcamentos_edited = formatOrcamentoEdited(data);
-        res.render("orcamento_edit.ejs", { orcamentos_edited, formatNumber });
+        var orcamento = JSON.parse(content);
+        orcamentos_edited = formatOrcamentoEdited(orcamento);
+        res.render("orcamento_edit.ejs", { orcamentos_edited, orcamento, formatNumber });
         return;
     }
 
@@ -163,11 +163,11 @@ app.get("/orcamento", function (req, res, next) {
 
     try {
         var content = fs.readFileSync(json_path);
-        var data = JSON.parse(content);
+        var orcamento = JSON.parse(content);
         
         // Render the page with the data 
-        orcamentos_edited = formatOrcamentoEdited(data);
-        res.render("orcamento_edit.ejs", { orcamentos_edited, formatNumber });
+        orcamentos_edited = formatOrcamentoEdited(orcamento);
+        res.render("orcamento_edit.ejs", { orcamentos_edited, orcamento, formatNumber });
     } catch (error) {
         // Return to the index page
         console.log("Error reading file", error);
@@ -186,7 +186,8 @@ function formatOrcamentoEdited(orcamentos) {
         unidades,
     } = require('./constants');
     var orcamentos_edited = [];
-    orcamentos.forEach(orcamento => {
+    for (let i = 0; i < orcamentos.length; i++) {
+        const orcamento = orcamentos[i];
         var formaFarmaceutica = orcamento['formaFarmaceutica'];
         var formaFarmaceuticaSubgrupo = orcamento['formaFarmaceuticaSubgrupo'];
         var embalagemNome = orcamento['embalagem']['nome'];
@@ -195,7 +196,6 @@ function formatOrcamentoEdited(orcamentos) {
         var embalagem = orcamento['embalagem'];
         var excipiente = orcamento['excipiente'];
         var capsula = orcamento['capsula'];
-
         var formaFarmaceuticaAllEdited = [... new Set([formaFarmaceutica].concat(formaFarmaceuticaAll))];
 
         var formaFarmaceuticaSubgrupoAllEdited = { ...formaFarmaceuticaSubgrupoAll };
@@ -245,7 +245,7 @@ function formatOrcamentoEdited(orcamentos) {
             custoFixo: orcamento['custoFixo'],
             nomeFormula: orcamento['nomeFormula'],
         });
-    });
+    };
 
     return { "orcamentos_edited": orcamentos_edited };
 }
@@ -254,7 +254,7 @@ app.post("/orcamento/edit", (req, res) => {
     const orcamento = JSON.parse(req.body['orcamento']);
     orcamentos_edited = formatOrcamentoEdited(orcamento);
 
-    res.render("orcamento_edit.ejs", { orcamentos_edited, formatNumber });
+    res.render("orcamento_edit.ejs", { orcamentos_edited, orcamento , formatNumber });
 })
 
 app.post('/orcamento/result', (req, res) => {
@@ -270,7 +270,6 @@ app.post('/orcamento/result', (req, res) => {
         }
     };
     var request = new Promise(function (resolve, reject) {
-        console.log("Sending request to extract prescription");
         let r = http.request(options, function (res) {
             res.setEncoding('utf8');
             res.on('data', (data) => {
@@ -295,6 +294,45 @@ app.post('/orcamento/result', (req, res) => {
         });
 })
 
+app.post('/orcamento/adjust', (req, res) => {
+    var content = req.body.orcamentos;
+
+    var options = {
+        hostname: 'localhost',
+        port: 8001,
+        path: "/adjust_orcamento",
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': Buffer.byteLength(content)
+        }
+    };
+    
+    var request = new Promise(function (resolve, reject) {
+        let r = http.request(options, function (res) {
+            res.setEncoding('utf8');
+            res.on('data', (data) => {
+                resolve(data);
+            });
+            if (res.statusCode != 200) {
+                console.log("Got ERROR");
+                reject(res.err);
+            }
+        });
+        r.write(content);
+        r.end();
+    });
+    request.then(function (body) {
+        const orcamento = JSON.parse(body)['result'];
+        orcamentos_edited = formatOrcamentoEdited(orcamento);
+        
+        res.render("orcamento_edit.ejs", { orcamentos_edited, orcamento , formatNumber });
+    })
+        .catch((err) => {
+            console.log("Error");
+            res.render("index.ejs", { parseError: true });
+        });
+})
 
 app.listen(port, "127.0.0.1", () => {
     console.log(`Server started on port ${port}`);
