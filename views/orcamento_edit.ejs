@@ -36,8 +36,11 @@
         <div class="budget-table">
             <% orcamentos_edited.orcamentos_edited.forEach(function(orcamento, indexOrcamento) { %>
                 <div class="table-container" id="orcamento-<%= indexOrcamento %>">
-                    <h2 id="nome-formula" class="table-title" style="margin-top: 1.5rem;">
-                        <%= orcamento.nomeFormula %>
+                    <h2 class="table-title" style="margin-top: 1.5rem;">
+                        <button id="minusButton" class="minus-button"
+                            onclick="removeFormula(<%= indexOrcamento %> )">-</button>
+                        <input id="nome-formula-<%= indexOrcamento %>" class="table-title" type="text"
+                            value="<%= orcamento.nomeFormula %>" />
                     </h2>
                     <table>
                         <tbody>
@@ -75,24 +78,29 @@
                     <table>
                         <thead class="table-title">
                             <tr class="header-row">
-                                <th class="line1 right-line" style="width: 604px;">Ativo Puro</th>
+                                <th class="line1 right-line" style="width: 604px;">Ativo Puro
+                                    <button id="minusButton" class="plus-button"
+                                        onclick="addAtivo(<%= indexOrcamento %>)">+</button>
+                                </th>
                                 <th class="line1 right-line" style="width: 180px;">Unidade</th>
                                 <th class="line1 right-line" style="width: 150px;">Quantidade</th>
                                 <th class="price-table-title">Preço</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="tbody-ativos">
                             <% orcamento.ativos.forEach(function(ativo, rowIndex) { %>
-                                <tr id="ativo">
+                                <tr id="ativo-<%= rowIndex %>">
                                     <td class="required right-line text line<%= (rowIndex%2)+1 %>">
                                         <datalist id="ativo-nome-<%= indexOrcamento %>-<%= rowIndex %>">
                                             <% ativo.opcoes.forEach(function(opcao) { %>
                                                 <option value="<%= opcao.nome %>" data-preco="<%= opcao.preco %>">
                                                     <% }) %>
                                         </datalist>
+                                        <button id="minusButton" class="minus-button"
+                                            onclick="removeAtivo(<%= indexOrcamento %>, <%= rowIndex %> )">-</button>
                                         <input id="ativo-puro-<%= indexOrcamento %>-<%= rowIndex %>" autoComplete="on"
                                             list="ativo-nome-<%= indexOrcamento %>-<%= rowIndex %>" size="50"
-                                            value="<%= ativo.opcoes.size != 1 ? ativo.opcoes[0].nome : '' %>" />
+                                            value="<%= ativo.opcoes[0].nome %>" name="<%= ativo.original %>"/>
                                     </td>
                                     <td class="required right-line text line<%= (rowIndex%2)+1 %>">
                                         <select id="ativo-unidade" name="ativo-unidade-<%= rowIndex %>">
@@ -253,6 +261,9 @@
                     </div>
                 </div>
                 <% }) %>
+                    <div class="button-container" style="justify-content: left">
+                        <button id="" class="submit-button" onclick="addFormula()">+ FORMULA</button>
+                    </div>
                     <div class="button-container">
                         <button id="submit_orcamento" class="submit-button">SALVAR</button>
                     </div>
@@ -260,15 +271,8 @@
     </div>
     <script>
         const formaFarmaceuticaSubgrupoAll = '<%- JSON.stringify(orcamentos_edited.orcamentos_edited[0].formaFarmaceuticaSubgrupoAll) %>';
-        <% var allAtivos = [] %>;
-        <% orcamentos_edited.orcamentos_edited.forEach((orcamento) => { %>
-            <% var ativos = [] %>;
-            <% orcamento.ativos.forEach((ativo) => { %>
-                <% ativos.push(ativo.opcoes) %>;
-                <% }) %>;
-                <% allAtivos.push(ativos) %>;
-        <% }) %>;
-        const ativosOrcamento = '<%- JSON.stringify(allAtivos) %>';
+        const orcamento = '<%- JSON.stringify(orcamento) %>';
+        const orcamentosEdited = '<%- JSON.stringify(orcamentos_edited.orcamentos_edited) %>';
     </script>
     <script src="/scripts/orcamento_edited.js"></script>
     <script src="/scripts/utils.js"></script>
