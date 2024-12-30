@@ -1,19 +1,23 @@
 import pandas as pd, re
 from pydantic import BaseModel
 
+
 class ativoOrcamentoClass(BaseModel):
     quantity: int = 0
     unity: str = ''
     price: float = 0
+    name: str = ''
 
     def __init__(
         self,
         quantity,
         unity,
+        name='',
     ) -> None:
         super().__init__()
         self.quantity = quantity
         self.unity = unity
+        self.name = name
 
 
 class ativoClass(BaseModel):
@@ -38,7 +42,9 @@ class ativoClass(BaseModel):
         df_ativos = pd.read_csv(
             '../orcamento_tables/smart/ativos_joined_FCerta_SMART_2024.csv'
         )
-        row = df_ativos[df_ativos['DESCR'] == self.name.strip().upper()].iloc[0].to_dict()
+        row = (
+            df_ativos[df_ativos['DESCR'] == self.name.strip().upper()].iloc[0].to_dict()
+        )
         self.price = row['PRVEN']
         self.equivalency = row['EQUIV']
         self.dilution = row['DILUICAO']
@@ -46,15 +52,24 @@ class ativoClass(BaseModel):
         if isinstance(row['ARGUMENTO'], str):
             self.unity_conversion = row['ARGUMENTO']
             self.unity_value_conversion = float(row['PARAMETRO'])
-    
+
     def set_orcamento_values(
         self,
         quantity,
         unity,
+        name='',
     ):
+        if self.orcamento != None:
+            self.orcamento = ativoOrcamentoClass(
+                quantity,
+                unity,
+                name,
+            )
+            
         self.orcamento = ativoOrcamentoClass(
             quantity,
             unity,
+            name,
         )
 
     def __str__(self):
