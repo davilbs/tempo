@@ -71,7 +71,7 @@
                         <tbody>
                             <% orcamento.ativos.forEach(function(ativo, rowIndex) { %>
                                 <tr id="ativo">
-                                    <td class=" right-line text line<%= (rowIndex%2)+1 %>" name="ativo-puro"
+                                    <td class=" right-line text line<%= (rowIndex%2)+1 %>" name="<%= ativo.original %>"
                                         id="ativo-puro-<%= rowIndex %>">
                                         <%= ativo.opcoes[0].nome %>
                                     </td>

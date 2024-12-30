@@ -139,6 +139,7 @@ function parse_orcamento() {
                                 ativo['opcoes'].push(element);
                             }
                         }
+                        ativo['original'] = td.getAttribute('name');
                         ativoCounter += 1;
                     }
                     else if (td.id.includes('ativo-unidade')) {
