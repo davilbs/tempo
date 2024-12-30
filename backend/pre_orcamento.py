@@ -29,7 +29,11 @@ class preOrcamentoClass(BaseModel):
         self.ativos = []
         for ativoRaw in ativos:
             ativo = {
-                'nome': ativoRaw['nome'],
+                'nome': (
+                    ativoRaw['nome']
+                    if 'original' not in ativoRaw
+                    else ativoRaw['original']
+                ),
                 'quantidade': ativoRaw['quantidade'],
                 'unidade': ativoRaw['unidade'],
             }
@@ -53,9 +57,7 @@ class preOrcamentoClass(BaseModel):
 
     def parse_ativo_fields(self, row, ativo):
         possible_ativo = ativoClass(row['DESCR'])
-        possible_ativo.set_orcamento_values(
-            ativo['quantidade'], ativo['unidade']
-        )
+        possible_ativo.set_orcamento_values(ativo['quantidade'], ativo['unidade'])
         return possible_ativo
 
     def find_ativos(self):
@@ -86,9 +88,10 @@ class preOrcamentoClass(BaseModel):
 
     def parse_to_web(self):
         ativos = []
-        for _, ativosAll in self.possible_ativos.items():
+        for ativosOriginal, ativosAll in self.possible_ativos.items():
             ativos.append(
                 {
+                    'original': ativosOriginal,
                     'unidade': ativosAll[0].orcamento.unity.upper(),
                     'quantidade': ativosAll[0].orcamento.quantity,
                     'opcoes': [
