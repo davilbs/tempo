@@ -163,7 +163,7 @@ app.get('/events', async function (req, res) {
                 res.write(`data: {"status_text": "Identificando medicamentos... Aguarde um momento", "status_code": ${loading_code}}\n\n`);
             }
         }
-    }, 1000);
+    }, 2000);
 
     req.on('close', () => {
         console.log("Connection closed by client");
