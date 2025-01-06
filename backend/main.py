@@ -69,16 +69,11 @@ def extract_prescription_route(file: File):
                     sub_forma_farmaceutica = medicamento['sub_excipiente']
                 qtd = medicamento['quantidade']
                 for ingrediente in medicamento['ingredientes']:
+                    matches = re.search(r'(\d+)', ingrediente['dosagem'].replace(',', '.'))
                     ativo = {
                         'nome': ingrediente['nome'],
-                        'unidade': ingrediente['unidade'],
-                        'quantidade': (
-                            float(ingrediente['dosagem'].replace(',', '.'))
-                            if not re.match(
-                                r'[\D\.]', ingrediente['dosagem'].replace(',', '.')
-                            )
-                            else 0
-                        ),
+                        'unidade': ingrediente['unidade'].upper(),
+                        'quantidade': matches.group(1) if matches != None else ingrediente['dosagem'],
                     }
                     ativos.append(ativo)
 
