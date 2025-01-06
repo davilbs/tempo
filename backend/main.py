@@ -5,7 +5,7 @@ from pre_orcamento import preOrcamentoClass
 from orcamento import orcamentoClass
 from fastapi.middleware.cors import CORSMiddleware
 
-import json, os, utils, re
+import json, os, re, platform
 
 if not os.path.exists("processed"):
     os.makedirs("processed")
@@ -63,6 +63,7 @@ def extract_prescription_route(file: File):
             sub_forma_farmaceutica = None
             ativos = []
             try:
+            # if True:
                 if forma_farmaceutica is None:
                     forma_farmaceutica = medicamento['excipiente']
                 if sub_forma_farmaceutica is None:
@@ -72,13 +73,7 @@ def extract_prescription_route(file: File):
                     ativo = {
                         'nome': ingrediente['nome'],
                         'unidade': ingrediente['unidade'].upper(),
-                        'quantidade': (
-                            float(ingrediente['dosagem'].replace(',', '.'))
-                            if not re.match(
-                                r'[\D\.]', ingrediente['dosagem'].replace(',', '.')
-                            )
-                            else 0
-                        ),
+                        'quantidade': re.search(r'(\d+)', ingrediente['dosagem'].replace(',', '.')).group(1),
                     }
                     ativos.append(ativo)
 
@@ -97,8 +92,13 @@ def extract_prescription_route(file: File):
             except:
                 print("Error parsing orcamento from prescription extracted")
                 return {"status": "error", "result": "Error when identifying the prescription"}
-        filename = file.filename.split("/")[-1].split(".")[0]
-        rootpath = "/".join(file.filename.split("/")[:-2])
+        system = platform.system()
+        if system == 'Windows':
+            bar = "\\"
+        else:
+            bar = "/"
+        filename = file.filename.split(bar)[-1].split(".")[0]
+        rootpath = bar.join(file.filename.split(bar)[:-2])
         print("Saving prescription to ", f"{rootpath}/processed/{filename}.json")
         with open(f"{rootpath}/processed/{filename}.json", "w") as f:
             json.dump(orcamentos, f, indent=4)
