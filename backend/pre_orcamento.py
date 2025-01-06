@@ -38,7 +38,7 @@ class preOrcamentoClass(BaseModel):
                 'unidade': ativoRaw['unidade'],
             }
             self.ativos.append(ativo)
-        self.dosagem = int(dosagem)
+        self.dosagem = dosagem
         self.forma_farmaceutica = forma_farmaceutica
         self.sub_forma_farmaceutica = sub_forma_farmaceutica
         self.nome_cliente = nome_cliente
