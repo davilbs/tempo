@@ -1,34 +1,22 @@
 from pre_orcamento import preOrcamentoClass
 from orcamento import orcamentoClass
+import re
 
 if __name__ == '__main__':
     ativos = [
-        {
-            'nome': 'Vitamina A (50% Retinol + 50% Betacaroteno)',
-            'unidade': 'UI',
-            'quantidade': 5000,
-        },
-        {
-            'nome': 'VIT D3',
-            'unidade': 'UI',
-            'quantidade': 5000,
-        },
-        {
-            'nome': 'Alfatocoferol (mix)',
-            'unidade': 'UI',
-            'quantidade': 200,
-        },
-        {
-            'nome': 'Vitamina K2 (Mk7)',
-            'unidade': 'UI',
-            'quantidade': 200,
-        },
-        {
-            'nome': 'Ácido folínico',
-            'unidade': 'mg',
-            'quantidade': 0.5,
-        },
+        {'nome': 'ÔMEGA 3 - TG (com selo IFOS)', 'dosagem': 'qsp', 'unidade': 'g'},
     ]
+    ativos_processed = []
+    for ingrediente in ativos:
+        matches = re.search(r'(\d+)', ingrediente['dosagem'].replace(',', '.'))
+        if matches == None:
+            a = 1
+        ativo = {
+            'nome': ingrediente['nome'],
+            'unidade': ingrediente['unidade'].upper(),
+            'quantidade': matches.group(1) if matches != None else ingrediente['dosagem'],
+        }
+        ativos_processed.append(ativo)
     orcamento = preOrcamentoClass(
         ativos,
         30,
@@ -37,7 +25,7 @@ if __name__ == '__main__':
         nome_medico='',
         nome_cliente='Marcos Andrei Schwinden',
     )
-    # print(orcamento.create_pre_orcamento())
+    print(orcamento.create_pre_orcamento())
     orcamento_body = {
         'nome_cliente': 'Maria',
         'nome_medico': 'João',
@@ -75,7 +63,7 @@ if __name__ == '__main__':
         },
         'capsula': {'tipo': 'INCOLOR', 'unidade': 'UN', 'quantidade': 30},
     }
-    orcamento = orcamentoClass(
-        orcamento_body,
-    )
-    print(orcamento.create_orcamento())
+    # orcamento = orcamentoClass(
+    #     orcamento_body,
+    # )
+    # print(orcamento.create_orcamento())
