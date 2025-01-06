@@ -113,7 +113,8 @@ def find_closest_match_contains(df: pd.DataFrame, target: str):
     if len(words) > 1:
         words = words[0:2]
         if len(words[1]) >= 2:
-            for i in range(len(words[1]), 1, -1):
+            size_letters = re.search(r'^([\W\d]*\w{1,2})', words[1].strip()).group(1)
+            for i in range(len(words[1]), len(size_letters)-1, -1):
                 word_1 = words[1][:i]
                 for j in range(len(words[0]), 1, -1):
                     shortened_name = f"{words[0][:j]} {word_1}"
