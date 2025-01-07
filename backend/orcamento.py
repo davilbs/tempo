@@ -30,7 +30,11 @@ class orcamentoClass(BaseModel):
             ativo = ativoClass(
                 ativoRaw['nome'],
             )
-            ativo.set_orcamento_values(ativoRaw['quantidade'], ativoRaw['unidade'])
+            ativo.set_orcamento_values(
+                ativoRaw['quantidade'],
+                ativoRaw['unidade'],
+                name=ativoRaw['original'] if 'original' in ativoRaw else '',
+            )
             self.ativos.append(ativo)
         self.dosagem = orcamento_values['dosagem']
         self.forma_farmaceutica = orcamento_values['forma_farmaceutica']
@@ -71,6 +75,7 @@ class orcamentoClass(BaseModel):
         for ativo in self.ativos:
             orcamento['ativos'].append(
                 {
+                    'original': ativo.orcamento.name,
                     'unidade': ativo.orcamento.unity,
                     'quantidade': ativo.orcamento.quantity,
                     'opcoes': [
@@ -93,13 +98,8 @@ class orcamentoClass(BaseModel):
             )
         return orcamento
 
-    def parse_ativo_fields(self, ativo: ativoClass):
-        ativo.set_values()
-        ativo.set_orcamento_values(ativo.orcamento.quantity, ativo.orcamento.unity)
-
     def calc_price_ativos(self):
         for ativo in self.ativos:
-            self.parse_ativo_fields(ativo)
             utils.calc_price(ativo, self.forma_farmaceutica, self.dosagem)
 
     def calc_volume_ativos(self):
@@ -177,7 +177,7 @@ class orcamentoClass(BaseModel):
             self.ativos,
         )
         self.get_excipiente_qnt_price()
-        
+
     def get_custo_fixo(self):
         df_custos = pd.read_csv(
             '../orcamento_tables/smart/custo_fixo_FCerta_SMART_2024.csv'

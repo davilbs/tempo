@@ -26,7 +26,7 @@ class capsuleClass(ativoClass):
         self.external_volume = int(external_volume)
         self.priority = int(priority)
 
-    def set_values(self):
+    def set_values(self, row = {}):
         df_ativos = pd.read_csv(
             '../orcamento_tables/smart/outros_ativos_joined_FCerta_SMART_2024.csv'
         )

@@ -26,7 +26,7 @@ function updateTotal() {
         });
 
         // Get preço custo fixo
-        const precoFixo = parseFloat(table.querySelector("span[id='preco-custo-fixo']").innerText.replace("R$", "").replace(".", "").replace(".", "."));
+        const precoFixo = parseFloat(table.querySelector("span[id='preco-custo-fixo']").innerText.replace("R$", "").replace(".", "").replace(",", "."));
         total += precoFixo;
 
         // Update the Total cell
@@ -139,6 +139,7 @@ function parse_orcamento() {
                                 ativo['opcoes'].push(element);
                             }
                         }
+                        ativo['original'] = td.getAttribute('name');
                         ativoCounter += 1;
                     }
                     else if (td.id.includes('ativo-unidade')) {
@@ -257,4 +258,30 @@ document.getElementById('edit_orcamento').addEventListener('click', async () => 
 
     document.body.appendChild(form);
     form.submit();
+});
+
+document.getElementById('save_orcamento').addEventListener('click', async () => {
+    var content = document.getElementById("orcamento-page");
+    print(content);
+    // const { jsPDF } = window.jspdf;
+    // var doc = new jsPDF();
+
+    // let content = document.getElementById("orcamento-page");
+    // content.querySelector("img[id='logo-essential']").remove();
+    // content.querySelector("div[class='button-container']").remove();
+    // content.querySelector("div[class='button-container']").remove();
+    // doc.html(
+    //     content,
+    //     {
+    //         callback: function (doc) {
+    //             doc.save("orcamento.pdf");
+    //         },
+    //         x: 0,
+    //         y: 0,
+    //         html2canvas: {
+    //             scale: 0.15,
+    //         },
+    //     },
+    // );
+    
 });
