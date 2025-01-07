@@ -95,7 +95,7 @@ def parse_matchs(all_matchs: pd.DataFrame):
 
 
 def find_closest_match_contains(df: pd.DataFrame, target: str):
-    target = target.upper()
+    target = unidecode(target.upper())
     # Exact match
     start_time = time.time()
     if len(df[df['DESCR'] == target]) > 0:
