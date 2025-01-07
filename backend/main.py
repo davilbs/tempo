@@ -113,6 +113,7 @@ def extract_prescription_route(orcamentos: list[Orcamento]):
     results = []
     for orcamento in orcamentos:
         try:
+        # if True:
             orcamento_result = preOrcamentoClass(
                 orcamento.ativos,
                 orcamento.dosagem,
@@ -121,7 +122,6 @@ def extract_prescription_route(orcamentos: list[Orcamento]):
                 nome_medico=orcamento.nome_medico,
                 nome_cliente=orcamento.nome_cliente,
             )
-            orcamento_result.adjust = True
             # Create pre_orcamento
             result = orcamento_result.create_pre_orcamento()
             for i in range(len(result['ativos'])):
