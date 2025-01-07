@@ -92,9 +92,8 @@ app.post("/calculate", upload.single("prescription"), (req, res, next) => {
     }
 
     var pdf_path = path.join(__dirname + "/uploads/", req.file.filename);
-    console.log("check existing file " + pdf_path);
     do {
-        console.log("waiting for file " + pdf_path);
+        console.log("Checking for file " + pdf_path);
     } while (!fs.existsSync(pdf_path))
 
     extractPrescription(pdf_path)
@@ -124,7 +123,6 @@ app.get('/events', async function (req, res) {
 
     let counter = 0;
     res.write(`data: {"status_text": "${loading_status}", "status_code": ${loading_code}}\n\n`);
-    console.log("Processing file: " + directory + filename + curr_ext);
     let interValID = setInterval(() => {
         if (fs.existsSync(directory + filename + curr_ext)) {
             console.log("Found file: " + directory + filename + curr_ext);

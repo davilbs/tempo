@@ -1,4 +1,4 @@
-import simplejson as json, re, pandas as pd, os, time
+import simplejson as json, re, pandas as pd, os
 
 from ativo.main import ativoClass
 from unidecode import unidecode
@@ -159,7 +159,6 @@ def calc_price(ativo: ativoClass, forma_farmaceutica: str, dosagem: int):
     if forma_farmaceutica not in ['']:
         ativo.orcamento.price *= dosagem
     ativo.orcamento.price = round(ativo.orcamento.price, 2)
-
 
 def adjust_csv(df: pd.DataFrame):
     def transform_values(value):
