@@ -26,7 +26,7 @@ function updateTotal() {
         });
 
         // Get preço custo fixo
-        const precoFixo = parseFloat(table.querySelector("span[id='preco-custo-fixo']").innerText.replace("R$", "").replace(".", "").replace(".", "."));
+        const precoFixo = parseFloat(table.querySelector("span[id='preco-custo-fixo']").innerText.replace("R$", "").replace(".", "").replace(",", "."));
         total += precoFixo;
 
         // Update the Total cell
