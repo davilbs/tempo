@@ -72,11 +72,14 @@ class preOrcamentoClass(BaseModel):
             df_match = utils.find_closest_match_contains(df_ativos, ativo['nome'])
             tempo = time.time() - start_time
             print(f"Closest match: {ativo} - tempo: {tempo}")
+            start_time = time.time()
             self.possible_ativos[ativo['nome']] = []
             for row in df_match.iterrows():
                 row = row[1].to_dict()
                 possible_ativo = self.parse_ativo_fields(row, ativo)
                 self.possible_ativos[ativo['nome']].append(possible_ativo)
+            tempo = time.time() - start_time
+            print(f"Possible_ativos - size: {len(df_match)} - tempo: {tempo}")
 
     def choose_excipiente(self):
         self.excipiente = excipientClass()

@@ -59,13 +59,6 @@ class ativoClass(BaseModel):
         unity,
         name='',
     ):
-        if self.orcamento != None:
-            self.orcamento = ativoOrcamentoClass(
-                quantity,
-                unity,
-                name,
-            )
-            
         self.orcamento = ativoOrcamentoClass(
             quantity,
             unity,

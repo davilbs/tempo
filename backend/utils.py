@@ -136,11 +136,13 @@ def find_closest_match_contains(df: pd.DataFrame, target: str):
                 matchs = do_descr_match(shortened_name, df, starts_with=True)
                 if len(matchs) > 0:
                     all_matchs = pd.concat([all_matchs, matchs])
-    tempo = time.time() - start_time
-    print(f"Two words: {tempo}")
     if len(all_matchs) > 0:
         all_matchs = parse_matchs(all_matchs)
+        tempo = time.time() - start_time
+        print(f"Two words: {tempo}")
         return all_matchs
+    tempo = time.time() - start_time
+    print(f"Two words: {tempo}")
 
     # Step 3: Match with the first word using at least 3 letters
     start_time = time.time()
