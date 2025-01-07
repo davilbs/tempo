@@ -59,7 +59,7 @@ class preOrcamentoClass(BaseModel):
         return orcamento
 
     def parse_ativo_fields(self, row, ativo):
-        possible_ativo = ativoClass(row['DESCR'])
+        possible_ativo = ativoClass(row['DESCR'], row=row)
         possible_ativo.set_orcamento_values(ativo['quantidade'], ativo['unidade'])
         return possible_ativo
 

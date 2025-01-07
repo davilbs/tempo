@@ -33,18 +33,20 @@ class ativoClass(BaseModel):
     def __init__(
         self,
         name,
+        row: dict = {}
     ) -> None:
         super().__init__()
         self.name = name
-        self.set_values()
+        self.set_values(row)
 
-    def set_values(self):
-        df_ativos = pd.read_csv(
-            '../orcamento_tables/smart/ativos_joined_FCerta_SMART_2024.csv'
-        )
-        row = (
-            df_ativos[df_ativos['DESCR'] == self.name.strip().upper()].iloc[0].to_dict()
-        )
+    def set_values(self, row = {}):
+        if row == {}:
+            df_ativos = pd.read_csv(
+                '../orcamento_tables/smart/ativos_joined_FCerta_SMART_2024.csv'
+            )
+            row = (
+                df_ativos[df_ativos['DESCR'] == self.name.strip().upper()].iloc[0].to_dict()
+            )
         self.price = row['PRVEN']
         self.equivalency = row['EQUIV']
         self.dilution = row['DILUICAO']

@@ -9,7 +9,7 @@ class embalagemClass(ativoClass):
             name = self.embalagemVolume(volume)
         super().__init__(name)
 
-    def set_values(self):
+    def set_values(self, row = {}):
         df_embalagens = pd.read_csv(
             '../orcamento_tables/smart/embalagens_FCerta_SMART_2024.csv'
         )

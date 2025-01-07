@@ -18,7 +18,7 @@ if __name__ == '__main__':
         }
         ativos_processed.append(ativo)
     orcamento = preOrcamentoClass(
-        ativos,
+        ativos_processed,
         30,
         forma_farmaceutica='1 - Cápsulas',
         sub_forma_farmaceutica='',
