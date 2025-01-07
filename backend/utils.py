@@ -1,4 +1,4 @@
-import simplejson as json, re, pandas as pd, os
+import simplejson as json, re, pandas as pd, os, time
 
 from ativo.main import ativoClass
 from unidecode import unidecode
@@ -97,18 +97,27 @@ def parse_matchs(all_matchs: pd.DataFrame):
 def find_closest_match_contains(df: pd.DataFrame, target: str):
     target = target.upper()
     # Exact match
+    start_time = time.time()
     if len(df[df['DESCR'] == target]) > 0:
+        tempo = time.time() - start_time
+        print(f"Exact match: {tempo}")
         return df[df['DESCR'] == target]
+    tempo = time.time() - start_time
+    print(f"Exact match: {tempo}")
 
     all_matchs = pd.DataFrame()
 
     # Step 1: Full match
+    start_time = time.time()
     matchs = do_descr_match(target, df)
     if len(matchs) > 0:
         all_matchs = pd.concat([all_matchs, matchs])
+    tempo = time.time() - start_time
+    print(f"Full match: {tempo}")
 
     # Step 2: Match between combinations using 2 words with at least
     # 2 letters of each one when possible
+    start_time = time.time()
     words = target.split()
     if len(words) > 1:
         words = words[0:2]
@@ -127,18 +136,22 @@ def find_closest_match_contains(df: pd.DataFrame, target: str):
                 matchs = do_descr_match(shortened_name, df, starts_with=True)
                 if len(matchs) > 0:
                     all_matchs = pd.concat([all_matchs, matchs])
-
+    tempo = time.time() - start_time
+    print(f"Two words: {tempo}")
     if len(all_matchs) > 0:
         all_matchs = parse_matchs(all_matchs)
         return all_matchs
 
     # Step 3: Match with the first word using at least 3 letters
+    start_time = time.time()
     shortened_name = unidecode(words[0][0:2])
     matchs = do_descr_match(shortened_name, df, starts_with=True)
     if len(matchs) > 0:
         all_matchs = pd.concat([all_matchs, matchs])
 
     all_matchs = parse_matchs(all_matchs)
+    tempo = time.time() - start_time
+    print(f"First word: {tempo}")
     return all_matchs
 
 

@@ -1,4 +1,4 @@
-import pandas as pd, utils, re
+import pandas as pd, utils, re, time
 from pydantic import BaseModel
 from typing import List, Dict
 
@@ -50,7 +50,10 @@ class preOrcamentoClass(BaseModel):
                 print(ativo)
 
     def create_pre_orcamento(self):
+        start_time = time.time()
         self.find_ativos()
+        tempo = time.time() - start_time
+        print(f"find_ativos - tempo: {tempo}")
         self.choose_excipiente()
         orcamento = self.parse_to_web()
         return orcamento
@@ -65,7 +68,10 @@ class preOrcamentoClass(BaseModel):
             '../orcamento_tables/smart/ativos_joined_FCerta_SMART_2024.csv'
         )
         for ativo in self.ativos:
+            start_time = time.time()
             df_match = utils.find_closest_match_contains(df_ativos, ativo['nome'])
+            tempo = time.time() - start_time
+            print(f"Closest match: {ativo} - tempo: {tempo}")
             self.possible_ativos[ativo['nome']] = []
             for row in df_match.iterrows():
                 row = row[1].to_dict()
