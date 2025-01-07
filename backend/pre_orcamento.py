@@ -1,6 +1,7 @@
-import pandas as pd, utils, re, time
+import pandas as pd, utils, re
 from pydantic import BaseModel
 from typing import List, Dict
+from unidecode import unidecode
 
 from ativo.main import ativoClass
 from excipients.main import excipientClass
@@ -50,10 +51,7 @@ class preOrcamentoClass(BaseModel):
                 print(ativo)
 
     def create_pre_orcamento(self):
-        start_time = time.time()
         self.find_ativos()
-        tempo = time.time() - start_time
-        print(f"find_ativos - tempo: {tempo}")
         self.choose_excipiente()
         orcamento = self.parse_to_web()
         return orcamento
@@ -67,19 +65,14 @@ class preOrcamentoClass(BaseModel):
         df_ativos = pd.read_csv(
             '../orcamento_tables/smart/ativos_joined_FCerta_SMART_2024.csv'
         )
+        df_ativos['DESCR_UNIDECODE'] = df_ativos['DESCR'].astype(str).apply(unidecode)
         for ativo in self.ativos:
-            start_time = time.time()
             df_match = utils.find_closest_match_contains(df_ativos, ativo['nome'])
-            tempo = time.time() - start_time
-            print(f"Closest match: {ativo} - tempo: {tempo}")
-            start_time = time.time()
             self.possible_ativos[ativo['nome']] = []
             for row in df_match.iterrows():
                 row = row[1].to_dict()
                 possible_ativo = self.parse_ativo_fields(row, ativo)
                 self.possible_ativos[ativo['nome']].append(possible_ativo)
-            tempo = time.time() - start_time
-            print(f"Possible_ativos - size: {len(df_match)} - tempo: {tempo}")
 
     def choose_excipiente(self):
         self.excipiente = excipientClass()

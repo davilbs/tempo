@@ -71,12 +71,18 @@ def unityCalcConversion(unity: str):
 
 def do_descr_match(target, df: pd.DataFrame, starts_with=False):
     if starts_with:
-        if df['DESCR'].str.startswith(target, na=False).any():
-            return df[df['DESCR'].str.startswith(target, na=False)]
+        if df['DESCR_UNIDECODE'].str.startswith(target, na=False).any():
+            return df[df['DESCR_UNIDECODE'].str.startswith(target, na=False)]
     else:
-        if df['DESCR'].str.contains(target, regex=False, case=False, na=False).any():
+        if (
+            df['DESCR_UNIDECODE']
+            .str.contains(target, regex=False, case=False, na=False)
+            .any()
+        ):
             return df[
-                df['DESCR'].str.contains(target, regex=False, case=False, na=False)
+                df['DESCR_UNIDECODE'].str.contains(
+                    target, regex=False, case=False, na=False
+                )
             ]
     return []
 
@@ -85,45 +91,36 @@ def parse_matchs(all_matchs: pd.DataFrame):
     if len(all_matchs) == 0:
         return all_matchs
     all_matchs = all_matchs[
-        ~all_matchs['DESCR'].str.contains(
-            '|'.join(['Ñ USAR', 'N USAR', 'NAO USAR', 'NÃO USAR']), case=False, na=False
+        ~all_matchs['DESCR_UNIDECODE'].str.contains(
+            '|'.join(['N USAR', 'NAO USAR']), case=False, na=False
         )
     ]
     all_matchs = all_matchs.drop_duplicates()
-    all_matchs = all_matchs.sort_values(by='DESCR')
+    all_matchs = all_matchs.sort_values(by='DESCR_UNIDECODE')
     return all_matchs
 
 
 def find_closest_match_contains(df: pd.DataFrame, target: str):
     target = unidecode(target.upper())
     # Exact match
-    start_time = time.time()
-    if len(df[df['DESCR'] == target]) > 0:
-        tempo = time.time() - start_time
-        print(f"Exact match: {tempo}")
-        return df[df['DESCR'] == target]
-    tempo = time.time() - start_time
-    print(f"Exact match: {tempo}")
+    if len(df[df['DESCR_UNIDECODE'] == target]) > 0:
+        return df[df['DESCR_UNIDECODE'] == target]
 
     all_matchs = pd.DataFrame()
 
     # Step 1: Full match
-    start_time = time.time()
     matchs = do_descr_match(target, df)
     if len(matchs) > 0:
         all_matchs = pd.concat([all_matchs, matchs])
-    tempo = time.time() - start_time
-    print(f"Full match: {tempo}")
 
     # Step 2: Match between combinations using 2 words with at least
     # 2 letters of each one when possible
-    start_time = time.time()
     words = target.split()
     if len(words) > 1:
         words = words[0:2]
         if len(words[1]) >= 2:
             size_letters = re.search(r'^([\W\d]*\w{1,2})', words[1].strip()).group(1)
-            for i in range(len(words[1]), len(size_letters)-1, -1):
+            for i in range(len(words[1]), len(size_letters) - 1, -1):
                 word_1 = words[1][:i]
                 for j in range(len(words[0]), 1, -1):
                     shortened_name = f"{words[0][:j]} {word_1}"
@@ -138,22 +135,15 @@ def find_closest_match_contains(df: pd.DataFrame, target: str):
                     all_matchs = pd.concat([all_matchs, matchs])
     if len(all_matchs) > 0:
         all_matchs = parse_matchs(all_matchs)
-        tempo = time.time() - start_time
-        print(f"Two words: {tempo}")
         return all_matchs
-    tempo = time.time() - start_time
-    print(f"Two words: {tempo}")
 
     # Step 3: Match with the first word using at least 3 letters
-    start_time = time.time()
     shortened_name = unidecode(words[0][0:2])
     matchs = do_descr_match(shortened_name, df, starts_with=True)
     if len(matchs) > 0:
         all_matchs = pd.concat([all_matchs, matchs])
 
     all_matchs = parse_matchs(all_matchs)
-    tempo = time.time() - start_time
-    print(f"First word: {tempo}")
     return all_matchs
 
 
