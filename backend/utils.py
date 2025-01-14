@@ -156,7 +156,7 @@ def calc_price(ativo: ativoClass, forma_farmaceutica: str, dosagem: int):
         * unityCalcConversion(ativo.orcamento.unity)
         / ativo.unity_value_conversion
     )
-    if forma_farmaceutica not in ['']:
+    if forma_farmaceutica in ['1 - Cápsulas', '2 - Cremes']:
         ativo.orcamento.price *= dosagem
     ativo.orcamento.price = round(ativo.orcamento.price, 2)
 
