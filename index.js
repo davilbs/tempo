@@ -232,6 +232,13 @@ function formatOrcamentoEdited(orcamentos) {
             }
         }
 
+        var tipoCapsulasEdited = [capsula.tipo != null ? capsula.tipo : ''].concat(... new Set(tipoCapsulas));
+        for (let i = 1; i < tipoCapsulasEdited.length; i++) {
+            if (capsula.tipo == tipoCapsulasEdited[i]) {
+                tipoCapsulasEdited.splice(i, 1);
+            }
+        }
+
         var unidadesEdited = {
             'embalagem': [... new Set([embalagem.unidade].concat(unidades))],
             'excipiente': [... new Set([excipiente.unidade].concat(unidades))],
@@ -247,7 +254,7 @@ function formatOrcamentoEdited(orcamentos) {
             dosagem: orcamento['dosagem'],
             formaFarmaceuticaAll: formaFarmaceuticaAllEdited,
             formaFarmaceuticaSubgrupoAll: formaFarmaceuticaSubgrupoAllEdited,
-            tipoCapsulas: tipoCapsulas,
+            tipoCapsulas: tipoCapsulasEdited,
             embalagens: embalagensEdited,
             excipientes: excipientesEdited,
             unidades: unidadesEdited,
