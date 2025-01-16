@@ -11,31 +11,27 @@ class capsuleClass(ativoClass):
     priority: int = 0
 
     def __init__(
-        self,
-        type,
-        color,
-        internal_volume,
-        external_volume,
-        priority,
-        name,
+        self, type, color, internal_volume, external_volume, priority, name, row={}
     ) -> None:
-        super().__init__(name)
+        super().__init__(name, row)
         self.type = type
         self.color = color
         self.internal_volume = int(internal_volume)
         self.external_volume = int(external_volume)
         self.priority = int(priority)
 
-    def set_values(self):
-        df_ativos = pd.read_csv(
-            '../orcamento_tables/smart/outros_ativos_joined_FCerta_SMART_2024.csv'
-        )
-        row = (
-            df_ativos[df_ativos['DESCR'] == self.name.strip().upper()]
-            .drop('Unnamed: 0', axis=1)
-            .drop_duplicates()
-            .iloc[0].to_dict()
-        )
+    def set_values(self, row={}):
+        if row == {}:
+            df_ativos = pd.read_csv(
+                '../orcamento_tables/smart/outros_ativos_joined_FCerta_SMART_2024.csv'
+            )
+            row = (
+                df_ativos[df_ativos['DESCR'] == self.name.strip().upper()]
+                .drop('Unnamed: 0', axis=1)
+                .drop_duplicates()
+                .iloc[0]
+                .to_dict()
+            )
         self.price = row['PRVEN']
         self.equivalency = row['EQUIV']
         self.dilution = row['DILUICAO']

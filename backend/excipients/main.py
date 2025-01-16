@@ -13,7 +13,7 @@ class excipientClass(ativoClass):
             name = 'EXCIPIENTE PADRÃO CÁPSULAS'
         super().__init__(name)
 
-    def set_values(self):
+    def set_values(self, row = {}):
         df_excipientes = pd.read_csv(
             '../orcamento_tables/smart/excipientes_FCerta_SMART_2024.csv'
         )

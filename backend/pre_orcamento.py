@@ -1,6 +1,7 @@
 import pandas as pd, utils, re
 from pydantic import BaseModel
 from typing import List, Dict
+from unidecode import unidecode
 
 from ativo.main import ativoClass
 from excipients.main import excipientClass
@@ -29,12 +30,16 @@ class preOrcamentoClass(BaseModel):
         self.ativos = []
         for ativoRaw in ativos:
             ativo = {
-                'nome': ativoRaw['nome'],
+                'nome': (
+                    ativoRaw['nome']
+                    if 'original' not in ativoRaw
+                    else ativoRaw['original']
+                ),
                 'quantidade': ativoRaw['quantidade'],
                 'unidade': ativoRaw['unidade'],
             }
             self.ativos.append(ativo)
-        self.dosagem = int(dosagem)
+        self.dosagem = dosagem
         self.forma_farmaceutica = forma_farmaceutica
         self.sub_forma_farmaceutica = sub_forma_farmaceutica
         self.nome_cliente = nome_cliente
@@ -52,16 +57,15 @@ class preOrcamentoClass(BaseModel):
         return orcamento
 
     def parse_ativo_fields(self, row, ativo):
-        possible_ativo = ativoClass(row['DESCR'])
-        possible_ativo.set_orcamento_values(
-            ativo['quantidade'], ativo['unidade']
-        )
+        possible_ativo = ativoClass(row['DESCR'], row=row)
+        possible_ativo.set_orcamento_values(ativo['quantidade'], ativo['unidade'])
         return possible_ativo
 
     def find_ativos(self):
         df_ativos = pd.read_csv(
             '../orcamento_tables/smart/ativos_joined_FCerta_SMART_2024.csv'
         )
+        df_ativos['DESCR_UNIDECODE'] = df_ativos['DESCR'].astype(str).apply(unidecode)
         for ativo in self.ativos:
             df_match = utils.find_closest_match_contains(df_ativos, ativo['nome'])
             self.possible_ativos[ativo['nome']] = []
@@ -86,9 +90,10 @@ class preOrcamentoClass(BaseModel):
 
     def parse_to_web(self):
         ativos = []
-        for _, ativosAll in self.possible_ativos.items():
+        for ativosOriginal, ativosAll in self.possible_ativos.items():
             ativos.append(
                 {
+                    'original': ativosOriginal,
                     'unidade': ativosAll[0].orcamento.unity.upper(),
                     'quantidade': ativosAll[0].orcamento.quantity,
                     'opcoes': [

@@ -69,30 +69,42 @@ def unityCalcConversion(unity: str):
         return 1
 
 
-def do_descr_match(target, df: pd.DataFrame, starts_with = False):
+def do_descr_match(target, df: pd.DataFrame, starts_with=False):
     if starts_with:
-        if df['DESCR'].str.startswith(target, na=False).any():
-            return df[df['DESCR'].str.startswith(target, na=False)]
-    else:        
-        if df['DESCR'].str.contains(target, regex=False, case=False, na=False).any():
-            return df[df['DESCR'].str.contains(target, regex=False, case=False, na=False)]
+        if df['DESCR_UNIDECODE'].str.startswith(target, na=False).any():
+            return df[df['DESCR_UNIDECODE'].str.startswith(target, na=False)]
+    else:
+        if (
+            df['DESCR_UNIDECODE']
+            .str.contains(target, regex=False, case=False, na=False)
+            .any()
+        ):
+            return df[
+                df['DESCR_UNIDECODE'].str.contains(
+                    target, regex=False, case=False, na=False
+                )
+            ]
     return []
 
 
 def parse_matchs(all_matchs: pd.DataFrame):
     if len(all_matchs) == 0:
         return all_matchs
-    all_matchs = all_matchs[~all_matchs['DESCR'].str.contains('|'.join(['Ñ USAR', 'N USAR', 'NAO USAR', 'NÃO USAR']), case=False, na=False)]
+    all_matchs = all_matchs[
+        ~all_matchs['DESCR_UNIDECODE'].str.contains(
+            '|'.join(['N USAR', 'NAO USAR']), case=False, na=False
+        )
+    ]
     all_matchs = all_matchs.drop_duplicates()
-    all_matchs = all_matchs.sort_values(by='DESCR')
+    all_matchs = all_matchs.sort_values(by='DESCR_UNIDECODE')
     return all_matchs
-    
+
 
 def find_closest_match_contains(df: pd.DataFrame, target: str):
     target = unidecode(target.upper())
     # Exact match
-    if len(df[df['DESCR'] == target]) > 0:
-        return df[df['DESCR'] == target]
+    if len(df[df['DESCR_UNIDECODE'] == target]) > 0:
+        return df[df['DESCR_UNIDECODE'] == target]
 
     all_matchs = pd.DataFrame()
 
@@ -101,36 +113,35 @@ def find_closest_match_contains(df: pd.DataFrame, target: str):
     if len(matchs) > 0:
         all_matchs = pd.concat([all_matchs, matchs])
 
-    # Step 2: Match between combinations using 2 words with at least 
+    # Step 2: Match between combinations using 2 words with at least
     # 2 letters of each one when possible
     words = target.split()
     if len(words) > 1:
         words = words[0:2]
         if len(words[1]) >= 2:
-            for i in range(len(words[1]), 1, -1):
+            size_letters = re.search(r'^([\W\d]*\w{1,2})', words[1].strip()).group(1)
+            for i in range(len(words[1]), len(size_letters) - 1, -1):
                 word_1 = words[1][:i]
                 for j in range(len(words[0]), 1, -1):
                     shortened_name = f"{words[0][:j]} {word_1}"
-                    matchs = do_descr_match(shortened_name, df)
+                    matchs = do_descr_match(shortened_name, df, starts_with=True)
                     if len(matchs) > 0:
                         all_matchs = pd.concat([all_matchs, matchs])
         else:
             for i in range(len(words[0]), 1, -1):
                 shortened_name = f"{words[0][:i]} {words[1]}"
-                matchs = do_descr_match(shortened_name, df)
+                matchs = do_descr_match(shortened_name, df, starts_with=True)
                 if len(matchs) > 0:
                     all_matchs = pd.concat([all_matchs, matchs])
-
     if len(all_matchs) > 0:
         all_matchs = parse_matchs(all_matchs)
         return all_matchs
-    
+
     # Step 3: Match with the first word using at least 3 letters
-    for i in range(len(words[0]), 1, -1):
-        shortened_name = unidecode(words[0][:i])
-        matchs = do_descr_match(shortened_name, df, starts_with=True)
-        if len(matchs) > 0:
-            all_matchs = pd.concat([all_matchs, matchs])
+    shortened_name = unidecode(words[0][0:2])
+    matchs = do_descr_match(shortened_name, df, starts_with=True)
+    if len(matchs) > 0:
+        all_matchs = pd.concat([all_matchs, matchs])
 
     all_matchs = parse_matchs(all_matchs)
     return all_matchs
@@ -145,9 +156,10 @@ def calc_price(ativo: ativoClass, forma_farmaceutica: str, dosagem: int):
         * unityCalcConversion(ativo.orcamento.unity)
         / ativo.unity_value_conversion
     )
-    if forma_farmaceutica not in ['']:
+    if forma_farmaceutica in ['1 - Cápsula', '2 - Cremes']:
         ativo.orcamento.price *= dosagem
     ativo.orcamento.price = round(ativo.orcamento.price, 2)
+
 
 def adjust_csv(df: pd.DataFrame):
     def transform_values(value):
@@ -155,9 +167,10 @@ def adjust_csv(df: pd.DataFrame):
             value = re.sub(r'\s+', ' ', value)
             value = value.upper().strip()
         return value
-    
+
     df = df.map(transform_values)
     return df
+
 
 if __name__ == '__main__':
     folder_path = './orcamento_tables/smart'

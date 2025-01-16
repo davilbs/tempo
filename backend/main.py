@@ -5,7 +5,7 @@ from pre_orcamento import preOrcamentoClass
 from orcamento import orcamentoClass
 from fastapi.middleware.cors import CORSMiddleware
 
-import json, os, utils, re
+import json, os, re, platform
 
 if not os.path.exists("processed"):
     os.makedirs("processed")
@@ -63,13 +63,14 @@ def extract_prescription_route(file: File):
             sub_forma_farmaceutica = None
             ativos = []
             try:
+            # if True:
                 if forma_farmaceutica is None:
                     forma_farmaceutica = medicamento['excipiente']
                 if sub_forma_farmaceutica is None:
                     sub_forma_farmaceutica = medicamento['sub_excipiente']
                 qtd = medicamento['quantidade']
                 for ingrediente in medicamento['ingredientes']:
-                    matches = re.search(r'(\d+)', ingrediente['dosagem'].replace(',', '.'))
+                    matches = re.search(r'([\d,\.]+)', ingrediente['dosagem'])
                     ativo = {
                         'nome': ingrediente['nome'],
                         'unidade': ingrediente['unidade'].upper(),
@@ -90,16 +91,68 @@ def extract_prescription_route(file: File):
                 orcamento_result['nomeFormula'] = medicamento['nome']
                 orcamentos.append(orcamento_result)
             except:
-                print("Error parsing orcamento")
+                print("Error parsing orcamento from prescription extracted")
                 return {"status": "error", "result": "Error when identifying the prescription"}
-        filename = file.filename.split("/")[-1].split(".")[0]
-        rootpath = "/".join(file.filename.split("/")[:-2])
+        system = platform.system()
+        if system == 'Windows':
+            bar = "\\"
+        else:
+            bar = "/"
+        filename = file.filename.split(bar)[-1].split(".")[0]
+        rootpath = bar.join(file.filename.split(bar)[:-2])
         print("Saving prescription to ", f"{rootpath}/processed/{filename}.json")
         with open(f"{rootpath}/processed/{filename}.json", "w") as f:
             json.dump(orcamentos, f, indent=4)
         # Enviar orçamento para o front-end
         return {"status": "success", "result": orcamentos}
     return {"status": "error", "result": "No prescription found"}
+
+
+@app.post("/adjust_orcamento")
+def extract_prescription_route(orcamentos: list[Orcamento]):
+    results = []
+    for orcamento in orcamentos:
+        try:
+        # if True:
+            orcamento_result = preOrcamentoClass(
+                orcamento.ativos,
+                orcamento.dosagem,
+                forma_farmaceutica=orcamento.forma_farmaceutica,
+                sub_forma_farmaceutica=orcamento.sub_forma_farmaceutica,
+                nome_medico=orcamento.nome_medico,
+                nome_cliente=orcamento.nome_cliente,
+            )
+            # Create pre_orcamento
+            result = orcamento_result.create_pre_orcamento()
+            for i in range(len(result['ativos'])):
+                if 'original' in orcamento.ativos[i] and orcamento.ativos[i]['original'] != '':
+                    ativo = orcamento.ativos[i]['nome']
+                    result['ativos'][i]['opcoes'].insert(0, 
+                        {
+                            'nome': ativo,
+                            'preco': 0.0
+                        }
+                    )
+                    result['ativos'][i]['pre_processed'] = True
+                else:
+                    result['ativos'][i]['pre_processed'] = False
+                result['ativos'][i]['opcoes'] = list({v['nome']:v for v in result['ativos'][i]['opcoes']}.values())
+            result['nomeFormula'] = orcamento.nome_formula
+            result['embalagem'] = {
+                'nome': orcamento.embalagem['nome'],
+                'unidade': '-',
+                'quantidade': orcamento.embalagem['quantidade'],
+                'preco': 0.0,
+            }
+            result['excipiente']['nome'] = orcamento.excipiente['nome'] if 'nome' in orcamento.excipiente else ''
+            result['capsula']['tipo'] = orcamento.capsula['tipo'] if 'tipo' in orcamento.capsula else ''
+            results.append(result)
+        except:
+            print("Error parsing orcamento from orcamento adjusted")
+            return {"status": "error", "result": "Error when adjusting the prescription"}
+
+    # Enviar orçamento para o front-end
+    return {"status": "success", "result": results}
 
 
 def parse_orcamento(orcamento: Orcamento):
@@ -122,5 +175,6 @@ def update_orcamento_route(orcamentos: list[Orcamento]):
     results = []
     for orcamento in orcamentos:
         body = parse_orcamento(orcamento)
-        results.append(orcamentoClass(body).create_orcamento())
+        result = orcamentoClass(body).create_orcamento()
+        results.append(result)
     return {"status": "success", "result": results}

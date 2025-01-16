@@ -12,11 +12,11 @@
     <link rel="stylesheet" href="/styles/css/total.css">
 </head>
 
-<body>
+<body id="orcamento-page">
     <div class="container">
         <header class="header">
             <div class="header__logo">
-                <img src="/styles/Logo Essential.svg">
+                <img id="logo-essential" src="/styles/Logo Essential.svg">
                 <span class="header__title">ESSENTIA PHARMA</span>
             </div>
             <h1 class="header__subtitle">ORÇAMENTO SMART ESSENTIA PHARMA</h1>
@@ -71,7 +71,7 @@
                         <tbody>
                             <% orcamento.ativos.forEach(function(ativo, rowIndex) { %>
                                 <tr id="ativo">
-                                    <td class=" right-line text line<%= (rowIndex%2)+1 %>" name="ativo-puro"
+                                    <td class=" right-line text line<%= (rowIndex%2)+1 %>" name="<%= ativo.original %>"
                                         id="ativo-puro-<%= rowIndex %>">
                                         <%= ativo.opcoes[0].nome %>
                                     </td>
@@ -112,14 +112,14 @@
                                     <%= formatNumber(orcamento.embalagem.quantidade) %>
                                 </td>
                                 <td id="preco-embalagem" class="price-table-value line1">R$ <%=
-                                        formatNumber(orcamento.embalagem.preco) %>
+                                        formatNumber(orcamento.embalagem.preco, true) %>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
 
                     <!-- Additional Details -->
-                    <table>
+                    <table id="excipiente-table-<%=indexOrcamento %>">
                         <thead>
                             <tr>
                                 <th class="line1 right-line" style="width: 604px;">Excipiente</th>
@@ -141,14 +141,14 @@
                                     <%= formatNumber(orcamento.excipiente.quantidade) %>
                                 </td>
                                 <td id="preco-excipiente" class="line1 price-table-value">R$ <%=
-                                        formatNumber(orcamento.excipiente.preco) %>
+                                        formatNumber(orcamento.excipiente.preco, true) %>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
 
                     <!-- Capsule Information -->
-                    <table>
+                    <table id="capsula-table-<%=indexOrcamento %>">
                         <thead>
                             <tr>
                                 <th class="line1 right-line" style="width: 304px;">Tipo Cápsula</th>
@@ -161,33 +161,35 @@
                         </thead>
                         <tbody>
                             <tr id="capsula">
-                                <% orcamento.capsulas.forEach(function(capsula, index) { %>
-                                    <td class="line1 right-line" id="capsula-tipo" name="capsula-tipo">
-                                        <%= capsula.tipo %>
-                                    </td>
-                                    <td class="line1 right-line" style="text-align: center;">
-                                        <select id="capsula-nome" name="capsula-nome">
-                                            <option value="<%= capsula.nome %>" <%=index===0 ? 'selected' : '' %>>
+                                <td class="line1 right-line" id="capsula-tipo" name="capsula-tipo">
+                                    <%= orcamento.capsulas.tipo %>
+                                </td>
+                                <td class="line1 right-line" style="text-align: center;">
+                                    <select id="capsula-nome" name="capsula-nome"
+                                        onchange="updateCapsule(<%= indexOrcamento %>)">
+                                        <% orcamento.capsulas.opcoes.forEach(function(capsula) { %>
+                                            <option value="<%= capsula.nome %>">
                                                 <%= capsula.nome %>
                                             </option>
-                                        </select>
-                                    </td>
-                                    <td class="line1 right-line" style="text-align: center;" id="capsula-unidade"
-                                        name="capsula-unidade">
-                                        UN
-                                    </td>
-                                    <td class="line1 number right-line" id="capsula-quantidade"
-                                        style="text-align: center;" id="capsula-quantidade" name="capsula-quantidade">
-                                        <%= formatNumber(capsula.quantidade) %>
-                                    </td>
-                                    <td class="line1 number right-line" id="capsula-contem" style="text-align: center;"
-                                        name="capsula-contem">
-                                        <%= formatNumber(capsula.contem) %>
-                                    </td>
-                                    <td id="preco-capsula" class="line1 price-table-value">R$ <%=
-                                            formatNumber(capsula.preco) %>
-                                    </td>
-                                    <% }) %>
+                                            <% }) %>
+                                    </select>
+                                </td>
+                                <td class="line1 right-line" style="text-align: center;" id="capsula-unidade"
+                                    name="capsula-unidade">
+                                    UN
+                                </td>
+                                <td class="line1 number right-line" id="capsula-quantidade" style="text-align: center;"
+                                    id="capsula-quantidade" name="capsula-quantidade">
+                                    <%= formatNumber(orcamento.capsulas.quantidade) %>
+                                </td>
+                                <td class="line1 number right-line" id="capsula-contem" style="text-align: center;"
+                                    name="capsula-contem">
+                                    <%= formatNumber(orcamento.capsulas.contem) %>
+                                </td>
+                                <td id="preco-capsula" class="line1 price-table-value">
+                                    <%= "preco" in orcamento.capsulas.opcoes[0] ? `R$
+                                        ${formatNumber(orcamento.capsulas.opcoes[0].preco, true)}` : 'R$ 0,00' %>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -196,12 +198,14 @@
                     <div class="total-section">
                         <div class="total-row">
                             <span>Custo Fixo</span>
-                            <span id="preco-custo-fixo" class="number">R$ <%= formatNumber(orcamento.custoFixo) %>
+                            <span id="preco-custo-fixo" class="number">R$ <%= formatNumber(orcamento.custoFixo, true) %>
                             </span>
                         </div>
                         <div class="total-row">
                             <span>Total</span>
-                            <span id="total-preco" class="number">R$ 0,00</span>
+                            <span id="total-preco-<%= indexOrcamento %>" class="number">R$ <%=
+                                    formatNumber(orcamento.precoTotal[0], true) %>
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -209,9 +213,17 @@
                     <div class="button-container">
                         <button id="edit_orcamento" class="submit-button">EDITAR</button>
                     </div>
+                    <!-- <div class="button-container">
+                        <button id="save_orcamento" class="submit-button">GERAR PDF</button>
+                    </div> -->
         </div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
         <script src="/scripts/orcamento.js"></script>
         <script src="/scripts/utils.js"></script>
+        <script>
+            const orcamento = '<%- JSON.stringify(orcamentos_edited.orcamentos_edited) %>';
+        </script>
 </body>
 
 </html>
