@@ -144,8 +144,8 @@ def extract_prescription_route(orcamentos: list[Orcamento]):
                 'quantidade': orcamento.embalagem['quantidade'],
                 'preco': 0.0,
             }
-            result['excipiente']['nome'] = orcamento.excipiente['nome']
-            result['capsula']['tipo'] = orcamento.capsula['tipo']
+            result['excipiente']['nome'] = orcamento.excipiente['nome'] if 'nome' in orcamento.excipiente else ''
+            result['capsula']['tipo'] = orcamento.capsula['tipo'] if 'tipo' in orcamento.capsula else ''
             results.append(result)
         except:
             print("Error parsing orcamento from orcamento adjusted")
