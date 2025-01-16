@@ -44,7 +44,9 @@ class orcamentoClass(BaseModel):
         self.nome_formula = orcamento_values['nome_formula']
 
         self.calc_price_ativos()
-        self.choose_capsule(orcamento_values['capsula']['tipo'])
+        self.choose_capsule(
+            orcamento_values['capsula']['tipo'] if 'tipo' in orcamento_values['capsula'] else ''
+        )
         self.choose_excipiente(orcamento_values)
         self.choose_embalagem(orcamento_values)
 
@@ -69,7 +71,7 @@ class orcamentoClass(BaseModel):
                 'quantidade': self.excipiente.orcamento.quantity,
                 'preco': self.excipiente.orcamento.price,
             },
-            'capsulas': [],
+            'capsulas': {},
             'custoFixo': self.get_custo_fixo(),
             'nomeFormula': self.nome_formula,
         }
@@ -88,25 +90,34 @@ class orcamentoClass(BaseModel):
                 }
             )
             total_price += ativo.orcamento.price
-        
-        total_price += orcamento['custoFixo'] + orcamento['embalagem']['preco'] + orcamento['excipiente']['preco']
+
+        total_price += (
+            orcamento['custoFixo']
+            + orcamento['embalagem']['preco']
+            + orcamento['excipiente']['preco']
+        )
         min_price = self.get_custo_minimo()
         price_per_capsule = []
+        opcoes_capsula = []
         for capsula in self.capsulas:
-            orcamento['capsulas'].append(
+            opcoes_capsula.append(
                 {
-                    'tipo': capsula.type,
                     'nome': capsula.name,
-                    'quantidade': self.dosagem,
-                    'contem': self.number_of_capsule,
                     'preco': capsula.orcamento.price,
                 }
             )
+            orcamento['capsulas'] = {
+                'tipo': capsula.type,
+                'quantidade': self.dosagem,
+                'contem': self.number_of_capsule,
+            }
             total_price_per_capsule = total_price + capsula.orcamento.price
             if total_price_per_capsule < min_price:
                 price_per_capsule.append(min_price)
             else:
                 price_per_capsule.append(total_price_per_capsule)
+        orcamento['capsulas']['opcoes'] = opcoes_capsula
+
         if len(price_per_capsule) > 0:
             orcamento['precoTotal'] = price_per_capsule
         else:
@@ -114,7 +125,7 @@ class orcamentoClass(BaseModel):
                 orcamento['precoTotal'] = [min_price]
             else:
                 orcamento['precoTotal'] = [total_price]
-            
+        
         return orcamento
 
     def calc_price_ativos(self):
@@ -135,6 +146,27 @@ class orcamentoClass(BaseModel):
 
     def choose_capsule(self, capsule_type):
         if capsule_type == '':
+            capsule = capsuleClass(
+                '',
+                '',
+                '0',
+                '0',
+                '0',
+                '',
+                {
+                    'PRVEN': 0,
+                    'EQUIV': 0,
+                    'DILUICAO': 0,
+                    'DENSIDADE': 0,
+                    'ARGUMENTO': 0,
+                },
+            )
+            capsule.set_orcamento_values(
+                0,
+                'UN',
+            )
+            utils.calc_price(capsule, self.forma_farmaceutica, self.dosagem)
+            self.capsulas.append(capsule)
             return
         df_capsule = pd.read_csv(
             '../orcamento_tables/smart/capsulas_FCerta_SMART_2024.csv'
@@ -164,7 +196,6 @@ class orcamentoClass(BaseModel):
                     self.number_of_capsule = number_of_capsule
                     utils.calc_price(capsule, self.forma_farmaceutica, self.dosagem)
                     self.capsulas.append(capsule)
-                    break
 
     def get_excipiente_qnt_price(self):
         self.excipiente.orcamento = ativoOrcamentoClass(
@@ -195,7 +226,7 @@ class orcamentoClass(BaseModel):
 
     def choose_excipiente(self, orcamento_values):
         self.excipiente = excipientClass(
-            orcamento_values['excipiente']['nome'],
+            orcamento_values['excipiente']['nome'] if 'nome' in orcamento_values['excipiente'] else '',
         )
         self.excipiente.get_excipiente(
             orcamento_values['sub_forma_farmaceutica'],
