@@ -1,3 +1,120 @@
+window.onload = () => {
+    updateCapsulaTable();
+};
+
+function updateCapsulaTable() {
+    capsula_tables = document.querySelectorAll('table[id^="capsula-table-"]');
+    capsula_tables.forEach((table, index) => {
+        if (table.id.match(/(\d+)/)[1] != '1') {
+            table.remove();
+            document.getElementById("excipiente-table-" + index).remove();
+        }
+    });
+}
+
+function createExcipienteTable(indexOrcamento) {
+    const orcamento = JSON.parse(orcamentosEdited)[0];
+    var datalistExcipientes = orcamento.excipientes;
+    datalistExcipientes.shift();
+    datalistExcipientes = datalistExcipientes
+        .map(excipiente => `<option value="${excipiente}">${excipiente}</option>`)
+        .join("");
+    var excepienteTable = `
+    <table id="excipiente-table-<%=indexOrcamento %>">
+        <thead>
+            <tr>
+                <th class="line1 right-line" style="width: 604px;">Excipiente</th>
+                <th class="line1 right-line" style="width: 180px; text-align: center;">Unidade</th>
+                <th class="line1 right-line" style="width: 150px; text-align: center;">Quantidade</th>
+                <th class="price-table-title">Preço</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr id="excipiente">
+                <td class="line1 right-line">
+                    <datalist name="excipientes" id="excipientes">
+                        ${datalistExcipientes}
+                    </datalist>
+                    <input id="excipiente-nome" autoComplete="on" list="excipientes" size="50"
+                        value="" />
+                </td>
+                <td class="line1 right-line" id="excipiente-unidade" style="text-align: center;">
+                    UN
+                </td>
+                <td class="number line1 right-line" id="excipiente-quantidade"
+                    style="text-align: center;">
+                    -
+                </td>
+                <td id="preco-excipiente" class="line1 price-table-value">
+                    R$ 0,00
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    `
+    const newExcipienteTable = document.createElement("div");
+    newExcipienteTable.id = "excipiente-table-" + (indexOrcamento);
+    newExcipienteTable.innerHTML = excepienteTable;
+    document.querySelector(`table[id="embalagem-table-${indexOrcamento}"`).after(newExcipienteTable);
+}
+
+function createCapsuleTable(indexOrcamento) {
+    const orcamento = JSON.parse(orcamentosEdited)[0];
+    var listCapsulas = orcamento.tipoCapsulas;
+    listCapsulas.shift();
+    listCapsulas = listCapsulas
+        .map(capsula => `<option value="${capsula}">${capsula}</option>`)
+        .join("");
+    var unidades = orcamento.unidades.capsula;
+    unidades.shift();
+    unidades = unidades
+        .map(unidade => `<option value="${unidade}">${unidade}</option>`)
+        .join("");
+    var capsuleTable = `
+    <!-- Capsule Information -->
+    <table id="capsula-table-<%=indexOrcamento %>">
+        <thead>
+            <tr>
+                <th class="line1 right-line" style="width: 304px;">Tipo Cápsula</th>
+                <th class="line1 right-line" style="width: 300px; text-align: center;">Cápsula</th>
+                <th class="line1 right-line" style="width: 180px; text-align: center;">Unidade</th>
+                <th class="line1 right-line" style="width: 150px; text-align: center;">Quantidade</th>
+                <th class="line1 right-line" style="text-align: center;">Contém</th>
+                <th class="price-table-title">Preço</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr id="capsula">
+                <td class="required line1 right-line">
+                    <select id="capsula-tipo" name="capsula-tipo">
+                        ${listCapsulas}
+                    </select>
+                </td>
+                <td class="line1 right-line" style="text-align: center;">-</td>
+                <td class="line1 right-line" style="text-align: center;">
+                    <select id="capsula-unidade" name="capsula-unidade">
+                        ${unidades}
+                    </select>
+                <td class="line1 number right-line" id="capsula-quantidade" style="text-align: center;">
+                    -
+                </td>
+                <td class="line1 number right-line" id="capsula-contem" name="capsula-contem"
+                    style="text-align: center;">
+                    -
+                </td>
+                <td id="preco-capsula" class="line1 price-table-value">
+                    R$ 0,00
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    `
+    const newCapsuleTable = document.createElement("div");
+    newCapsuleTable.id = "capsula-table-" + (indexOrcamento);
+    newCapsuleTable.innerHTML = capsuleTable;
+    document.querySelector(`table[id="embalagem-table-${indexOrcamento}"`).after(newCapsuleTable);
+}
+
 function updateSubgrupoDropdown(indexOrcamento) {
     const formaFarmaceutica = document.getElementById('forma-farmaceutica-' + indexOrcamento).value;
     const subgrupoDropdown = document.getElementById('forma-farmaceutica-subgrupo-' + indexOrcamento);
@@ -14,6 +131,14 @@ function updateSubgrupoDropdown(indexOrcamento) {
         }
         subgrupoDropdown.appendChild(option);
     });
+
+    if (formaFarmaceutica.match(/(\d+)/)[1] == '1' && document.getElementById(`excipiente-table-${indexOrcamento}`) == null) {
+        createCapsuleTable(indexOrcamento);
+        createExcipienteTable(indexOrcamento);
+    } else if (formaFarmaceutica.match(/(\d+)/)[1] != '1' && document.getElementById(`excipiente-table-${indexOrcamento}`) != null) {
+        document.getElementById(`capsula-table-${indexOrcamento}`).remove();
+        document.getElementById(`excipiente-table-${indexOrcamento}`).remove();
+    }
 }
 
 function parse_orcamento_editted() {
@@ -179,8 +304,15 @@ function addCounterOrcamentoEdited() {
     orcamentoEditado = sessionStorage.getItem('orcamentoEditado');
 }
 
-function subCounterOrcamentoEdited() {
+function subCounterOrcamentoEdited(index) {
     var orcamentoEditado = sessionStorage.getItem('orcamentoEditado');
+    var indexOrcamentoEditado = sessionStorage.getItem('indexOrcamentoEditado');
+    if (indexOrcamentoEditado == null) {
+        sessionStorage.setItem('indexOrcamentoEditado', `${index}`)
+    } else {
+        sessionStorage.setItem('indexOrcamentoEditado', `${indexOrcamentoEditado},${index}`)
+    }
+
     if (orcamentoEditado == null) {
         return;
     } else if (orcamentoEditado == 1) {
@@ -203,7 +335,7 @@ function addFormula() {
         `;
     }
     var formaFarmaceuticaAll = '';
-    orcamentos["formaFarmaceuticaAll"].forEach(function (forma) {
+    orcamentos["formaFarmaceuticaAll"].sort().forEach(function (forma) {
         formaFarmaceuticaAll += `<option value="${forma}">${forma}</option>
         `;
     });
@@ -303,7 +435,7 @@ function addFormula() {
     </table>
 
     <!-- Packaging Information -->
-    <table>
+    <table id="embalagem-table-${index}">
         <thead>
             <tr class="header-row">
                 <th class="line1 right-line" style="width: 604px;">Embalagem</th>
@@ -333,7 +465,7 @@ function addFormula() {
     </table>
 
     <!-- Additional Details -->
-    <table>
+    <table id="excipiente-table-${index}">
         <thead>
             <tr>
                 <th class="line1 right-line" style="width: 604px;">Excipiente</th>
@@ -366,7 +498,7 @@ function addFormula() {
     </table>
 
     <!-- Capsule Information -->
-    <table>
+    <table id="capsula-table-${index}">
         <thead>
             <tr>
                 <th class="line1 right-line" style="width: 304px;">Tipo Cápsula</th>
@@ -380,7 +512,7 @@ function addFormula() {
         <tbody>
             <tr id="capsula">
                 <td class="required line1 right-line">
-                    <select id="capsula-tipo" name="capsula-tipo" onchange="updateCapsulaDropdown()">
+                    <select id="capsula-tipo" name="capsula-tipo">
                         ${tipoCapsulas}
                     </select>
                 </td>
@@ -420,7 +552,7 @@ function addFormula() {
 
 function removeFormula(index) {
     document.querySelector('div[id="orcamento-' + index + '"]').remove();
-    subCounterOrcamentoEdited()
+    subCounterOrcamentoEdited(index)
 }
 
 function addAtivo(index) {

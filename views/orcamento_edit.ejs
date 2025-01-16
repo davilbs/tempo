@@ -127,7 +127,7 @@
                     </table>
 
                     <!-- Packaging Information -->
-                    <table>
+                    <table id="embalagem-table-<%=indexOrcamento %>">
                         <thead>
                             <tr class="header-row">
                                 <th class="line1 right-line" style="width: 604px;">Embalagem</th>
@@ -162,7 +162,7 @@
                     </table>
 
                     <!-- Additional Details -->
-                    <table>
+                    <table id="excipiente-table-<%=indexOrcamento %>">
                         <thead>
                             <tr>
                                 <th class="line1 right-line" style="width: 604px;">Excipiente</th>
@@ -201,7 +201,7 @@
                     </table>
 
                     <!-- Capsule Information -->
-                    <table>
+                    <table id="capsula-table-<%=indexOrcamento %>">
                         <thead>
                             <tr>
                                 <th class="line1 right-line" style="width: 304px;">Tipo Cápsula</th>
@@ -215,7 +215,7 @@
                         <tbody>
                             <tr id="capsula">
                                 <td class="required line1 right-line">
-                                    <select id="capsula-tipo" name="capsula-tipo" onchange="updateCapsulaDropdown()">
+                                    <select id="capsula-tipo" name="capsula-tipo">
                                         <% orcamento.tipoCapsulas.forEach(function(tipo, index) { %>
                                             <option value="<%= tipo %>" <%=index===0 ? 'selected' : '' %>>
                                                 <%= tipo %>
@@ -271,7 +271,6 @@
     </div>
     <script>
         const formaFarmaceuticaSubgrupoAll = '<%- JSON.stringify(orcamentos_edited.orcamentos_edited[0].formaFarmaceuticaSubgrupoAll) %>';
-        const orcamento = '<%- JSON.stringify(orcamento) %>';
         const orcamentosEdited = '<%- JSON.stringify(orcamentos_edited.orcamentos_edited) %>';
     </script>
     <script src="/scripts/orcamento_edited.js"></script>
